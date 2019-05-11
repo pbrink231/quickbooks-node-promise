@@ -1,0 +1,27 @@
+{
+  "name": "quickbooks-node-promise",
+  "version": "1.0.0",
+  "description": "Used to connect to quickbooks api in promises",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "dependencies": {
+    "csrf": "^3.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "qs": "^6.7.0",
+    "underscore": "^1.9.1",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "npm run dev"
+  },
+  "keywords": [
+    "quickbooks",
+    "node",
+    "promise"
+  ],
+  "author": "Peter Brink",
+  "license": "ISC"
+}
