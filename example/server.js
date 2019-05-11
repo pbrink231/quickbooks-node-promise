@@ -93,8 +93,8 @@ app.get('/quickbooks/refreshtoken', async (req, res) => {
 
   var qbo = new QuickBooks(QBAppconfig, realmID)
 
-  qbo.refreshAccessToken().then(jsonResponse => {
-    res.send(jsonResponse.QueryResponse.Invoice)
+  qbo.refreshAccessToken().then(newToken => {
+    res.send(newToken)
   }).catch(err => {
     console.log('could not run invoices because', err)
     res.send(err)
