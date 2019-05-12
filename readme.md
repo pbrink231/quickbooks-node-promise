@@ -7,6 +7,12 @@ I made this because there is node-quickbooks which is really good but made on ca
 
 #  Setup
 
+Instal with
+
+```
+npm i pbrink231/quickbooks-node-promise --save
+```
+
 There is a default StoreStrategy which uses memory and is internal to the object.  Best to create your own store strategy.
 
 ```javascript
