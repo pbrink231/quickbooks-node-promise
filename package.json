@@ -1,6 +1,6 @@
 {
   "name": "quickbooks-node-promise",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Used to connect to quickbooks api in promises",
   "main": "index.js",
   "directories": {
