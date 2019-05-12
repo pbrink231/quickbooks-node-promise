@@ -466,7 +466,7 @@ module.request = function(context, verb, options, entity) {
       headers: opts.headers
     }
     if (opts.body) {
-      fetchOptions.body = qs.stringify(opts.body)
+      fetchOptions.body = qs.stringify(opts.qs)
     }
 
 
@@ -488,6 +488,68 @@ module.request = function(context, verb, options, entity) {
     })
   })
 }
+
+// **********************  CRUD Api **********************
+module.create = function(context, entityName, entity) {
+  var url = '/' + entityName.toLowerCase()
+  return module.request(context, 'post', {url: url}, entity)
+}
+
+module.read = function(context, entityName, id) {
+  var url = '/' + entityName.toLowerCase()
+  if (id) url = url + '/' + id
+  return module.request(context, 'get', {url: url}, null)
+}
+
+module.update = function(context, entityName, entity) {
+  if (_.isUndefined(entity.Id) ||
+      _.isEmpty(entity.Id + '') ||
+      _.isUndefined(entity.SyncToken) ||
+      _.isEmpty(entity.SyncToken + '')) {
+    if (entityName !== 'exchangerate') {
+      throw new Error(entityName + ' must contain Id and SyncToken fields: ' +
+          util.inspect(entity, {showHidden: false, depth: null}))
+    }
+  }
+  if (! entity.hasOwnProperty('sparse')) {
+    entity.sparse = true
+  }
+  var url = '/' + entityName.toLowerCase() + '?operation=update'
+  var opts = {url: url}
+  if (entity.void && entity.void.toString() === 'true') {
+    opts.qs = { include: 'void' }
+    delete entity.void
+  }
+  module.request(context, 'post', opts, entity)
+}
+
+module.delete = function(context, entityName, idOrEntity) {
+  // requires minimum Id and SyncToken
+  // if passed Id as numeric value then grab entity and send it to delete
+  var url = '/' + entityName.toLowerCase() + '?operation=delete'
+  if (_.isObject(idOrEntity)) {
+    return module.request(context, 'post', {url: url}, idOrEntity)
+  } else {
+    return module.read(context, entityName, idOrEntity).then(entity => {
+      return module.request(context, 'post', {url: url}, entity)
+    })
+  }
+}
+
+module.void = function (context, entityName, idOrEntity) {
+  // requires minimum Id and SyncToken
+  // if passed Id as numeric value then grab entity and send it to delete
+  var url = '/' + entityName.toLowerCase() + '?operation=void'
+  callback = callback || function () { }
+  if (_.isObject(idOrEntity)) {
+    return module.request(context, 'post', { url: url }, idOrEntity)
+  } else {
+    return module.read(context, entityName, idOrEntity).then(entity => {
+      return module.request(context, 'post', { url: url }, entity)
+    })
+  }
+}
+
 
 // **********************  Query Api **********************
 module.query = function(context, entity, criteria) {
@@ -702,19 +764,6 @@ module.pluralize = function(s) {
 }
 
 QuickBooks.prototype.pluralize = module.pluralize
-
-module.unwrap = function(callback, entityName) {
-  if (! callback) return function(err, data) {}
-  return function(err, data) {
-    if (err) {
-      if (callback) callback(err)
-    } else {
-      var name = module.capitalize(entityName)
-      if (callback) callback(err, (data || {})[name] || data)
-    }
-  }
-}
-
 
 /*** API CALLS HERE ***/
 /**
