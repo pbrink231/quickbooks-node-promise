@@ -7,10 +7,15 @@ I made this because there is node-quickbooks which is really good but made on ca
 
 #  Setup
 
-Instal with
+To install or update (for update run the remove command first)
 
 ```
 npm i pbrink231/quickbooks-node-promise --save
+```
+
+To remove
+```
+npm uninstall quickbooks-node-promise
 ```
 
 There is a default StoreStrategy which uses memory and is internal to the object.  Best to create your own store strategy.
