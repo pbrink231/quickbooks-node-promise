@@ -9,7 +9,8 @@
 var uuid    = require('uuid'),
     _       = require('underscore'),
     qs      = require('qs'),
-    jwt     = require('jsonwebtoken')
+    jwt     = require('jsonwebtoken'),
+    fetch   = require('node-fetch'),
     Tokens  = require('csrf'),
     csrf    = new Tokens()
     // require('rsa-pem-from-mod-exp'); used in method below
@@ -207,19 +208,14 @@ function QuickBooks(appConfig, realmID) {
 
   this.appKey = appConfig.appKey
   this.appSecret = appConfig.appSecret
-  this.useProduction = appConfig.useProduction || false;
+  this.useProduction = (appConfig.useProduction === "true" || appConfig.useProduction === true) ? true : false
   this.minorversion = appConfig.minorversion || 37;
-  this.debug = appConfig.debug || false
+  this.debug = (appConfig.debug === "true" || appConfig.debug === true) ? true : false
   this.storeStrategy = appConfig.storeStrategy || new MemoryStrategy;
 
   this.realmID = realmID
-
-  this.endpoint = this.useProduction
-    ? QuickBooks.V3_ENDPOINT_BASE_URL.replace('sandbox-', '')
-    : QuickBooks.V3_ENDPOINT_BASE_URL
-
+  this.endpoint = this.useProduction ? QuickBooks.V3_ENDPOINT_BASE_URL.replace('sandbox-', '') : QuickBooks.V3_ENDPOINT_BASE_URL
   console.log('using enpoint', this.endpoint)
-
 }
 
 /**
