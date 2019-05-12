@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
@@ -9,6 +10,66 @@ const port = process.env.PORT || 3000;
 const app = express();
 //app.use(cors('*'));
 
+app.get('/health', (req, res) => {
+  res.sendStatus(200)
+})
+
+const {
+  NODE_ENV,
+  QB_APP_KEY,
+  QB_APP_SECRET,
+  QB_REDIRECT_URL,
+  QB_USE_PROD
+} = process.env;
+
+// for example only, save to a better location
+let realmInfo = {}
+
+
+class QBStoreStrategy {
+  getQBToken({ realmID }) {
+    return new Promise((resolve, reject) => {
+      console.log('realm info', realmInfo[realmID])
+      if (!realmInfo[realmID]) {
+        reject("missing realm informaiton")
+      } else {
+        resolve(realmInfo[realmID])
+      }
+    })
+  }
+  storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
+    return new Promise((resolve) => {
+      realmInfo[realmID] = {
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+        access_expire_timestamp: access_expire_timestamp,
+        refresh_expire_timestamp: refresh_expire_timestamp
+      }
+      console.log('saving realm info', realmInfo[realmID])
+      resolve(realmInfo[realmID])
+    })
+  }
+}
+
+
+// QB config
+QBAppconfig = {
+  appKey: QB_APP_KEY,
+  appSecret: QB_APP_SECRET,
+  redirectUrl: QB_REDIRECT_URL,
+  minorversion: 37, /* default is 37, check for your version in the documents */
+  useProduction: QB_USE_PROD, /* default is false */
+  debug: (NODE_ENV == "production" ? false : true), /* default is false */
+  storeStrategy: new QBStoreStrategy(),
+  scope: [
+    QuickBooks.scopes.Accounting,
+    QuickBooks.scopes.OpenId,
+    QuickBooks.scopes.Profile,
+    QuickBooks.scopes.Email,
+    QuickBooks.scopes.Phone,
+    QuickBooks.scopes.Address
+  ]
+}
 
 // --- End points required to get inital token
 // QB requestToken - Used to start the process
