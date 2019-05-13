@@ -7,18 +7,19 @@ I made this because there is node-quickbooks which is really good but made on ca
 
 #  Setup
 
-To install or update (for update run the remove command first)
+**Check the example for node express setup endpoints**
+
+## Install
 
 ```
-npm i pbrink231/quickbooks-node-promise --save
+npm i quickbooks-node-promise
 ```
 
-To remove
-```
-npm uninstall quickbooks-node-promise
-```
 
-There is a default StoreStrategy which uses memory and is internal to the object.  Best to create your own store strategy.
+## Create Store Strategy
+The store strategy is used to save token information and retreive token information.  It returns a promise.
+
+There is a default StoreStrategy which uses memory and is internal to the object.  NOT RECOMMENDED.  Best to create your own store strategy.  likly will remove this default strategy and force to create own.
 
 ```javascript
 class QBStoreStrategy {
@@ -59,7 +60,9 @@ class QBStoreStrategy {
 }
 ```
 
-Also need a config setup
+## Config setup
+
+A config setup is needed for each app.  Some values have defaults but should supply your own
 
 ```javascript
 // QB config
@@ -82,7 +85,7 @@ QBAppconfig = {
 }
 ```
 
-Available scopes are:
+### Scopes available:
 
 ```javascript
 QuickBooks.scopes = {
