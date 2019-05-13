@@ -157,8 +157,12 @@ QuickBooks.createToken = function(appConfig, authCode, realmID) {
  * @returns {boolean}
  */
 QuickBooks._dateNotExpired = function(expired_timestamp) {
-  let dateToCheck = Date.parse(expired_timestamp) - QuickBooks.EXPIRATION_BUFFER
-  console.log('token minutes left', (dateToCheck - Date.now()) / (1000 * 60))
+  let dateToCheck = null
+  if (typeof expired_timestamp == "date") { dateToCheck = expired_timestamp }
+  if (typeof expired_timestamp == "number") { dateToCheck = new Date(expired_timestamp) }
+  if (typeof expired_timestamp == "string") { dateToCheck = Date.parse(expired_timestamp) }
+  // use buffer on time
+  dateToCheck = dateToCheck - QuickBooks.EXPIRATION_BUFFER
   return (dateToCheck > Date.now());
 }
 
@@ -225,7 +229,7 @@ function QuickBooks(appConfig, realmID) {
  * @param {object} info - the realmID and token to send to store area
  */
 QuickBooks.saveToken = function(storeStrategy, info) {
-  // Get expire date
+  // Get expired dates
   let extraInfo = {
     access_expire_timestamp: Date.now() + (info.token.expires_in * 1000),
     refresh_expire_timestamp: Date.now() + (info.token.x_refresh_token_expires_in * 1000)
@@ -239,7 +243,7 @@ QuickBooks.saveToken = function(storeStrategy, info) {
  * @param {object} token - the token to send to store area
  */
 QuickBooks.prototype.saveToken = function(token) {
-  return QuickBooks.saveToken(this.storeStrategy, { realmID: this.realmID, token, access_expire, refresh_expire })
+  return QuickBooks.saveToken(this.storeStrategy, { realmID: this.realmID, token })
 }
 
 
@@ -269,6 +273,7 @@ QuickBooks.prototype.getToken = function() {
  */
 QuickBooks.prototype.refreshWithAccessToken = function(token) {
   if (!token.refresh_token) throw Error("Refresh Token missing")
+  console.log("Refreshing quickbooks access_token")
 
   var auth = (new Buffer(this.appKey + ':' + this.appSecret).toString('base64'));
 
