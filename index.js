@@ -52,60 +52,22 @@ QuickBooks.scopes = {
 
 module.exports = QuickBooks
 
-/**
- * Used as the default store.  keeps the token in the object memory
- * 2 Added fields on saving and returning
- * access_expire_timestamp, refresh_expire_timestamp
- * Used to determine if token is expired.  If not returned will refresh token on each call
- */
-class MemoryStrategy {
-  getQBToken({ realmID }) {
-    if (!this.tokeninfo || !this.tokenStore[realmID]) throw Error("token information is missing")
-    return this.tokenStore[realmID]
-    /*    
-    return new Promise((resolve, reject) => {
-      resolve(this.tokeninfo)
-    })
-    */
-  }
-  storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
-    if (!token) throw Error("Token is not set");
-    if (!this.tokenStore) { this.tokenStore = {} }
-
-    this.tokenStore[realmID] = token
-    this.tokenStore[realmID].access_expire_timestamp = access_expire_timestamp
-    this.tokenStore[realmID].refresh_expire_timestamp = refresh_expire_timestamp
-
-    return this.tokenStore[realmID]
-    /*
-    return new Promise((resolve, reject) => {
-      this.tokeninfo = token
-      this.tokeninfo.access_expire_timestamp = access_expire_timestamp
-      this.tokeninfo.refresh_expire_timestamp = refresh_expire_timestamp
-      resolve(this.tokeninfo)
-    })
-    */
-  }
-}
-
 function checkConfig(appConfig) {
   if (!appConfig.appKey) throw new Error("appKey is missing")
   if (!appConfig.appSecret) throw new Error("appScret is missing")
   if (!appConfig.redirectUrl) throw new Error("RedirectUrl is missing")
   if (!appConfig.scope) throw new Error("scope is missing")
+  if (!appConfig.storeStrategy) throw new Error("storeStrategy is missing")
 }
 
 
 /**
- * Redirect  User to Authorization Page
- * @param appKey - String - Key of your Quickbook App
- * @param redirectUrl - String - Must match one or your redirect urls in your app
- * @param scope - Array or String - List of scopes asking for when authenticating
+ * Redirect link to Authorization Page
+ * @param {object} appConfig The config for your app
  * @returns {string} authorize Uri
  */
 QuickBooks.authorizeUrl = function(appConfig) {
   checkConfig(appConfig)
-  //if(!appConfig.appKey || !appConfig.redirectUrl || !appConfig.scope) throw new Error('Provide the scopes');
 
   let scopes = (Array.isArray(appConfig.scope)) ? appConfig.scope.join(' ') : appConfig.scope
   let authorizeUri = QuickBooks.AUTHORIZATION_URL +
@@ -118,7 +80,21 @@ QuickBooks.authorizeUrl = function(appConfig) {
   //this.log('info','The Authorize Uri is :',authorizeUri);
   return authorizeUri;
 }
+/**
+ * Redirect link to Authorization Page
+ * @returns {string} authorize Uri
+ */
+QuickBooks.prototype.authorizeUrl = function() {
+  return QuickBooks.authorizeUrl(this.config);
+}
 
+/**
+ * Creates new token for the realmID from the returned authorization code received in the callback request
+ * @param {object} appConfig The config for your app
+ * @param {string} authCode The code returned in your callback as a param called "code"
+ * @param {number} realmID The company identifier in your callback as a param called "realmId"
+ * @returns {object} new token with expiration dates from storeStrategy
+ */
 QuickBooks.createToken = function(appConfig, authCode, realmID) {
   checkConfig(appConfig);
 
@@ -152,13 +128,23 @@ QuickBooks.createToken = function(appConfig, authCode, realmID) {
 }
 
 /**
+ * Creates new token for the realmID from the returned authorization code received in the callback request
+ * @param {string} authCode The code returned in your callback as a param called "code"
+ * @param {number} realmID The company identifier in your callback as a param called "realmId"
+ * @returns {object} new token with expiration dates from storeStrategy
+ */
+QuickBooks.prototype.createToken = function(authCode, realmID) {
+  return QuickBooks.createToken(this.config, authCode, realmID)
+}
+
+/**
  * Helper Method to check token expiry { set Token Object }
- * @param seconds
+ * @param  {object|number|string} expired_timestamp - JS Date object, JS Date milliseconds, or string in ISO 8601 - when token expires
  * @returns {boolean}
  */
 QuickBooks._dateNotExpired = function(expired_timestamp) {
   let dateToCheck = null
-  if (typeof expired_timestamp == "date") { dateToCheck = expired_timestamp }
+  if (typeof expired_timestamp == "object") { dateToCheck = expired_timestamp }
   if (typeof expired_timestamp == "number") { dateToCheck = new Date(expired_timestamp) }
   if (typeof expired_timestamp == "string") { dateToCheck = Date.parse(expired_timestamp) }
   // use buffer on time
@@ -168,11 +154,12 @@ QuickBooks._dateNotExpired = function(expired_timestamp) {
 
 /**
 * Check if access_token is valid
-* @returns {boolean}
+* @param {object} token returned from storeStrategy
+* @return {boolean} token has expired or not
 */
 QuickBooks.isAccessTokenValid = function(token) {
   if (!token.access_expire_timestamp) {
-    console.log("Access Token expire date missing, assuming invalid")
+    console.log("Access Token expire date MISSING, ASSUMING EXPIRED")
     return false;
   } else {
     return QuickBooks._dateNotExpired(token.access_expire_timestamp);
@@ -181,11 +168,12 @@ QuickBooks.isAccessTokenValid = function(token) {
 
 /**
 * Check if there is a valid (not expired) access token
-* @return {boolean}
+* @param {object} token returned from storeStrategy
+* @return {boolean} token has expired or not
 */
 QuickBooks.isRefreshTokenValid = function(token) {
   if (!token.refresh_expire_timestamp) {
-    console.log("Refresh Token expire date missing, assuming valid")
+    console.log("Refresh Token expire date MISSING, ASSUMING NOT EXPIRED")
     return true;
   } else {
     return QuickBooks._dateNotExpired(token.refresh_expire_timestamp);
@@ -195,7 +183,7 @@ QuickBooks.isRefreshTokenValid = function(token) {
 
 /**
  * Node.js client encapsulating access to the QuickBooks V3 Rest API. An instance
- * of this class should be instantiated on behalf of each user accessing the api.
+ * of this class should be instantiated on behalf of each user and company accessing the api.
  *
  * @param consumerKey - application key
  * @param consumerSecret  - application password
@@ -209,18 +197,24 @@ QuickBooks.isRefreshTokenValid = function(token) {
 function QuickBooks(appConfig, realmID) {
   if (!realmID) throw new Error("realmID is required")
   checkConfig(appConfig)
+  this.config = appConfig
 
   this.appKey = appConfig.appKey
   this.appSecret = appConfig.appSecret
+  this.redirectUrl = appConfig.redirectUrl
+  this.storeStrategy = appConfig.storeStrategy
   this.useProduction = (appConfig.useProduction === "true" || appConfig.useProduction === true) ? true : false
   this.minorversion = appConfig.minorversion || 37;
   this.debug = (appConfig.debug === "true" || appConfig.debug === true) ? true : false
-  this.storeStrategy = appConfig.storeStrategy || new MemoryStrategy;
+  
 
   this.realmID = realmID
   this.endpoint = this.useProduction ? QuickBooks.V3_ENDPOINT_BASE_URL.replace('sandbox-', '') : QuickBooks.V3_ENDPOINT_BASE_URL
-  console.log('using enpoint', this.endpoint)
+  if ('production' !== process.env.NODE_ENV && this.debug) {
+    console.log('using enpoint for calls', this.endpoint)
+  }
 }
+
 
 /**
  * Save token
@@ -272,8 +266,10 @@ QuickBooks.prototype.getToken = function() {
  *
  */
 QuickBooks.prototype.refreshWithAccessToken = function(token) {
+  if ('production' !== process.env.NODE_ENV && this.debug) {
+    console.log("Refreshing quickbooks access_token")
+  }
   if (!token.refresh_token) throw Error("Refresh Token missing")
-  console.log("Refreshing quickbooks access_token")
 
   var auth = (new Buffer(this.appKey + ':' + this.appSecret).toString('base64'));
 
@@ -418,11 +414,9 @@ QuickBooks.prototype.getPublicKey = function(modulus, exponent) {
 
 /*** API HELPER FUNCTIONS  ***/
 module.request = function(context, verb, options, entity) {
-  console.log('requesting')
   return context.getToken().then( async (token) => {
     if (!token.access_token) throw Error("Access Token missing")
     if (!QuickBooks.isAccessTokenValid(token)) {
-      console.log('refreshing token')
       token = await context.refreshWithAccessToken(token);
     }
 
@@ -469,7 +463,6 @@ module.request = function(context, verb, options, entity) {
     if (opts.body) {
       fetchOptions.body = qs.stringify(opts.qs)
     }
-
 
     if ('production' !== process.env.NODE_ENV && context.debug) {
       console.log('invoking endpoint: ' + url)
@@ -614,9 +607,6 @@ module.query = function(context, entity, criteria) {
   }
   url = url.replace('@@', '=')
 
-  console.log('doing the query request')
-
-
   return module.request(context, 'get', {url: url}, null).then((data) => {
     var fields = Object.keys(data.QueryResponse)
     var key = _.find(fields, function(k) { return k.toLowerCase() === entity.toLowerCase()})
@@ -650,7 +640,7 @@ module.report = function(context, reportType, criteria) {
   if (criteria && typeof criteria !== 'function') {
     url += module.reportCriteria(criteria) || ''
   }
-  return module.request(context, 'get', {url: url}, null, typeof criteria === 'function' ? criteria : callback)
+  return module.request(context, 'get', {url: url}, null)
 }
 
 
@@ -766,6 +756,11 @@ module.pluralize = function(s) {
 
 QuickBooks.prototype.pluralize = module.pluralize
 
+module.unwrap = function(data, entityName) {
+  var name = module.capitalize(entityName)
+  return((data || {})[name] || data)
+}
+
 /*** API CALLS HERE ***/
 /**
  * Get user info (OAuth2).
@@ -798,13 +793,19 @@ QuickBooks.prototype.batch = function(items) {
  * The change data capture (CDC) operation returns a list of entities that have changed since a specified time.
  *
  * @param  {object} entities - Comma separated list or JavaScript array of entities to search for changes
- * @param  {object} since - JavaScript Date or string representation of the form '2012-07-20T22:25:51-07:00' to look back for changes until
+ * @param  {object|number|string} since - JS Date object, JS Date milliseconds, or string in ISO 8601 - to look back for changes until
  */
 QuickBooks.prototype.changeDataCapture = function(entities, since) {
+  let dateToCheck = null
+  if (typeof since == "object") { dateToCheck = since }
+  if (typeof since == "number") { dateToCheck = new Date(since) }
+  if (typeof since == "string") { dateToCheck = Date.parse(since) }
+  if (!since) throw Error("since is missing")
+
   var url = '/cdc?entities='
   url += typeof entities === 'string' ? entities : entities.join(',')
   url += '&changedSince='
-  url += typeof since === 'string' ? since : moment(since).format()
+  url += dateToCheck.toISOString()
   return module.request(this, 'get', {url: url}, null)
 }
 
@@ -832,14 +833,16 @@ QuickBooks.prototype.upload = function(filename, contentType, stream, entityType
       }
     }
   }
-  return module.request(this, 'post', opts, null, module.unwrap(function(err, data) {
-    if (err || data[0].Fault) {
-      (callback || entityType)(err || data[0], null)
+  return module.request(this, 'post', opts, null).then(data => {
+    return module.unwrap(data, 'AttachableResponse')
+  }).then(data => {
+    if (data[0].Fault) {
+      return (entityType)(data[0], null)
     } else if (_.isFunction(entityType)) {
-      entityType(null, data[0].Attachable)
+      return entityType(null, data[0].Attachable)
     } else {
       var id = data[0].Attachable.Id
-      that.updateAttachable({
+      return that.updateAttachable({
         Id: id,
         SyncToken: '0',
         AttachableRef: [{
@@ -848,11 +851,9 @@ QuickBooks.prototype.upload = function(filename, contentType, stream, entityType
             value: entityId + ''
           }
         }]
-      }, function(err, data) {
-        callback(err, data)
       })
     }
-  }, 'AttachableResponse'))
+  })
 }
 
 /**
@@ -1251,7 +1252,9 @@ QuickBooks.prototype.sendEstimatePdf = function(id, sendTo) {
   if (sendTo && ! _.isFunction(sendTo)) {
     path += '?sendTo=' + sendTo
   }
-  return module.request(this, 'post', {url: path}, null, module.unwrap(callback, 'Estimate'))
+  return module.request(this, 'post', {url: path}, null).then(data => {
+    return module.unwrap(data, 'Estimate')
+  })
 }
 
 /**
@@ -1285,7 +1288,9 @@ QuickBooks.prototype.sendInvoicePdf = function(id, sendTo) {
   if (sendTo && ! _.isFunction(sendTo)) {
     path += '?sendTo=' + sendTo
   }
-  return module.request(this, 'post', {url: path}, null, module.unwrap(callback, 'Invoice'))
+  return module.request(this, 'post', {url: path}, null).then(data => {
+    return module.unwrap(data, 'Invoice')
+  })
 }
 
 /**
@@ -1408,7 +1413,9 @@ QuickBooks.prototype.sendSalesReceiptPdf = function(id, sendTo) {
   if (sendTo && ! _.isFunction(sendTo)) {
     path += '?sendTo=' + sendTo
   }
-  return module.request(this, 'post', {url: path}, null, module.unwrap(callback, 'SalesReceipt'))
+  return module.request(this, 'post', {url: path}, null).then(data => {
+    return module.unwrap(data, 'SalesReceipt')
+  })
 }
 
 /**
