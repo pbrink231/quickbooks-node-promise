@@ -642,7 +642,7 @@ module.report = function(context, reportType, criteria) {
   if (criteria && typeof criteria !== 'function') {
     url += module.reportCriteria(criteria) || ''
   }
-  return module.request(context, 'get', {url: url}, null, typeof criteria === 'function' ? criteria : callback)
+  return module.request(context, 'get', {url: url}, null)
 }
 
 
@@ -758,6 +758,11 @@ module.pluralize = function(s) {
 
 QuickBooks.prototype.pluralize = module.pluralize
 
+module.unwrap = function(data, entityName) {
+  var name = module.capitalize(entityName)
+  return((data || {})[name] || data)
+}
+
 /*** API CALLS HERE ***/
 /**
  * Get user info (OAuth2).
@@ -830,7 +835,9 @@ QuickBooks.prototype.upload = function(filename, contentType, stream, entityType
       }
     }
   }
-  return module.request(this, 'post', opts, null, module.unwrap(function(err, data) {
+  return module.request(this, 'post', opts, null).then(data => {
+    return module.unwrap(data, entityType)
+  }).then(data => {
     if (err || data[0].Fault) {
       (callback || entityType)(err || data[0], null)
     } else if (_.isFunction(entityType)) {
@@ -1249,7 +1256,9 @@ QuickBooks.prototype.sendEstimatePdf = function(id, sendTo) {
   if (sendTo && ! _.isFunction(sendTo)) {
     path += '?sendTo=' + sendTo
   }
-  return module.request(this, 'post', {url: path}, null, module.unwrap(callback, 'Estimate'))
+  return module.request(this, 'post', {url: path}, null).then(data => {
+    return module.unwrap(data, 'Estimate')
+  })
 }
 
 /**
@@ -1283,7 +1292,9 @@ QuickBooks.prototype.sendInvoicePdf = function(id, sendTo) {
   if (sendTo && ! _.isFunction(sendTo)) {
     path += '?sendTo=' + sendTo
   }
-  return module.request(this, 'post', {url: path}, null, module.unwrap(callback, 'Invoice'))
+  return module.request(this, 'post', {url: path}, null).then(data => {
+    return module.unwrap(data, 'Invoice')
+  })
 }
 
 /**
@@ -1406,7 +1417,9 @@ QuickBooks.prototype.sendSalesReceiptPdf = function(id, sendTo) {
   if (sendTo && ! _.isFunction(sendTo)) {
     path += '?sendTo=' + sendTo
   }
-  return module.request(this, 'post', {url: path}, null, module.unwrap(callback, 'SalesReceipt'))
+  return module.request(this, 'post', {url: path}, null).then(data => {
+    return module.unwrap(data, 'SalesReceipt')
+  })
 }
 
 /**
