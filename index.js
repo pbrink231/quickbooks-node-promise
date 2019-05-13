@@ -836,15 +836,15 @@ QuickBooks.prototype.upload = function(filename, contentType, stream, entityType
     }
   }
   return module.request(this, 'post', opts, null).then(data => {
-    return module.unwrap(data, entityType)
+    return module.unwrap(data, 'AttachableResponse')
   }).then(data => {
-    if (err || data[0].Fault) {
-      (callback || entityType)(err || data[0], null)
+    if (data[0].Fault) {
+      return (entityType)(data[0], null)
     } else if (_.isFunction(entityType)) {
-      entityType(null, data[0].Attachable)
+      return entityType(null, data[0].Attachable)
     } else {
       var id = data[0].Attachable.Id
-      that.updateAttachable({
+      return that.updateAttachable({
         Id: id,
         SyncToken: '0',
         AttachableRef: [{
@@ -853,11 +853,9 @@ QuickBooks.prototype.upload = function(filename, contentType, stream, entityType
             value: entityId + ''
           }
         }]
-      }, function(err, data) {
-        callback(err, data)
       })
     }
-  }, 'AttachableResponse'))
+  })
 }
 
 /**
