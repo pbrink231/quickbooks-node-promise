@@ -16,7 +16,8 @@
   },
   "devDependencies": {
     "dotenv": "^8.0.0",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "jsdoc-to-markdown": "^5.0.0"
   },
   "scripts": {
     "start": "node example/server.js"

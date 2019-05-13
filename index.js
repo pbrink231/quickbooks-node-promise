@@ -185,13 +185,8 @@ QuickBooks.isRefreshTokenValid = function(token) {
  * Node.js client encapsulating access to the QuickBooks V3 Rest API. An instance
  * of this class should be instantiated on behalf of each user and company accessing the api.
  *
- * @param consumerKey - application key
- * @param consumerSecret  - application password
- * @param token - the OAuth generated user-specific key
+ * @param appConfig - application information
  * @param realmID - QuickBooks companyId, returned as a request parameter when the user is redirected to the provided callback URL following authentication
- * @param useProduction - boolean - See https://developer.intuit.com/v2/blog/2014/10/24/intuit-developer-now-offers-quickbooks-sandboxes
- * @param debug - boolean flag to turn on logging of HTTP requests, including headers and body
- * @param minorversion - integer to set minorversion in request
  * @constructor
  */
 function QuickBooks(appConfig, realmID) {
@@ -760,6 +755,9 @@ module.unwrap = function(data, entityName) {
   var name = module.capitalize(entityName)
   return((data || {})[name] || data)
 }
+
+
+
 
 /*** API CALLS HERE ***/
 /**
