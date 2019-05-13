@@ -139,7 +139,7 @@ QuickBooks.prototype.createToken = function(authCode, realmID) {
 
 /**
  * Helper Method to check token expiry { set Token Object }
- * @param expired_timestamp could be Date, Number or String.  if string uses Date.parse()
+ * @param  {object|number|string} expired_timestamp - JS Date object, JS Date milliseconds, or string in ISO 8601 - when token expires
  * @returns {boolean}
  */
 QuickBooks._dateNotExpired = function(expired_timestamp) {
@@ -790,13 +790,19 @@ QuickBooks.prototype.batch = function(items) {
  * The change data capture (CDC) operation returns a list of entities that have changed since a specified time.
  *
  * @param  {object} entities - Comma separated list or JavaScript array of entities to search for changes
- * @param  {object} since - JavaScript Date or string representation of the form '2012-07-20T22:25:51-07:00' to look back for changes until
+ * @param  {object|number|string} since - JS Date object, JS Date milliseconds, or string in ISO 8601 - to look back for changes until
  */
 QuickBooks.prototype.changeDataCapture = function(entities, since) {
+  let dateToCheck = null
+  if (typeof since == "object") { dateToCheck = since }
+  if (typeof since == "number") { dateToCheck = new Date(since) }
+  if (typeof since == "string") { dateToCheck = Date.parse(since) }
+  if (!since) throw Error("since is missing")
+
   var url = '/cdc?entities='
   url += typeof entities === 'string' ? entities : entities.join(',')
   url += '&changedSince='
-  url += typeof since === 'string' ? since : moment(since).format()
+  url += dateToCheck.toISOString()
   return module.request(this, 'get', {url: url}, null)
 }
 
