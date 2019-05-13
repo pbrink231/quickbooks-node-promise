@@ -19,43 +19,61 @@ npm i quickbooks-node-promise
 ## Create Store Strategy
 The store strategy is used to save token information and retreive token information.  It returns a promise.
 
-There is a default StoreStrategy which uses memory and is internal to the object.  NOT RECOMMENDED.  Best to create your own store strategy.  likly will remove this default strategy and force to create own.
-
 ```javascript
 class QBStoreStrategy {
+  /**
+   * Uses a realmID to lookup the token information.
+   * Should return back in an object
+   * 
+   * @param {number} realmID the quickbooks companyID
+   * @returns {object} Promise
+   */
   getQBToken({ realmID }) {
-    /**
-     * Uses a realmID to lookup the token information.
-     * Should return back in an object
-     * let token = {
-     *  access_token
-     *  refresh_token              // This should be securely stored
-     *  access_expire_timestamp    // Datetime when the access token expires - if not returned assumed bad for each request
-     *  refresh_expire_timestamp   // Datetime when the refresh token expires - if not returned assumed good for each request
-     *  ID token                   // (Optional) Used for OpenID information
-     * }
-     */
-    return token  // includes the access_expire_timestamp & refresh_expire_timestamp
-  }
-  storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
-    /**
-     * Used to store the new token information
-     * Will be looked up using the realmID
-     * 
-     * realmID - Big Integer - the quickbooks companyID
-     * token - {
-     *  refresh_token
-     *  access_token
-     *  expires_in                    // access_token expire time in seconds, 3600 usually
-     *  x_refresh_token_expires_in    // refresh_token expire time in seconds
-     *  id_token                      // (sometimes) - OpenID user token - sent only on original access, not included after refresh token
-     *  token_type                    // usually "Bearer"
-     * }
-     * access_expire_timestamp        // datetime when the access_token expires, calculated from expires_in
-     * refresh_expire_timestamp       // datetime when the refresh_token expires, calculated from x_refresh_token_expires_in
-     */
+    return new Promise((resolve) => {
+      // Get token infomraiton using realmID here
 
-    return token  // includes the access_expire_timestamp & refresh_expire_timestamp
+      // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
+      let newToken = {
+        access_token: my_access_token,
+        refresh_token: my_refresh_token,
+        access_expire_timestamp: my_access_expire_timestamp,
+        refresh_expire_timestamp: my_access_expire_timestamp,
+        id_token: my_id_token // (Optional) Used only for user OpenID verification
+      }
+      resolve(newToken)
+    })
+  }
+
+  /**
+   * Used to store the new token information
+   * Will be looked up using the realmID   
+   * 
+   * @param {number} realmID the quickbooks companyID
+   * @param {object} token
+   * @param {string} token.access_token used to access quickbooks resource
+   * @param {string} token.refresh_token This should be securely stored
+   * @param {number} token.expires_in access_token expire time in seconds, 3600 usually
+   * @param {number} token.x_refresh_token_expires_in refresh_token expire time in seconds.  does not always renew on fresh
+   * @param {string} token.id_token (Optional) OpenID user token - sent only on original access, not included in refresh token
+   * @param {string} token.token_type This will be "Bearer"
+   * @param {object} access_expire_timestamp JS Date object when the access_token expires, calculated from expires_in
+   * @param {object} refresh_expire_timestamp JS Date object when the refresh_token expires, calculated from x_refresh_token_expires_in
+   * @returns {object} Promise
+   */
+  storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
+    return new Promise((resolve) => {
+      // Store information to DB or your location here now
+
+      // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
+      let newToken = {
+        access_token: my_access_token,
+        refresh_token: my_refresh_token,
+        access_expire_timestamp: my_access_expire_timestamp,
+        refresh_expire_timestamp: my_access_expire_timestamp,
+        id_token: my_id_token // (Optional) Used only for user OpenID verification
+      }
+      resolve(newToken)
+    })
   }
 }
 ```
