@@ -159,7 +159,7 @@ QuickBooks._dateNotExpired = function(expired_timestamp) {
 */
 QuickBooks.isAccessTokenValid = function(token) {
   if (!token.access_expire_timestamp) {
-    console.log("Access Token expire date missing, assuming invalid")
+    console.log("Access Token expire date MISSING, ASSUMING EXPIRED")
     return false;
   } else {
     return QuickBooks._dateNotExpired(token.access_expire_timestamp);
@@ -173,7 +173,7 @@ QuickBooks.isAccessTokenValid = function(token) {
 */
 QuickBooks.isRefreshTokenValid = function(token) {
   if (!token.refresh_expire_timestamp) {
-    console.log("Refresh Token expire date missing, assuming valid")
+    console.log("Refresh Token expire date MISSING, ASSUMING NOT EXPIRED")
     return true;
   } else {
     return QuickBooks._dateNotExpired(token.refresh_expire_timestamp);
@@ -210,7 +210,9 @@ function QuickBooks(appConfig, realmID) {
 
   this.realmID = realmID
   this.endpoint = this.useProduction ? QuickBooks.V3_ENDPOINT_BASE_URL.replace('sandbox-', '') : QuickBooks.V3_ENDPOINT_BASE_URL
-  console.log('using enpoint', this.endpoint)
+  if ('production' !== process.env.NODE_ENV && this.debug) {
+    console.log('using enpoint for calls', this.endpoint)
+  }
 }
 
 
@@ -264,8 +266,10 @@ QuickBooks.prototype.getToken = function() {
  *
  */
 QuickBooks.prototype.refreshWithAccessToken = function(token) {
+  if ('production' !== process.env.NODE_ENV && this.debug) {
+    console.log("Refreshing quickbooks access_token")
+  }
   if (!token.refresh_token) throw Error("Refresh Token missing")
-  console.log("Refreshing quickbooks access_token")
 
   var auth = (new Buffer(this.appKey + ':' + this.appSecret).toString('base64'));
 
@@ -410,11 +414,9 @@ QuickBooks.prototype.getPublicKey = function(modulus, exponent) {
 
 /*** API HELPER FUNCTIONS  ***/
 module.request = function(context, verb, options, entity) {
-  console.log('requesting')
   return context.getToken().then( async (token) => {
     if (!token.access_token) throw Error("Access Token missing")
     if (!QuickBooks.isAccessTokenValid(token)) {
-      console.log('refreshing token')
       token = await context.refreshWithAccessToken(token);
     }
 
@@ -461,7 +463,6 @@ module.request = function(context, verb, options, entity) {
     if (opts.body) {
       fetchOptions.body = qs.stringify(opts.qs)
     }
-
 
     if ('production' !== process.env.NODE_ENV && context.debug) {
       console.log('invoking endpoint: ' + url)
@@ -605,9 +606,6 @@ module.query = function(context, entity, criteria) {
              .replace(/\+/g, '%2B')
   }
   url = url.replace('@@', '=')
-
-  console.log('doing the query request')
-
 
   return module.request(context, 'get', {url: url}, null).then((data) => {
     var fields = Object.keys(data.QueryResponse)
