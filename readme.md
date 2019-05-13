@@ -1,9 +1,17 @@
-# This is still early so use with caution
+# Overview
 
-## Overview
+This library was created for Quickbooks OAuth2.  It converted a lot of node-quickbooks into promises.
 
-I made this because there is node-quickbooks which is really good but made on callbacks and I didnt want to get into that.  I also wanted to auto refresh the tokens on calls since access_tokens only last 60 minutes.
+Will handle the authentication and auto renew Access Tokens when they are expired.
 
+## Example grabbing resource
+```javascript
+const QuickBooks = require("quickbooks-node-promise");
+const qbo = new QuickBooks(appConfig, realmID);
+const customers = await qbo.findCustomers({ Id: "1234" });
+const customer = customer.QueryResponse.Customer[0]
+console.log(`Hi my customer's name is ${customer.Name}`)
+```
 
 #  Setup
 
@@ -15,9 +23,8 @@ I made this because there is node-quickbooks which is really good but made on ca
 npm i quickbooks-node-promise
 ```
 
-
 ## Create Store Strategy
-The store strategy is used to save token information and retreive token information.  It returns a promise.
+The store strategy is used to Save and Retreive token information.  Both methods return a promise.
 
 ```javascript
 class QBStoreStrategy {
@@ -37,7 +44,7 @@ class QBStoreStrategy {
         access_token: my_access_token,
         refresh_token: my_refresh_token,
         access_expire_timestamp: my_access_expire_timestamp,
-        refresh_expire_timestamp: my_access_expire_timestamp,
+        refresh_expire_timestamp: my_refresh_expire_timestamp,
         id_token: my_id_token // (Optional) Used only for user OpenID verification
       }
       resolve(newToken)
@@ -53,7 +60,7 @@ class QBStoreStrategy {
    * @param {string} token.access_token used to access quickbooks resource
    * @param {string} token.refresh_token This should be securely stored
    * @param {number} token.expires_in access_token expire time in seconds, 3600 usually
-   * @param {number} token.x_refresh_token_expires_in refresh_token expire time in seconds.  does not always renew on fresh
+   * @param {number} token.x_refresh_token_expires_in refresh_token expire time in seconds.
    * @param {string} token.id_token (Optional) OpenID user token - sent only on original access, not included in refresh token
    * @param {string} token.token_type This will be "Bearer"
    * @param {object} access_expire_timestamp JS Date object when the access_token expires, calculated from expires_in
@@ -63,13 +70,20 @@ class QBStoreStrategy {
   storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
     return new Promise((resolve) => {
       // Store information to DB or your location here now
+      saveToDB({
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+        access_expire_timestamp: access_expire_timestamp,
+        refresh_expire_timestamp: refresh_expire_timestamp,
+        id_token: my_id_token // (Optional) Used only for user OpenID verification
+      })
 
       // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
       let newToken = {
         access_token: my_access_token,
         refresh_token: my_refresh_token,
         access_expire_timestamp: my_access_expire_timestamp,
-        refresh_expire_timestamp: my_access_expire_timestamp,
+        refresh_expire_timestamp: my_refresh_expire_timestamp,
         id_token: my_id_token // (Optional) Used only for user OpenID verification
       }
       resolve(newToken)

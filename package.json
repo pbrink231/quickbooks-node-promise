@@ -25,7 +25,8 @@
   "keywords": [
     "quickbooks",
     "node",
-    "promise"
+    "promise",
+    "OAuth2"
   ],
   "author": "Peter Brink",
   "license": "ISC"
