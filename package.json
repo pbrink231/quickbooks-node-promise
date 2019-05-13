@@ -1,7 +1,7 @@
 {
   "name": "quickbooks-node-promise",
   "version": "1.0.7",
-  "description": "Used to connect to quickbooks api in promises",
+  "description": "Connect to QuickBooks Online API with OAuth 2",
   "main": "index.js",
   "directories": {
     "example": "example"
