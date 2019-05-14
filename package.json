@@ -3,8 +3,17 @@
   "version": "1.0.7",
   "description": "Connect to QuickBooks Online API with OAuth 2",
   "main": "index.js",
-  "directories": {
-    "example": "example"
+  "author": "Peter Brink",
+  "license": "ISC",
+  "keywords": [
+    "quickbooks",
+    "node",
+    "promise",
+    "OAuth2"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pbrink231/quickbooks-node-promise.git"
   },
   "dependencies": {
     "csrf": "^3.1.0",
@@ -21,13 +30,5 @@
   },
   "scripts": {
     "start": "node example/server.js"
-  },
-  "keywords": [
-    "quickbooks",
-    "node",
-    "promise",
-    "OAuth2"
-  ],
-  "author": "Peter Brink",
-  "license": "ISC"
+  }
 }
