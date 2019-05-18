@@ -19,7 +19,7 @@
  * 2014 Michael Cohen
  */
 
-var uuid    = require('uuid'),
+var uuid    = require('uuid/v4'),
     _       = require('underscore'),
     qs      = require('qs'),
     jwt     = require('jsonwebtoken'),
