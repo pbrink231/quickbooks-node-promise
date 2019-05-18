@@ -1,6 +1,6 @@
 {
   "name": "quickbooks-node-promise",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Connect to QuickBooks Online API with OAuth 2",
   "main": "index.js",
   "author": "Peter Brink",
