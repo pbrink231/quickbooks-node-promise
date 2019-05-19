@@ -41,6 +41,7 @@ class QBStoreStrategy {
 
       // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
       let newToken = {
+        realmID: my_realm_id // optional but nice to have
         access_token: my_access_token,
         refresh_token: my_refresh_token,
         access_expire_timestamp: my_access_expire_timestamp,
@@ -71,6 +72,7 @@ class QBStoreStrategy {
     return new Promise((resolve) => {
       // Store information to DB or your location here now
       saveToDB({
+        realmID: realmID
         access_token: token.access_token,
         refresh_token: token.refresh_token,
         access_expire_timestamp: access_expire_timestamp,
@@ -80,6 +82,7 @@ class QBStoreStrategy {
 
       // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
       let newToken = {
+        realmID: my_realm_id
         access_token: my_access_token,
         refresh_token: my_refresh_token,
         access_expire_timestamp: my_access_expire_timestamp,
