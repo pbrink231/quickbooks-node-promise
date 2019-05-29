@@ -473,7 +473,6 @@ module.request = function(context, verb, options, entity) {
     url = `${url}?${qs.stringify(opts.qs)}`
 
     if ('production' !== process.env.NODE_ENV && context.debug) {
-      console.log('adding query', query)
       console.log('invoking endpoint:', url )
       console.log('fetch options', fetchOptions)
     }
