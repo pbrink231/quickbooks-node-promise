@@ -40,6 +40,7 @@ class QBStoreStrategy {
   storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
     return new Promise((resolve) => {
       realmInfo[realmID] = {
+        realmID: realmID,
         access_token: token.access_token,
         refresh_token: token.refresh_token,
         access_expire_timestamp: access_expire_timestamp,
@@ -127,6 +128,24 @@ app.get('/quickbooks/getaccounts', async (req, res) => {
   })
 })
 
+app.get('/quickbooks/getprefs', async (req, res) => {
+  const realmID = req.query.realmID;
+  if (!realmID) {
+    res.send("Realm is required").sendStatus(500)
+    return
+  }
+
+  var qbo = new QuickBooks(QBAppconfig, realmID)
+
+  qbo.getPreferences().then(jsonResponse => {
+    res.send(jsonResponse.Preferences)
+  }).catch(err => {
+    console.log('could not get prefs', err)
+    res.send(err)
+  });
+})
+
+
 app.get('/quickbooks/getinvoices', async (req, res) => {
   const realmID = req.query.realmID;
   if (!realmID) {
@@ -140,6 +159,288 @@ app.get('/quickbooks/getinvoices', async (req, res) => {
     res.send(jsonResponse.QueryResponse.Invoice)
   }).catch(err => {
     console.log('could not run invoices because', err)
+    res.send(err)
+  });
+})
+
+app.get('/quickbooks/getinvoice', async (req, res) => {
+  const realmID = req.query.realmID;
+  const entityID = req.query.entityID;
+  if (!realmID) {
+    res.send("Realm is required").sendStatus(500)
+    return
+  }
+  if (!entityID) {
+    res.send("Entity is required").sendStatus(500)
+    return
+  }
+
+  var qbo = new QuickBooks(QBAppconfig, realmID)
+
+  qbo.getInvoice(entityID).then(jsonResponse => {
+    res.send(jsonResponse.Invoice)
+  }).catch(err => {
+    console.log('could not get invoice', err)
+    res.send(err)
+  });
+})
+
+app.get('/quickbooks/createinvoice', async (req, res) => {
+  const realmID = req.query.realmID;
+  if (!realmID) {
+    res.status(500).send("Realm is required")
+    return
+  }
+
+  var qbo = new QuickBooks(QBAppconfig, realmID)
+
+  let prefs = await qbo.getPreferences().then(json => { return json.Preferences })
+  .catch(err => {
+    res.send(err)
+  });
+  let defaultDiscountAccount = prefs.SalesFormsPrefs.DefaultDiscountAccount
+  let defaultMessage = prefs.SalesFormsPrefs.DefaultCustomerMessage
+
+  newInvoice = {
+    "DocNumber": "CR1052",
+    "TxnDate": "2019-04-12",
+    "CustomField": [
+      {
+        "DefinitionId": "1",
+        "StringValue": "123 - Marloone"
+      }
+    ],
+    "CustomerRef": {
+      "value": "61",
+    },
+    "Line": [
+      {
+        "Description": "Some first item here description here",
+        "Amount": 230,
+        "DetailType": "SalesItemLineDetail",
+        "SalesItemLineDetail": {
+          "ItemRef": {
+            "value": "26",
+          },
+          "UnitPrice": 23,
+          "Qty": 10,
+        }
+      },
+      {
+        "Description": "and here",
+        "Amount": 12,
+        "DetailType": "SalesItemLineDetail",
+        "SalesItemLineDetail": {
+          "ItemRef": {
+            "value": "27",
+          },
+          "UnitPrice": 12,
+          "Qty": 1,
+        }
+      },
+      {
+        "Amount": 82.95,
+        "DetailType": "DiscountLineDetail",
+        "DiscountLineDetail": {
+          "DiscountAccountRef": {
+            "value": defaultDiscountAccount
+          }
+        }
+      },
+      {
+        "Amount": 20,
+        "DetailType": "SalesItemLineDetail",
+        "SalesItemLineDetail": {
+          "ItemRef": {
+            "value": "SHIPPING_ITEM_ID"
+          }
+        }
+      }
+    ],
+    "CurrencyRef": {
+      "value": "USD",
+    },
+    "CustomerMemo": {
+      "value": defaultMessage
+    },
+    "BillAddr": {
+      "Line1": "bla bla",
+      "City": "Norwalk",
+      "Country": "USA",
+      "CountrySubDivisionCode": "CT",
+      "PostalCode": "06850"
+    },
+    "SalesTermRef": {
+      "value": "11"
+    },
+    "DueDate": "2019-06-17",
+    "ShipMethodRef": {
+      "value": "fedex",
+      "name": "fedex"
+    },
+    "ShipDate": "2019-05-22",
+    "TrackingNum": "aaaaaa",
+    "ApplyTaxAfterDiscount": true,
+    "BillEmail": {
+      "Address": "someemail@email.com"
+    }  
+  }
+
+  qbo.createInvoice(newInvoice).then(jsonResponse => {
+    res.send(jsonResponse)
+  }).catch(err => {
+    console.log('could not create invoice', err)
+    res.send(err)
+  });
+})
+
+app.get('/quickbooks/updateinvoice', async (req, res) => {
+  const realmID = req.query.realmID;
+  if (!realmID) {
+    res.status(500).send("Realm is required")
+    return
+  }
+
+  var qbo = new QuickBooks(QBAppconfig, realmID)
+
+  let sparseUpdate = {
+    "Id": "160",
+    "SyncToken": "3",
+    "sparse": true,
+    "BillAddr": {
+      "Line1": "Some customer",
+      "Line2": "123 Gramercy st",
+      "City": "Norwalk",
+      "Country": "USA",
+      "CountrySubDivisionCode": "CT",
+      "PostalCode": "06850"
+    },
+    "Line": [ // will remove items not in this list from the invoice
+      {
+        "Id": "13",
+        "Description": "8765876",
+        "Amount": 625,
+        "DetailType": "SalesItemLineDetail",
+        "SalesItemLineDetail": {
+          "ItemRef": {
+            "value": "26",
+          },
+          "UnitPrice": 25,
+          "Qty": 25,
+        }
+      }
+    ]
+  }
+
+  let updatedInvoice = {
+    "Id": "160",
+    "SyncToken": "2",
+    "sparse": false,
+    "DocNumber": "CR0034",
+    "TxnDate": "2019-05-05",
+    "CustomField": [
+      {
+        "DefinitionId": "1",
+        "StringValue": "123 - Marloone"
+      }
+    ],
+    "CustomerRef": {
+      "value": "61",
+    },
+    "Line": [
+      {
+        "Description": "Some first item here description here",
+        "Amount": 230,
+        "DetailType": "SalesItemLineDetail",
+        "SalesItemLineDetail": {
+          "ItemRef": {
+            "value": "26",
+          },
+          "UnitPrice": 23,
+          "Qty": 10,
+        }
+      },
+      {
+        "Description": "and here",
+        "Amount": 60,
+        "DetailType": "SalesItemLineDetail",
+        "SalesItemLineDetail": {
+          "ItemRef": {
+            "value": "27",
+          },
+          "UnitPrice": 10,
+          "Qty": 6,
+        }
+      },
+      {
+        "Amount": 14,
+        "DetailType": "DiscountLineDetail",
+        "DiscountLineDetail": {
+          "DiscountAccountRef": {
+            "value": "136"
+          }
+        }
+      },
+      {
+        "Amount": 20,
+        "DetailType": "SalesItemLineDetail",
+        "SalesItemLineDetail": {
+          "ItemRef": {
+            "value": "SHIPPING_ITEM_ID"
+          }
+        }
+      }
+    ],
+    "CurrencyRef": {
+      "value": "USD",
+    },
+    "CustomerMemo": {
+      "value": "hello world"
+    },
+    "BillAddr": {
+      "Line1": "bla bla",
+      "City": "Norwalk",
+      "Country": "USA",
+      "CountrySubDivisionCode": "CT",
+      "PostalCode": "06850"
+    },
+    "SalesTermRef": {
+      "value": "11"
+    },
+    "DueDate": "2019-06-17",
+    "ShipMethodRef": {
+      "value": "fedex 2",
+      "name": "fedex 2"
+    },
+    "ShipDate": "2019-05-28",
+    "TrackingNum": "aaaaaa",
+    "ApplyTaxAfterDiscount": true,
+    "BillEmail": {
+      "Address": "anewemail@email.com"
+    }  
+  }
+
+  qbo.updateInvoice(sparseUpdate).then(jsonResponse => {
+    res.send(jsonResponse)
+  }).catch(err => {
+    console.log('could not update invoice', err)
+    res.send(err)
+  });
+})
+
+app.get('/quickbooks/getcustomerbalance', async (req, res) => {
+  const realmID = req.query.realmID;
+  if (!realmID) {
+    res.send("Realm is required").sendStatus(500)
+    return
+  }
+
+  var qbo = new QuickBooks(QBAppconfig, realmID)
+
+  qbo.reportCustomerBalance({customer: 61}).then(jsonResponse => {
+    res.send(jsonResponse)
+  }).catch(err => {
+    console.log('could not get customer balance', err)
     res.send(err)
   });
 })

@@ -24,6 +24,8 @@ var uuid    = require('uuid/v4'),
     qs      = require('qs'),
     jwt     = require('jsonwebtoken'),
     fetch   = require('node-fetch'),
+    util    = require('util'),
+    version = require('./package.json').version,
     Tokens  = require('csrf'),
     csrf    = new Tokens()
     // require('rsa-pem-from-mod-exp'); used in method below
@@ -31,10 +33,8 @@ var uuid    = require('uuid/v4'),
 /*
     
     debug   = require('request-debug'),
-    util    = require('util'),
     moment  = require('moment'),
     _       = require('underscore'),
-    version = require('./package.json').version,
     jxon    = require('jxon');
 
     */
@@ -83,14 +83,15 @@ QuickBooks.authorizeUrl = function(appConfig) {
   checkConfig(appConfig)
 
   let scopes = (Array.isArray(appConfig.scope)) ? appConfig.scope.join(' ') : appConfig.scope
-  let authorizeUri = QuickBooks.AUTHORIZATION_URL +
-    '?client_id=' + appConfig.appKey +
-    '&redirect_uri=' + encodeURIComponent(appConfig.redirectUrl) +  //Make sure this path matches entry in application dashboard
-    '&scope=' + scopes +
-    '&response_type=code' +
-    '&state=' + (appConfig.state || csrf.create(csrf.secretSync()));
+  let querys = {
+    client_id: appConfig.appKey,
+    redirect_uri: appConfig.redirectUrl,  //Make sure this path matches entry in application dashboard
+    scope: scopes,
+    response_type: 'code',
+    state: appConfig.state || csrf.create(csrf.secretSync())
+  }
 
-  //this.log('info','The Authorize Uri is :',authorizeUri);
+  let authorizeUri = `${QuickBooks.AUTHORIZATION_URL}?${qs.stringify(querys)}`
   return authorizeUri;
 }
 /**
@@ -428,27 +429,28 @@ module.request = function(context, verb, options, entity) {
       token = await context.refreshWithAccessToken(token);
     }
 
-    var url = context.endpoint + context.realmID + options.url
     var opts = {
       qs:      options.qs || {},
       headers: options.headers || {},
-      json:    true
+    }
+
+    var url = null
+    if (options.fullurl) {
+      url = options.url
+    } else {
+      url = context.endpoint + context.realmID + options.url
     }
 
     if (entity && entity.allowDuplicateDocNum) {
       delete entity.allowDuplicateDocNum;
       opts.qs.include = 'allowduplicatedocnum';
     }
+    if (verb == 'post') {
+      opts.qs.requestid = uuid()
+    }
 
-    if (entity && entity.requestId) {
-      opts.qs.requestid = entity.requestId;
-      delete entity.requestId;
-    } 
-
-    opts.qs.minorversion = opts.qs.minorversion || context.minorversion;
-    //opts.headers['User-Agent'] = 'node-quickbooks: version ' + version
-    opts.headers['Request-Id'] = uuid.v1()
-    opts.qs.format = 'json';
+    opts.qs.minorversion = context.minorversion;
+    opts.headers['User-Agent'] = 'quickbooks-node-promise: version ' + version
     opts.headers['Authorization'] =  'Bearer ' + token.access_token
 
     if (options.url.match(/pdf$/)) {
@@ -457,25 +459,25 @@ module.request = function(context, verb, options, entity) {
     } else {
       opts.headers['accept'] = 'application/json'
     }
+
     if (entity !== null) {
-      opts.body = entity
-    }
-    if (options.formData) {
-      opts.formData = options.formData
+      opts.body = JSON.stringify(entity)
+      opts.headers['Content-Type'] = 'application/json'
     }
 
     fetchOptions = {
       method: verb,
-      headers: opts.headers
+      headers: opts.headers,
+      body: opts.body
     }
-    if (opts.body) {
-      fetchOptions.body = qs.stringify(opts.qs)
-    }
+    url = `${url}?${qs.stringify(opts.qs)}`
 
     if ('production' !== process.env.NODE_ENV && context.debug) {
-      console.log('invoking endpoint: ' + url)
-      console.log('fetch options', url, fetchOptions)
+      console.log('adding query', query)
+      console.log('invoking endpoint:', url )
+      console.log('fetch options', fetchOptions)
     }
+
 
     return fetch(url, fetchOptions).then((response) => {
       if (response.ok) {
@@ -483,7 +485,11 @@ module.request = function(context, verb, options, entity) {
       } else {
         var error = new Error(response.statusText)
         error.response = response
-        throw error
+        return response.json().then(json => {
+          let newError = new Error(`Error of type ${json.Fault.Error.type}`)
+          newError.Error = json.Fault.Error
+          throw newError
+        })
       }
     }).then((data) => { 
       return data
@@ -516,24 +522,22 @@ module.update = function(context, entityName, entity) {
   if (! entity.hasOwnProperty('sparse')) {
     entity.sparse = true
   }
-  var url = '/' + entityName.toLowerCase() + '?operation=update'
-  var opts = {url: url}
-  if (entity.void && entity.void.toString() === 'true') {
-    opts.qs = { include: 'void' }
-    delete entity.void
-  }
-  module.request(context, 'post', opts, entity)
+  let url = '/' + entityName.toLowerCase()
+  let qs = { operation: 'update' }
+  let opts = {url: url, qs: qs}
+  return module.request(context, 'post', opts, entity)
 }
 
 module.delete = function(context, entityName, idOrEntity) {
   // requires minimum Id and SyncToken
   // if passed Id as numeric value then grab entity and send it to delete
-  var url = '/' + entityName.toLowerCase() + '?operation=delete'
+  let url = '/' + entityName.toLowerCase()
+  let qs = { operation: 'delete' }
   if (_.isObject(idOrEntity)) {
-    return module.request(context, 'post', {url: url}, idOrEntity)
+    return module.request(context, 'post', { url: url, qs: qs }, idOrEntity)
   } else {
     return module.read(context, entityName, idOrEntity).then(entity => {
-      return module.request(context, 'post', {url: url}, entity)
+      return module.request(context, 'post', { url: url, qs: qs }, entity)
     })
   }
 }
@@ -541,13 +545,14 @@ module.delete = function(context, entityName, idOrEntity) {
 module.void = function (context, entityName, idOrEntity) {
   // requires minimum Id and SyncToken
   // if passed Id as numeric value then grab entity and send it to delete
-  var url = '/' + entityName.toLowerCase() + '?operation=void'
+  var url = '/' + entityName.toLowerCase()
+  let qs = { operation: 'void' }
   callback = callback || function () { }
   if (_.isObject(idOrEntity)) {
-    return module.request(context, 'post', { url: url }, idOrEntity)
+    return module.request(context, 'post', { url: url, qs: qs }, idOrEntity)
   } else {
     return module.read(context, entityName, idOrEntity).then(entity => {
-      return module.request(context, 'post', { url: url }, entity)
+      return module.request(context, 'post', { url: url, qs: qs }, entity)
     })
   }
 }
@@ -555,11 +560,12 @@ module.void = function (context, entityName, idOrEntity) {
 
 // **********************  Query Api **********************
 module.query = function(context, entity, criteria) {
-  var url = '/query?query@@select * from ' + entity
+  var url = '/query'
+  var query = 'select * from ' + entity
   var count = function(obj) {
     for (var p in obj) {
       if (obj[p] && p.toLowerCase() === 'count') {
-        url = url.replace('select \* from', 'select count(*) from')
+        query = query.replace('select \* from', 'select count(*) from')
         delete obj[p]
       }
     }
@@ -602,8 +608,8 @@ module.query = function(context, entity, criteria) {
   }
 
   if (criteria && !_.isFunction(criteria)) {
-    url += module.criteriaToString(criteria) || ''
-    url = url.replace(/%/g, '%25')
+    query += module.criteriaToString(criteria) || ''
+    query = query.replace(/%/g, '%25')
              .replace(/'/g, '%27')
              .replace(/=/g, '%3D')
              .replace(/</g, '%3C')
@@ -613,9 +619,11 @@ module.query = function(context, entity, criteria) {
              .replace(/\\/g, '%5C')
              .replace(/\+/g, '%2B')
   }
-  url = url.replace('@@', '=')
+  let qs = {
+    query: query
+  }
 
-  return module.request(context, 'get', {url: url}, null).then((data) => {
+  return module.request(context, 'get', {url: url, qs: qs}, null).then((data) => {
     var fields = Object.keys(data.QueryResponse)
     var key = _.find(fields, function(k) { return k.toLowerCase() === entity.toLowerCase()})
     if (fetchAll) {
@@ -644,25 +652,8 @@ module.query = function(context, entity, criteria) {
 
 // **********************  Report Api **********************
 module.report = function(context, reportType, criteria) {
-  var url = '/reports/' + reportType
-  if (criteria && typeof criteria !== 'function') {
-    url += module.reportCriteria(criteria) || ''
-  }
-  return module.request(context, 'get', {url: url}, null)
-}
-
-
-module.oauth = function(context) {
-  return {
-    consumer_key:    context.consumerKey,
-    consumer_secret: context.consumerSecret,
-    token:           context.token,
-    token_secret:    context.tokenSecret
-  }
-}
-
-module.isNumeric = function(n) {
-  return ! isNaN(parseFloat(n)) && isFinite(n);
+  let url = '/reports/' + reportType
+  return module.request(context, 'get', { url: url, qs: criteria }, null)
 }
 
 module.checkProperty = function(field, name) {
@@ -737,14 +728,6 @@ module.criteriaToString = function(criteria) {
   return sql
 }
 
-module.reportCriteria = function(criteria) {
-  var s = '?'
-  for (var p in criteria) {
-    s += p + '=' + criteria[p] + '&'
-  }
-  return s
-}
-
 module.capitalize = function(s) {
   return s.substring(0, 1).toUpperCase() + s.substring(1)
 }
@@ -782,7 +765,7 @@ QuickBooks.prototype.getUserInfo = function() {
   ? QuickBooks.USER_INFO_URL.replace('sandbox-', '')
   : QuickBooks.USER_INFO_URL
 
-  return module.request(this, 'get', {url: useUrl}, null);
+  return module.request(this, 'get', {url: useUrl, fullurl: true}, null);
 };
 
 /**
@@ -813,11 +796,12 @@ QuickBooks.prototype.changeDataCapture = function(entities, since) {
   if (typeof since == "string") { dateToCheck = Date.parse(since) }
   if (!since) throw Error("since is missing")
 
-  var url = '/cdc?entities='
-  url += typeof entities === 'string' ? entities : entities.join(',')
-  url += '&changedSince='
-  url += dateToCheck.toISOString()
-  return module.request(this, 'get', {url: url}, null)
+  let url = '/cdc'
+  let qs = { 
+    entities: typeof entities === 'string' ? entities : entities.join(','),
+    changedSince: dateToCheck.toISOString()
+  }
+  return module.request(this, 'get', { url: url, qs: qs}, null)
 }
 
 /**
@@ -1259,11 +1243,11 @@ QuickBooks.prototype.getEstimatePdf = function(id) {
  */
 QuickBooks.prototype.sendEstimatePdf = function(id, sendTo) {
   var path = '/estimate/' + id + '/send'
-  callback = _.isFunction(sendTo) ? sendTo : callback
-  if (sendTo && ! _.isFunction(sendTo)) {
-    path += '?sendTo=' + sendTo
+  let qs = {}
+  if (sendTo) {
+    qs.sendTo = sendTo
   }
-  return module.request(this, 'post', {url: path}, null).then(data => {
+  return module.request(this, 'post', { url: path, qs: qs }, null).then(data => {
     return module.unwrap(data, 'Estimate')
   })
 }
@@ -1295,11 +1279,11 @@ QuickBooks.prototype.getInvoicePdf = function(id) {
  */
 QuickBooks.prototype.sendInvoicePdf = function(id, sendTo) {
   var path = '/invoice/' + id + '/send'
-  callback = _.isFunction(sendTo) ? sendTo : callback
-  if (sendTo && ! _.isFunction(sendTo)) {
-    path += '?sendTo=' + sendTo
+  let qs = {}
+  if (sendTo) {
+    qs.sendTo = sendTo
   }
-  return module.request(this, 'post', {url: path}, null).then(data => {
+  return module.request(this, 'post', {url: path, qs: qs}, null).then(data => {
     return module.unwrap(data, 'Invoice')
   })
 }
@@ -1420,11 +1404,11 @@ QuickBooks.prototype.getSalesReceiptPdf = function(id) {
  */
 QuickBooks.prototype.sendSalesReceiptPdf = function(id, sendTo) {
   var path = '/salesreceipt/' + id + '/send'
-  callback = _.isFunction(sendTo) ? sendTo : callback
-  if (sendTo && ! _.isFunction(sendTo)) {
-    path += '?sendTo=' + sendTo
+  let qs = {}
+  if (sendTo) {
+    qs.sendTo = sendTo
   }
-  return module.request(this, 'post', {url: path}, null).then(data => {
+  return module.request(this, 'post', { url: path, qs: qs }, null).then(data => {
     return module.unwrap(data, 'SalesReceipt')
   })
 }
