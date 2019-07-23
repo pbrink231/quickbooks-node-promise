@@ -21,7 +21,8 @@
     "node-fetch": "^2.5.0",
     "qs": "^6.7.0",
     "underscore": "^1.9.1",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "lodash": ">=4.17.13"
   },
   "devDependencies": {
     "dotenv": "^8.0.0",
