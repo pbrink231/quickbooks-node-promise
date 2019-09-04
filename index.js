@@ -608,15 +608,6 @@ module.query = function(context, entity, criteria) {
 
   if (criteria && !_.isFunction(criteria)) {
     query += module.criteriaToString(criteria) || ''
-    query = query.replace(/%/g, '%25')
-             .replace(/'/g, '%27')
-             .replace(/=/g, '%3D')
-             .replace(/</g, '%3C')
-             .replace(/>/g, '%3E')
-             .replace(/&/g, '%26')
-             .replace(/#/g, '%23')
-             .replace(/\\/g, '%5C')
-             .replace(/\+/g, '%2B')
   }
   let qs = {
     query: query
