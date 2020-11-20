@@ -452,8 +452,10 @@ module.request = function(context, verb, options, entity) {
     opts.qs.minorversion = context.minorversion;
     opts.headers['User-Agent'] = 'quickbooks-node-promise: version ' + version
     opts.headers['Authorization'] =  'Bearer ' + token.access_token
+      
+    const isPdfUrl = options.url.match(/pdf$/);
 
-    if (options.url.match(/pdf$/)) {
+    if (isPdfUrl) {
       opts.headers['accept'] = 'application/pdf'
       opts.encoding = null
     } else {
@@ -480,6 +482,9 @@ module.request = function(context, verb, options, entity) {
 
     return fetch(url, fetchOptions).then((response) => {
       if (response.ok) {
+        if (isPdfUrl) {
+          return response;
+        }
         return response.json();
       } else {
         var error = new Error(response.statusText)
