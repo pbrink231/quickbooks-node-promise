@@ -344,7 +344,7 @@ QuickBooks.prototype.revokeAccess = function(useRefresh) {
       })
     }
 
-    return fetch(QuickBooks.TOKEN_URL, fetchOptions).then((response) => {
+    return fetch(QuickBooks.REVOKE_URL, fetchOptions).then((response) => {
       if (response.ok) {
         return response;
       } else {
