@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "csrf": "^3.1.0",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "node-fetch": "^2.5.0",
     "qs": "^6.7.0",
     "underscore": "^1.9.1",
