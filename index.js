@@ -19,8 +19,8 @@
  * 2014 Michael Cohen
  */
 
-var uuid    = require('uuid/v4'),
-    _       = require('underscore'),
+const { v4: uuidv4 } = require('uuid');
+const _     = require('underscore'),
     qs      = require('qs'),
     jwt     = require('jsonwebtoken'),
     fetch   = require('node-fetch'),
@@ -28,16 +28,7 @@ var uuid    = require('uuid/v4'),
     version = require('./package.json').version,
     Tokens  = require('csrf'),
     csrf    = new Tokens()
-    // require('rsa-pem-from-mod-exp'); used in method below
 
-/*
-    
-    debug   = require('request-debug'),
-    moment  = require('moment'),
-    _       = require('underscore'),
-    jxon    = require('jxon');
-
-    */
 QuickBooks.AUTHORIZATION_URL = "https://appcenter.intuit.com/connect/oauth2"
 QuickBooks.TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
 QuickBooks.USER_INFO_URL = "https://sandbox-accounts.platform.intuit.com/v1/openid_connect/userinfo"
@@ -61,7 +52,6 @@ QuickBooks.scopes = {
   OpenId: 'openid',
   Intuit_name: 'intuit_name'
 }
-   
 
 module.exports = QuickBooks
 
@@ -213,7 +203,7 @@ function QuickBooks(appConfig, realmID) {
   this.redirectUrl = appConfig.redirectUrl
   this.storeStrategy = appConfig.storeStrategy
   this.useProduction = (appConfig.useProduction === "true" || appConfig.useProduction === true) ? true : false
-  this.minorversion = appConfig.minorversion || 37;
+  this.minorversion = appConfig.minorversion || 69;
   this.debug = (appConfig.debug === "true" || appConfig.debug === true) ? true : false
   
 
@@ -446,7 +436,7 @@ module.request = function(context, verb, options, entity) {
       opts.qs.include = 'allowduplicatedocnum';
     }
     if (verb == 'post') {
-      opts.qs.requestid = uuid()
+      opts.qs.requestid = uuidv4()
     }
 
     opts.qs.minorversion = context.minorversion;
