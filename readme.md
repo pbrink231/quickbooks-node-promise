@@ -17,6 +17,8 @@ console.log(`Hi my customer's name is ${customer.Name}`)
 
 **Check the example for node express setup endpoints**
 
+[Example of server on github](https://github.com/pbrink231/quickbooks-node-promise/tree/master/example)
+
 ## Install
 
 ```
