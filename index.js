@@ -473,7 +473,7 @@ module.request = function(context, verb, options, entity) {
     return fetch(url, fetchOptions).then((response) => {
       if (response.ok) {
         if (isPdfUrl) {
-          return response;
+          return response.buffer()
         }
         return response.json();
       } else {
