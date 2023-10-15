@@ -105,7 +105,7 @@ QBAppconfig = {
   appKey: QB_APP_KEY,
   appSecret: QB_APP_SECRET,
   redirectUrl: QB_REDIRECT_URL,
-  minorversion: 37, /* default if ommited is 37, check for your version in the documents */
+  minorversion: 69, /* default if ommited is 69, check for your version in the documents */
   useProduction: QB_USE_PROD, /* default is false */
   debug: (NODE_ENV == "production" ? false : true), /* default is false */
   storeStrategy: new QBStoreStrategy(),  // if ommited uses storage inside the created object
