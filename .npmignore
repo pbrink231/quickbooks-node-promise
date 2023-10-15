@@ -1,0 +1,5 @@
+.env
+node_modules
+jsdoc.md
+example/
+changeLog.md
