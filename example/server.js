@@ -1,10 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const path = require("path");
-const bodyParser = require("body-parser");
 const QuickBooks = require("..");
-
-var jsonParser = bodyParser.json();
 
 const port = process.env.PORT || 3000;
 const app = express();
