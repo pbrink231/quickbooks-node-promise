@@ -7,7 +7,7 @@ export interface TokenData {
   expires_in: 3600;
 }
 export interface RealmTokenData {
-  realmId: number | string;
+  realmID: number | string;
   token: TokenData;
 }
 
@@ -25,9 +25,13 @@ export interface StoreTokenData {
   id_token?: string; // (Optional) Used only for user OpenID verification
 }
 
-declare class QBStoreStrategy {
-  static getQBToken(realm: { realmId: number | string }): StoreTokenData;
-  static saveQBToken(storeTokenData: StoreSaveTokenData): StoreTokenData;
+export interface StoreGetTokenData {
+  realmID: number | string;
+}
+
+export abstract class QBStoreStrategy {
+  getQBToken(storeGetTokenData: StoreGetTokenData): Promise<StoreTokenData>;
+  saveQBToken(storeSaveTokenData: StoreSaveTokenData): Promise<StoreTokenData>;
 }
 
 export interface AppConfig {
@@ -39,7 +43,7 @@ export interface AppConfig {
   /* default is false */
   useProduction?: string;
   /* default is false */
-  debug: boolean;
+  debug?: boolean;
   storeStrategy: QBStoreStrategy;
   scope: string[];
 }
@@ -60,4 +64,4 @@ declare class Quickbooks {
   saveToken(tokenData: RealmTokenData): Promise<StoreTokenData>;
 }
 
-export = Quickbooks;
+export default Quickbooks;
