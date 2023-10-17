@@ -629,7 +629,6 @@ class Quickbooks {
       token = await this.refreshWithAccessToken(token);
     }
 
-    const url = `/${entityName.toLowerCase()}/${id}/pdf`;
 
     const fetchOptions = {
       method: "get",
@@ -638,10 +637,15 @@ class Quickbooks {
         accept: "application/pdf",
       },
     };
-    const qsv = {
-      minorversion: this.minorversion,
+    const qsv: {
+      minorversion?: number
+    } = {}
+    if (this.minorversion) {
+      qsv.minorversion = this.minorversion
     };
-    const sendUrl = `${url}?${qs.stringify(qsv)}`;
+
+    const sendUrl = `${this.endpoint}${this.realmID}/${entityName.toLowerCase()}/${id}/pdf?${qs.stringify(qsv)}`;
+
 
     if ("production" !== process.env.NODE_ENV && this.debug) {
       console.log("invoking endpoint:", sendUrl);
