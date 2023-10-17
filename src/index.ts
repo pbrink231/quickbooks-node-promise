@@ -71,6 +71,43 @@ export interface QBStoreStrategy {
   storeQBToken(storeSaveTokenData: StoreSaveTokenData): Promise<StoreTokenData>;
 }
 
+export class DefaultStore implements QBStoreStrategy {
+  realmInfo: { [key: string]: StoreTokenData } = {};
+  constructor() {
+    this.realmInfo = {};
+  }
+  getQBToken(getTokenData: StoreGetTokenData) {
+    const realmID = getTokenData.realmID.toString();
+    return new Promise<StoreTokenData>((resolve, reject) => {
+      if (!this.realmInfo[realmID]) {
+        reject("missing realm informaiton");
+      }
+      const token = this.realmInfo[realmID];
+      if (!token) reject("Realm token information is missing")
+      resolve(token);
+    });
+  }
+  storeQBToken({
+    realmID,
+    token,
+    access_expire_timestamp,
+    refresh_expire_timestamp,
+  }: StoreSaveTokenData) {
+    return new Promise<StoreTokenData>((resolve) => {
+      this.realmInfo[realmID] = {
+        realmID: realmID,
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+        access_expire_timestamp: access_expire_timestamp,
+        refresh_expire_timestamp: refresh_expire_timestamp,
+      };
+      const storeToken = this.realmInfo[realmID];
+      resolve(storeToken);
+    });
+  }
+}
+
+
 export interface AppConfig {
   appKey: string;
   appSecret: string;
@@ -79,6 +116,7 @@ export interface AppConfig {
   minorversion?: number | null;
   /** default is false */
   useProduction?: string | boolean;
+  /** default uses internal memory storage, should supply this */
   storeStrategy: QBStoreStrategy;
   scope: string[];
   /** default is false */
