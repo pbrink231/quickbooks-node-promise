@@ -1,5 +1,6 @@
 import Quickbooks, {
   AppConfig,
+  DefaultStore,
   QBStoreStrategy,
   QueryData,
   StoreGetTokenData,
@@ -12,42 +13,6 @@ import express from "express";
 const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD } =
   process.env;
 
-class QBStore implements QBStoreStrategy {
-  realmInfo: { [key: string]: StoreTokenData } = {};
-  constructor() {
-    this.realmInfo = {};
-  }
-  getQBToken(getTokenData: StoreGetTokenData) {
-    const realmID = getTokenData.realmID.toString();
-    return new Promise<StoreTokenData>((resolve, reject) => {
-      console.log("realm info", this.realmInfo[realmID]);
-      if (!this.realmInfo[realmID]) {
-        reject("missing realm informaiton");
-      }
-      const token = this.realmInfo[realmID];
-      resolve(token);
-    });
-  }
-  storeQBToken({
-    realmID,
-    token,
-    access_expire_timestamp,
-    refresh_expire_timestamp,
-  }: StoreSaveTokenData) {
-    return new Promise<StoreTokenData>((resolve) => {
-      this.realmInfo[realmID] = {
-        realmID: realmID,
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
-        access_expire_timestamp: access_expire_timestamp,
-        refresh_expire_timestamp: refresh_expire_timestamp,
-      };
-      const storeToken = this.realmInfo[realmID];
-      resolve(storeToken);
-    });
-  }
-}
-
 // QB config
 const QBAppconfig: AppConfig = {
   appKey: QB_APP_KEY ?? "",
@@ -55,7 +20,7 @@ const QBAppconfig: AppConfig = {
   redirectUrl: QB_REDIRECT_URL ?? "",
   useProduction: QB_USE_PROD /* default is false */,
   debug: NODE_ENV == "production" ? false : true /* default is false */,
-  storeStrategy: new QBStore(),
+  storeStrategy: new DefaultStore(),
   scope: [
     Quickbooks.scopes.Accounting,
     Quickbooks.scopes.OpenId,
