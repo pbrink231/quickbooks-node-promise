@@ -141,13 +141,13 @@ interface GetResponseData {
 }
 
 export interface DeleteResponse {
-    "Invoice": {
-      "status": string, 
-      "domain": string, 
-      "Id": string
-    }, 
-    "time": string
-  }
+  Invoice: {
+    status: string;
+    domain: string;
+    Id: string;
+  };
+  time: string;
+}
 
 class QBFetchError extends Error {
   response: Response;
@@ -634,13 +634,13 @@ class Quickbooks {
     const fetchOptions = {
       method: "get",
       headers: {
-        "Authorization": `Bearer ${token.access_token}`,
-        "accept": "application/pdf"
-      }
+        Authorization: `Bearer ${token.access_token}`,
+        accept: "application/pdf",
+      },
     };
     const qsv = {
-      minorversion: this.minorversion
-    }
+      minorversion: this.minorversion,
+    };
     const sendUrl = `${url}?${qs.stringify(qsv)}`;
 
     if ("production" !== process.env.NODE_ENV && this.debug) {
@@ -650,12 +650,11 @@ class Quickbooks {
 
     const response = await fetch(sendUrl, fetchOptions);
     if (response.ok) {
-        return response.buffer();
+      return response.buffer();
     } else {
       throw new QBFetchError(response.statusText, response);
     }
   };
-
 
   // **********************  CRUD Api **********************
   create = <T>(entityName: string, entity: any) => {
@@ -666,7 +665,7 @@ class Quickbooks {
   read = <T>(entityName: string, id: string | null) => {
     let url = "/" + entityName.toLowerCase();
     if (id) url = url + "/" + id;
-    return this.request<T>("get", { url: url }, null);
+    return this.request<GetResponseData>("get", { url: url }, null);
   };
 
   update = <T>(entityName: string, entity: any) => {
@@ -699,15 +698,18 @@ class Quickbooks {
     let url = "/" + entityName.toLowerCase();
     let qs = { operation: "delete" };
     if (_.isObject(idOrEntity)) {
-      return this.request<DeleteResponse>("post", { url: url, qs: qs }, idOrEntity);
+      return this.request<DeleteResponse>(
+        "post",
+        { url: url, qs: qs },
+        idOrEntity
+      );
     } else {
-      const entity = await this.read<any>(entityName, idOrEntity)
-        return this.request<DeleteResponse>("post", { url: url, qs: qs }, entity);
-
+      const entity = await this.read<any>(entityName, idOrEntity);
+      return this.request<DeleteResponse>("post", { url: url, qs: qs }, entity);
     }
   };
 
-  void = (entityName: string, idOrEntity: any) => {
+  void = async (entityName: string, idOrEntity: any) => {
     // requires minimum Id and SyncToken
     // if passed Id as numeric value then grab entity and send it to delete
     const url = "/" + entityName.toLowerCase();
@@ -715,9 +717,8 @@ class Quickbooks {
     if (_.isObject(idOrEntity)) {
       return this.request("post", { url: url, qs: qs }, idOrEntity);
     } else {
-      return this.read(entityName, idOrEntity).then((entity) => {
-        return this.request("post", { url: url, qs: qs }, entity);
-      });
+      const entity = await this.read<any>(entityName, idOrEntity);
+      return this.request("post", { url: url, qs: qs }, entity);
     }
   };
 
@@ -779,7 +780,7 @@ class Quickbooks {
     return s.substring(0, 1).toUpperCase() + s.substring(1);
   };
 
-  pluralize = (s:string) => {
+  pluralize = (s: string) => {
     const last = s.substring(s.length - 1);
     if (last === "s") {
       return s + "es";
