@@ -1,3 +1,8 @@
+## [2.0.3]
+
+- Added DefaultStore that can be used
+- Updated readme documentation
+
 ## [2.0.2]
 
 - Fixed pdf url
