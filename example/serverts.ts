@@ -1,6 +1,7 @@
 import Quickbooks, {
   AppConfig,
   QBStoreStrategy,
+  QueryData,
   StoreGetTokenData,
   StoreSaveTokenData,
   StoreTokenData,
@@ -137,16 +138,36 @@ app.get("/quickbooks/findinvoices", async (req, res) => {
     res.status(500).send("realmID is required");
     return;
   }
-  if (!entityID || typeof entityID !== "string") {
-    res.status(500).send("entityID is required");
+
+  var qbo = new Quickbooks(QBAppconfig, realmID);
+
+  try {
+    const foundInvoices = await qbo.findInvoices();
+    res.send(foundInvoices.QueryResponse.Invoice);
+  } catch (err: any) {
+    console.log("could not run accounts because", err);
+    res.send(err);
+  }
+});
+
+app.get("/quickbooks/findinvoiceslimit", async (req, res) => {
+  const realmID = req.query.realmID;
+  const entityID = req.query.entityID;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("realmID is required");
     return;
   }
 
   var qbo = new Quickbooks(QBAppconfig, realmID);
 
+  const queryData: QueryData = {
+    limit: 10,
+    items: [],
+  };
+
   try {
-    const foundAccounts = await qbo.findAccounts();
-    res.send(foundAccounts.QueryResponse.Account);
+    const foundInvoices= await qbo.findInvoices(queryData);
+    res.send(foundInvoices.QueryResponse.Invoice);
   } catch (err: any) {
     console.log("could not run accounts because", err);
     res.send(err);
