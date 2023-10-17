@@ -1,3 +1,10 @@
+## [2.0.2]
+
+- Fixed pdf url
+- Added more typings
+- Added and cleaned up typescript server example
+- Fixed query to allow undefined or null
+
 ## [2.0.0]
 
 - Updated to typescript
