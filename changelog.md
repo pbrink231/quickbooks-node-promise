@@ -1,3 +1,7 @@
+## [2.0.0]
+
+- Updated to typescript
+
 ## [1.1.6]
 
 - Removed typescript because was not complete
