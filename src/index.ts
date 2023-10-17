@@ -1263,9 +1263,9 @@ class Quickbooks {
    *
    * @param  {object} options - An object with options including the required `sourcecurrencycode` parameter and optional `asofdate` parameter.
    */
-  getExchangeRate = function (options: any) {
+  getExchangeRate = (options: any) => {
     const url = "/exchangerate";
-    return this.request(this, "get", { url: url, qs: options }, null);
+    return this.request("get", { url: url, qs: options }, null);
   };
 
   /**
