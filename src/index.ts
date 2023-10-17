@@ -585,7 +585,7 @@ class Quickbooks {
     }
 
     if (this.minorversion) {
-    opts.qs.minorversion = this.minorversion;
+      opts.qs.minorversion = this.minorversion;
     }
     opts.headers["Authorization"] = "Bearer " + token.access_token;
     opts.headers["accept"] = "application/json";
@@ -630,7 +630,6 @@ class Quickbooks {
     if (!Quickbooks.isAccessTokenValid(token)) {
       token = await this.refreshWithAccessToken(token);
     }
-
 
     const fetchOptions = {
       method: "get",
@@ -730,8 +729,8 @@ class Quickbooks {
   };
 
   // **********************  Query Api **********************
-  query = async (entity: any, queryInput: QueryInput) => {
-    const [query, queryData] = getQueryString(entity, queryInput);
+  query = async (entityName: string, queryInput: QueryInput) => {
+    const [query, queryData] = getQueryString(entityName, queryInput);
     const url = "/query";
     let qs = {
       query: query,
@@ -741,10 +740,9 @@ class Quickbooks {
       { url: url, qs: qs },
       null
     );
-    if (Buffer.isBuffer(data)) throw new Error("Buffer is not supported");
     const fields = Object.keys(data.QueryResponse);
     const key = _.find(fields, (k) => {
-      return k.toLowerCase() === entity.toLowerCase();
+      return k.toLowerCase() === entityName.toLowerCase();
     });
     if (!key) {
       throw new Error(
@@ -764,7 +762,7 @@ class Quickbooks {
       } else {
         queryData.offset = queryData.offset + queryData.limit + 1;
       }
-      const more = await this.query(entity, queryInput);
+      const more = await this.query(entityName, queryInput);
       data.QueryResponse[key] = data.QueryResponse[key].concat(
         more.QueryResponse[key] || []
       );
