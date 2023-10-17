@@ -1,3 +1,7 @@
+## [2.0.4]
+
+- Fixed pointing to the correct types file in package.json
+
 ## [2.0.3]
 
 - Added DefaultStore that can be used
