@@ -139,8 +139,14 @@ const criteriaToSql = (criteriaItems: CriteriaItem[], queryBase: QueryBase) => {
 
 export const getQueryString = (
   entityName: string,
-  queryData: QueryInput
+  queryData?: QueryInput | null
 ): [string, QueryData | null] => {
+  let query = "select * from " + entityName;
+
+  if (!queryData) {
+    return [query, null];
+  }
+
   if (typeof queryData === "string") {
     return [queryData, null];
   }
@@ -181,8 +187,6 @@ export const getQueryString = (
     ...queryBaseInitial,
     ...criteriaBase,
   };
-
-  let query = "select * from " + entityName;
 
   if (queryBase.count) {
     query = query.replace("select * from", "select count(*) from");

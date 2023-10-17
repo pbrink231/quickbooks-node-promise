@@ -729,7 +729,7 @@ class Quickbooks {
   };
 
   // **********************  Query Api **********************
-  query = async (entityName: string, queryInput: QueryInput) => {
+  query = async (entityName: string, queryInput?: QueryInput | null) => {
     const [query, queryData] = getQueryString(entityName, queryInput);
     const url = "/query";
     let qs = {
@@ -769,10 +769,8 @@ class Quickbooks {
       data.QueryResponse.maxResults =
         data.QueryResponse.maxResults + (more.QueryResponse.maxResults || 0);
       data.time = more.time || data.time;
-      return data;
-    } else {
-      return data;
     }
+    return data;
   };
 
   // **********************  Report Api **********************
