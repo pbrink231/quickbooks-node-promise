@@ -25,7 +25,6 @@ import qs from "qs";
 import jwt from "jsonwebtoken";
 import fetch, { Response } from "node-fetch";
 import util from "util";
-import version from "../package.json";
 import Tokens from "csrf";
 import {
   checkConfig,
@@ -576,7 +575,6 @@ class Quickbooks {
     }
 
     opts.qs.minorversion = this.minorversion;
-    opts.headers["User-Agent"] = "quickbooks-node-promise: version " + version;
     opts.headers["Authorization"] = "Bearer " + token.access_token;
     opts.headers["accept"] = "application/json";
 
@@ -626,7 +624,6 @@ class Quickbooks {
     const fetchOptions = {
       method: "get",
       headers: {
-        "User-Agent": `quickbooks-node-promise: version ${version}`,
         "Authorization": `Bearer ${token.access_token}`,
         "accept": "application/pdf"
       }
@@ -763,9 +760,9 @@ class Quickbooks {
   };
 
   // **********************  Report Api **********************
-  report = (reportType: string, criteria: any) => {
+  report = <T>(reportType: string, criteria: any) => {
     let url = "/reports/" + reportType;
-    return this.request("get", { url: url, qs: criteria }, null);
+    return this.request<T>("get", { url: url, qs: criteria }, null);
   };
 
   capitalize = (s: string) => {
@@ -906,7 +903,7 @@ class Quickbooks {
    * @param  {object} account - The unsaved account, to be persisted in QuickBooks
    */
   createAccount = (account: any) => {
-    return this.create("account", account);
+    return this.create<any>("account", account);
   };
 
   /**
@@ -915,7 +912,7 @@ class Quickbooks {
    * @param  {object} attachable - The unsaved attachable, to be persisted in QuickBooks
    */
   createAttachable = (attachable: any) => {
-    return this.create("attachable", attachable);
+    return this.create<any>("attachable", attachable);
   };
 
   /**
@@ -924,7 +921,7 @@ class Quickbooks {
    * @param  {object} bill - The unsaved bill, to be persisted in QuickBooks
    */
   createBill = (bill: any) => {
-    return this.create("bill", bill);
+    return this.create<any>("bill", bill);
   };
 
   /**
@@ -933,7 +930,7 @@ class Quickbooks {
    * @param  {object} billPayment - The unsaved billPayment, to be persisted in QuickBooks
    */
   createBillPayment = (billPayment: any) => {
-    return this.create("billPayment", billPayment);
+    return this.create<any>("billPayment", billPayment);
   };
 
   /**
@@ -942,7 +939,7 @@ class Quickbooks {
    * @param classqb - The unsaved class, to be persisted in QuickBooks
    */
   createClass = (classqb: any) => {
-    return this.create("class", classqb);
+    return this.create<any>("class", classqb);
   };
 
   /**
@@ -951,7 +948,7 @@ class Quickbooks {
    * @param  {object} creditMemo - The unsaved creditMemo, to be persisted in QuickBooks
    */
   createCreditMemo = (creditMemo: any) => {
-    return this.create("creditMemo", creditMemo);
+    return this.create<any>("creditMemo", creditMemo);
   };
 
   /**
@@ -960,7 +957,7 @@ class Quickbooks {
    * @param  {object} customer - The unsaved customer, to be persisted in QuickBooks
    */
   createCustomer = (customer: any) => {
-    return this.create("customer", customer);
+    return this.create<any>("customer", customer);
   };
 
   /**
@@ -969,7 +966,7 @@ class Quickbooks {
    * @param  {object} department - The unsaved department, to be persisted in QuickBooks
    */
   createDepartment = (department: any) => {
-    return this.create("department", department);
+    return this.create<any>("department", department);
   };
 
   /**
@@ -978,7 +975,7 @@ class Quickbooks {
    * @param  {object} deposit - The unsaved Deposit, to be persisted in QuickBooks
    */
   createDeposit = (deposit: any) => {
-    return this.create("deposit", deposit);
+    return this.create<any>("deposit", deposit);
   };
 
   /**
@@ -987,7 +984,7 @@ class Quickbooks {
    * @param  {object} employee - The unsaved employee, to be persisted in QuickBooks
    */
   createEmployee = (employee: any) => {
-    return this.create("employee", employee);
+    return this.create<any>("employee", employee);
   };
 
   /**
@@ -996,7 +993,7 @@ class Quickbooks {
    * @param  {object} estimate - The unsaved estimate, to be persisted in QuickBooks
    */
   createEstimate = (estimate: any) => {
-    return this.create("estimate", estimate);
+    return this.create<any>("estimate", estimate);
   };
 
   /**
@@ -1005,7 +1002,7 @@ class Quickbooks {
    * @param  {object} invoice - The unsaved invoice, to be persisted in QuickBooks
    */
   createInvoice = (invoice: any) => {
-    return this.create("invoice", invoice);
+    return this.create<any>("invoice", invoice);
   };
 
   /**
@@ -1014,7 +1011,7 @@ class Quickbooks {
    * @param  {object} item - The unsaved item, to be persisted in QuickBooks
    */
   createItem = (item: any) => {
-    return this.create("item", item);
+    return this.create<any>("item", item);
   };
 
   /**
@@ -1023,7 +1020,7 @@ class Quickbooks {
    * @param  {object} journalCode - The unsaved journalCode, to be persisted in QuickBooks
    */
   createJournalCode = (journalCode: any) => {
-    return this.create("journalCode", journalCode);
+    return this.create<any>("journalCode", journalCode);
   };
 
   /**
@@ -1032,7 +1029,7 @@ class Quickbooks {
    * @param  {object} journalEntry - The unsaved journalEntry, to be persisted in QuickBooks
    */
   createJournalEntry = (journalEntry: any) => {
-    return this.create("journalEntry", journalEntry);
+    return this.create<any>("journalEntry", journalEntry);
   };
 
   /**
@@ -1042,7 +1039,7 @@ class Quickbooks {
 
  */
   createPayment = (payment: any) => {
-    return this.create("payment", payment);
+    return this.create<any>("payment", payment);
   };
 
   /**
@@ -1051,7 +1048,7 @@ class Quickbooks {
    * @param  {object} paymentMethod - The unsaved paymentMethod, to be persisted in QuickBooks
    */
   createPaymentMethod = (paymentMethod: any) => {
-    return this.create("paymentMethod", paymentMethod);
+    return this.create<any>("paymentMethod", paymentMethod);
   };
 
   /**
@@ -1060,7 +1057,7 @@ class Quickbooks {
    * @param  {object} purchase - The unsaved purchase, to be persisted in QuickBooks
    */
   createPurchase = (purchase: any) => {
-    return this.create("purchase", purchase);
+    return this.create<any>("purchase", purchase);
   };
 
   /**
@@ -1069,7 +1066,7 @@ class Quickbooks {
    * @param  {object} purchaseOrder - The unsaved purchaseOrder, to be persisted in QuickBooks
    */
   createPurchaseOrder = (purchaseOrder: any) => {
-    return this.create("purchaseOrder", purchaseOrder);
+    return this.create<any>("purchaseOrder", purchaseOrder);
   };
 
   /**
@@ -1078,7 +1075,7 @@ class Quickbooks {
    * @param  {object} refundReceipt - The unsaved refundReceipt, to be persisted in QuickBooks
    */
   createRefundReceipt = (refundReceipt: any) => {
-    return this.create("refundReceipt", refundReceipt);
+    return this.create<any>("refundReceipt", refundReceipt);
   };
 
   /**
@@ -1087,7 +1084,7 @@ class Quickbooks {
    * @param  {object} salesReceipt - The unsaved salesReceipt, to be persisted in QuickBooks
    */
   createSalesReceipt = (salesReceipt: any) => {
-    return this.create("salesReceipt", salesReceipt);
+    return this.create<any>("salesReceipt", salesReceipt);
   };
 
   /**
@@ -1096,7 +1093,7 @@ class Quickbooks {
    * @param  {object} taxAgency - The unsaved taxAgency, to be persisted in QuickBooks
    */
   createTaxAgency = (taxAgency: any) => {
-    return this.create("taxAgency", taxAgency);
+    return this.create<any>("taxAgency", taxAgency);
   };
 
   /**
@@ -1105,7 +1102,7 @@ class Quickbooks {
    * @param  {object} taxService - The unsaved taxService, to be persisted in QuickBooks
    */
   createTaxService = (taxService: any) => {
-    return this.create("taxService/taxcode", taxService);
+    return this.create<any>("taxService/taxcode", taxService);
   };
 
   /**
@@ -1114,7 +1111,7 @@ class Quickbooks {
    * @param  {object} term - The unsaved term, to be persisted in QuickBooks
    */
   createTerm = (term: any) => {
-    return this.create("term", term);
+    return this.create<any>("term", term);
   };
 
   /**
@@ -1123,7 +1120,7 @@ class Quickbooks {
    * @param  {object} timeActivity - The unsaved timeActivity, to be persisted in QuickBooks
    */
   createTimeActivity = (timeActivity: any) => {
-    return this.create("timeActivity", timeActivity);
+    return this.create<any>("timeActivity", timeActivity);
   };
 
   /**
@@ -1132,7 +1129,7 @@ class Quickbooks {
    * @param  {object} transfer - The unsaved Transfer, to be persisted in QuickBooks
    */
   createTransfer = (transfer: any) => {
-    return this.create("transfer", transfer);
+    return this.create<any>("transfer", transfer);
   };
 
   /**
@@ -1141,7 +1138,7 @@ class Quickbooks {
    * @param  {object} vendor - The unsaved vendor, to be persisted in QuickBooks
    */
   createVendor = (vendor: any) => {
-    return this.create("vendor", vendor);
+    return this.create<any>("vendor", vendor);
   };
 
   /**
@@ -1150,7 +1147,7 @@ class Quickbooks {
    * @param  {object} vendorCredit - The unsaved vendorCredit, to be persisted in QuickBooks
    */
   createVendorCredit = (vendorCredit: any) => {
-    return this.create("vendorCredit", vendorCredit);
+    return this.create<any>("vendorCredit", vendorCredit);
   };
 
   /**
@@ -1159,7 +1156,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Account
    */
   getAccount = (id: string) => {
-    return this.read("account", id);
+    return this.read<any>("account", id);
   };
 
   /**
@@ -1168,7 +1165,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Attachable
    */
   getAttachable = (id: string) => {
-    return this.read("attachable", id);
+    return this.read<any>("attachable", id);
   };
 
   /**
@@ -1177,7 +1174,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Bill
    */
   getBill = (id: string) => {
-    return this.read("bill", id);
+    return this.read<any>("bill", id);
   };
 
   /**
@@ -1186,7 +1183,7 @@ class Quickbooks {
    * @param Id - The Id of persistent BillPayment
    */
   getBillPayment = (id: string) => {
-    return this.read("billPayment", id);
+    return this.read<any>("billPayment", id);
   };
 
   /**
@@ -1195,7 +1192,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Class
    */
   getClass = (id: string) => {
-    return this.read("class", id);
+    return this.read<any>("class", id);
   };
 
   /**
@@ -1204,7 +1201,7 @@ class Quickbooks {
    * @param Id - The Id of persistent CompanyInfo
    */
   getCompanyInfo = (id: string) => {
-    return this.read("companyInfo", id);
+    return this.read<any>("companyInfo", id);
   };
 
   /**
@@ -1213,7 +1210,7 @@ class Quickbooks {
    * @param Id - The Id of persistent CreditMemo
    */
   getCreditMemo = (id: string) => {
-    return this.read("creditMemo", id);
+    return this.read<any>("creditMemo", id);
   };
 
   /**
@@ -1222,7 +1219,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Customer
    */
   getCustomer = (id: string) => {
-    return this.read("customer", id);
+    return this.read<any>("customer", id);
   };
 
   /**
@@ -1231,7 +1228,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Department
    */
   getDepartment = (id: string) => {
-    return this.read("department", id);
+    return this.read<any>("department", id);
   };
 
   /**
@@ -1240,7 +1237,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Deposit
    */
   getDeposit = (id: string) => {
-    return this.read("deposit", id);
+    return this.read<any>("deposit", id);
   };
 
   /**
@@ -1249,7 +1246,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Employee
    */
   getEmployee = (id: string) => {
-    return this.read("employee", id);
+    return this.read<any>("employee", id);
   };
 
   /**
@@ -1258,7 +1255,7 @@ class Quickbooks {
    * @param Id - The Id of persistent Estimate
    */
   getEstimate = (id: string) => {
-    return this.read("estimate", id);
+    return this.read<any>("estimate", id);
   };
 
   /**
@@ -1540,7 +1537,7 @@ class Quickbooks {
    * @param account - The persistent Account, including Id and SyncToken fields
    */
   updateAccount = (account: any) => {
-    return this.update("account", account);
+    return this.update<any>("account", account);
   };
 
   /**
@@ -1549,7 +1546,7 @@ class Quickbooks {
    * @param bill - The persistent Bill, including Id and SyncToken fields
    */
   updateBill = (bill: any) => {
-    return this.update("bill", bill);
+    return this.update<any>("bill", bill);
   };
 
   /**
@@ -1558,7 +1555,7 @@ class Quickbooks {
    * @param billPayment - The persistent BillPayment, including Id and SyncToken fields
    */
   updateBillPayment = (billPayment: any) => {
-    return this.update("billPayment", billPayment);
+    return this.update<any>("billPayment", billPayment);
   };
 
   /**
@@ -1567,7 +1564,7 @@ class Quickbooks {
    * @param classqb - The persistent Class, including Id and SyncToken fields
    */
   updateClass = (classqb: any) => {
-    return this.update("class", classqb);
+    return this.update<any>("class", classqb);
   };
 
   /**
@@ -1576,7 +1573,7 @@ class Quickbooks {
    * @param companyInfo - The persistent CompanyInfo, including Id and SyncToken fields
    */
   updateCompanyInfo = (companyInfo: any) => {
-    return this.update("companyInfo", companyInfo);
+    return this.update<any>("companyInfo", companyInfo);
   };
 
   /**
@@ -1585,7 +1582,7 @@ class Quickbooks {
    * @param creditMemo - The persistent CreditMemo, including Id and SyncToken fields
    */
   updateCreditMemo = (creditMemo: any) => {
-    return this.update("creditMemo", creditMemo);
+    return this.update<any>("creditMemo", creditMemo);
   };
 
   /**
@@ -1594,7 +1591,7 @@ class Quickbooks {
    * @param customer - The persistent Customer, including Id and SyncToken fields
    */
   updateCustomer = (customer: any) => {
-    return this.update("customer", customer);
+    return this.update<any>("customer", customer);
   };
 
   /**
@@ -1603,7 +1600,7 @@ class Quickbooks {
    * @param department - The persistent Department, including Id and SyncToken fields
    */
   updateDepartment = (department: any) => {
-    return this.update("department", department);
+    return this.update<any>("department", department);
   };
 
   /**
@@ -1612,7 +1609,7 @@ class Quickbooks {
    * @param deposit - The persistent Deposit, including Id and SyncToken fields
    */
   updateDeposit = (deposit: any) => {
-    return this.update("deposit", deposit);
+    return this.update<any>("deposit", deposit);
   };
 
   /**
@@ -1621,7 +1618,7 @@ class Quickbooks {
    * @param employee - The persistent Employee, including Id and SyncToken fields
    */
   updateEmployee = (employee: any) => {
-    return this.update("employee", employee);
+    return this.update<any>("employee", employee);
   };
 
   /**
@@ -1630,7 +1627,7 @@ class Quickbooks {
    * @param estimate - The persistent Estimate, including Id and SyncToken fields
    */
   updateEstimate = (estimate: any) => {
-    return this.update("estimate", estimate);
+    return this.update<any>("estimate", estimate);
   };
 
   /**
@@ -1639,7 +1636,7 @@ class Quickbooks {
    * @param invoice - The persistent Invoice, including Id and SyncToken fields
    */
   updateInvoice = (invoice: any) => {
-    return this.update("invoice", invoice);
+    return this.update<any>("invoice", invoice);
   };
 
   /**
@@ -1648,7 +1645,7 @@ class Quickbooks {
    * @param item - The persistent Item, including Id and SyncToken fields
    */
   updateItem = (item: any) => {
-    return this.update("item", item);
+    return this.update<any>("item", item);
   };
 
   /**
@@ -1657,7 +1654,7 @@ class Quickbooks {
    * @param journalCode - The persistent JournalCode, including Id and SyncToken fields
    */
   updateJournalCode = (journalCode: any) => {
-    return this.update("journalCode", journalCode);
+    return this.update<any>("journalCode", journalCode);
   };
 
   /**
@@ -1666,7 +1663,7 @@ class Quickbooks {
    * @param journalEntry - The persistent JournalEntry, including Id and SyncToken fields
    */
   updateJournalEntry = (journalEntry: any) => {
-    return this.update("journalEntry", journalEntry);
+    return this.update<any>("journalEntry", journalEntry);
   };
 
   /**
@@ -1675,7 +1672,7 @@ class Quickbooks {
    * @param payment - The persistent Payment, including Id and SyncToken fields
    */
   updatePayment = (payment: any) => {
-    return this.update("payment", payment);
+    return this.update<any>("payment", payment);
   };
 
   /**
@@ -1684,7 +1681,7 @@ class Quickbooks {
    * @param paymentMethod - The persistent PaymentMethod, including Id and SyncToken fields
    */
   updatePaymentMethod = (paymentMethod: any) => {
-    return this.update("paymentMethod", paymentMethod);
+    return this.update<any>("paymentMethod", paymentMethod);
   };
 
   /**
@@ -1693,7 +1690,7 @@ class Quickbooks {
    * @param preferences - The persistent Preferences, including Id and SyncToken fields
    */
   updatePreferences = (preferences: any) => {
-    return this.update("preferences", preferences);
+    return this.update<any>("preferences", preferences);
   };
 
   /**
@@ -1702,7 +1699,7 @@ class Quickbooks {
    * @param purchase - The persistent Purchase, including Id and SyncToken fields
    */
   updatePurchase = (purchase: any) => {
-    return this.update("purchase", purchase);
+    return this.update<any>("purchase", purchase);
   };
 
   /**
@@ -1711,7 +1708,7 @@ class Quickbooks {
    * @param purchaseOrder - The persistent PurchaseOrder, including Id and SyncToken fields
    */
   updatePurchaseOrder = (purchaseOrder: any) => {
-    return this.update("purchaseOrder", purchaseOrder);
+    return this.update<any>("purchaseOrder", purchaseOrder);
   };
 
   /**
@@ -1720,7 +1717,7 @@ class Quickbooks {
    * @param refundReceipt - The persistent RefundReceipt, including Id and SyncToken fields
    */
   updateRefundReceipt = (refundReceipt: any) => {
-    return this.update("refundReceipt", refundReceipt);
+    return this.update<any>("refundReceipt", refundReceipt);
   };
 
   /**
@@ -1729,7 +1726,7 @@ class Quickbooks {
    * @param salesReceipt - The persistent SalesReceipt, including Id and SyncToken fields
    */
   updateSalesReceipt = (salesReceipt: any) => {
-    return this.update("salesReceipt", salesReceipt);
+    return this.update<any>("salesReceipt", salesReceipt);
   };
 
   /**
@@ -1738,7 +1735,7 @@ class Quickbooks {
    * @param taxAgency - The persistent TaxAgency, including Id and SyncToken fields
    */
   updateTaxAgency = (taxAgency: any) => {
-    return this.update("taxAgency", taxAgency);
+    return this.update<any>("taxAgency", taxAgency);
   };
 
   /**
@@ -1747,7 +1744,7 @@ class Quickbooks {
    * @param taxCode - The persistent TaxCode, including Id and SyncToken fields
    */
   updateTaxCode = (taxCode: any) => {
-    return this.update("taxCode", taxCode);
+    return this.update<any>("taxCode", taxCode);
   };
 
   /**
@@ -1756,7 +1753,7 @@ class Quickbooks {
    * @param taxRate - The persistent TaxRate, including Id and SyncToken fields
    */
   updateTaxRate = (taxRate: any) => {
-    return this.update("taxRate", taxRate);
+    return this.update<any>("taxRate", taxRate);
   };
 
   /**
@@ -1765,7 +1762,7 @@ class Quickbooks {
    * @param term - The persistent Term, including Id and SyncToken fields
    */
   updateTerm = (term: any) => {
-    return this.update("term", term);
+    return this.update<any>("term", term);
   };
 
   /**
@@ -1774,7 +1771,7 @@ class Quickbooks {
    * @param timeActivity - The persistent TimeActivity, including Id and SyncToken fields
    */
   updateTimeActivity = (timeActivity: any) => {
-    return this.update("timeActivity", timeActivity);
+    return this.update<any>("timeActivity", timeActivity);
   };
 
   /**
@@ -1783,7 +1780,7 @@ class Quickbooks {
    * @param Transfer - The persistent Transfer, including Id and SyncToken fields
    */
   updateTransfer = (transfer: any) => {
-    return this.update("transfer", transfer);
+    return this.update<any>("transfer", transfer);
   };
 
   /**
@@ -1792,7 +1789,7 @@ class Quickbooks {
    * @param vendor - The persistent Vendor, including Id and SyncToken fields
    */
   updateVendor = (vendor: any) => {
-    return this.update("vendor", vendor);
+    return this.update<any>("vendor", vendor);
   };
 
   /**
@@ -1801,7 +1798,7 @@ class Quickbooks {
    * @param vendorCredit - The persistent VendorCredit, including Id and SyncToken fields
    */
   updateVendorCredit = (vendorCredit: any) => {
-    return this.update("vendorCredit", vendorCredit);
+    return this.update<any>("vendorCredit", vendorCredit);
   };
 
   /**
@@ -1810,7 +1807,7 @@ class Quickbooks {
    * @param exchangeRate - The persistent ExchangeRate, including Id and SyncToken fields
    */
   updateExchangeRate = (exchangeRate: any) => {
-    return this.update("exchangerate", exchangeRate);
+    return this.update<any>("exchangerate", exchangeRate);
   };
 
   /**
@@ -2289,7 +2286,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportBalanceSheet = (options?: any) => {
-    return this.report("BalanceSheet", options);
+    return this.report<any>("BalanceSheet", options);
   };
 
   /**
@@ -2298,7 +2295,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportProfitAndLoss = (options?: any) => {
-    return this.report("ProfitAndLoss", options);
+    return this.report<any>("ProfitAndLoss", options);
   };
 
   /**
@@ -2307,7 +2304,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportProfitAndLossDetail = (options?: any) => {
-    return this.report("ProfitAndLossDetail", options);
+    return this.report<any>("ProfitAndLossDetail", options);
   };
 
   /**
@@ -2316,7 +2313,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportTrialBalance = (options?: any) => {
-    return this.report("TrialBalance", options);
+    return this.report<any>("TrialBalance", options);
   };
 
   /**
@@ -2325,7 +2322,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportCashFlow = (options?: any) => {
-    return this.report("CashFlow", options);
+    return this.report<any>("CashFlow", options);
   };
 
   /**
@@ -2334,7 +2331,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportInventoryValuationSummary = (options?: any) => {
-    return this.report("InventoryValuationSummary", options);
+    return this.report<any>("InventoryValuationSummary", options);
   };
 
   /**
@@ -2343,7 +2340,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportCustomerSales = (options?: any) => {
-    return this.report("CustomerSales", options);
+    return this.report<any>("CustomerSales", options);
   };
 
   /**
@@ -2352,7 +2349,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportItemSales = (options?: any) => {
-    return this.report("ItemSales", options);
+    return this.report<any>("ItemSales", options);
   };
 
   /**
@@ -2361,7 +2358,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportCustomerIncome = (options?: any) => {
-    return this.report("CustomerIncome", options);
+    return this.report<any>("CustomerIncome", options);
   };
 
   /**
@@ -2370,7 +2367,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportCustomerBalance = (options?: any) => {
-    return this.report("CustomerBalance", options);
+    return this.report<any>("CustomerBalance", options);
   };
 
   /**
@@ -2379,7 +2376,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportCustomerBalanceDetail = (options?: any) => {
-    return this.report("CustomerBalanceDetail", options);
+    return this.report<any>("CustomerBalanceDetail", options);
   };
 
   /**
@@ -2388,7 +2385,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportAgedReceivables = (options?: any) => {
-    return this.report("AgedReceivables", options);
+    return this.report<any>("AgedReceivables", options);
   };
 
   /**
@@ -2397,7 +2394,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportAgedReceivableDetail = (options?: any) => {
-    return this.report("AgedReceivableDetail", options);
+    return this.report<any>("AgedReceivableDetail", options);
   };
 
   /**
@@ -2406,7 +2403,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportVendorBalance = (options?: any) => {
-    return this.report("VendorBalance", options);
+    return this.report<any>("VendorBalance", options);
   };
 
   /**
@@ -2415,7 +2412,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportVendorBalanceDetail = (options?: any) => {
-    return this.report("VendorBalanceDetail", options);
+    return this.report<any>("VendorBalanceDetail", options);
   };
 
   /**
@@ -2424,7 +2421,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportAgedPayables = (options?: any) => {
-    return this.report("AgedPayables", options);
+    return this.report<any>("AgedPayables", options);
   };
 
   /**
@@ -2433,7 +2430,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportAgedPayableDetail = (options?: any) => {
-    return this.report("AgedPayableDetail", options);
+    return this.report<any>("AgedPayableDetail", options);
   };
 
   /**
@@ -2442,7 +2439,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportVendorExpenses = (options?: any) => {
-    return this.report("VendorExpenses", options);
+    return this.report<any>("VendorExpenses", options);
   };
 
   /**
@@ -2451,7 +2448,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportTransactionList = (options?: any) => {
-    return this.report("TransactionList", options);
+    return this.report<any>("TransactionList", options);
   };
 
   /**
@@ -2460,7 +2457,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportGeneralLedgerDetail = (options?: any) => {
-    return this.report("GeneralLedger", options);
+    return this.report<any>("GeneralLedger", options);
   };
 
   /**
@@ -2469,7 +2466,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportTaxSummary = (options?: any) => {
-    return this.report("TaxSummary", options);
+    return this.report<any>("TaxSummary", options);
   };
 
   /**
@@ -2478,7 +2475,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportDepartmentSales = (options?: any) => {
-    return this.report("DepartmentSales", options);
+    return this.report<any>("DepartmentSales", options);
   };
 
   /**
@@ -2487,7 +2484,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportClassSales = (options?: any) => {
-    return this.report("ClassSales", options);
+    return this.report<any>("ClassSales", options);
   };
 
   /**
@@ -2496,7 +2493,7 @@ class Quickbooks {
    * @param options - (Optional) Map of key-value pairs passed as options to the Report
    */
   reportAccountListDetail = (options?: any) => {
-    return this.report("AccountList", options);
+    return this.report<any>("AccountList", options);
   };
 }
 
