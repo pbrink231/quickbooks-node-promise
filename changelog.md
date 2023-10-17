@@ -1,3 +1,7 @@
+## [1.1.6]
+
+- Removed typescript because was not complete
+
 ## [1.1.3]
 
 - Fixed PDF to return buffer correctly
