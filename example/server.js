@@ -47,7 +47,7 @@ class QBStoreStrategy {
 }
 
 // QB config
-QBAppconfig = {
+const QBAppconfig = {
   appKey: QB_APP_KEY,
   appSecret: QB_APP_SECRET,
   redirectUrl: QB_REDIRECT_URL,
