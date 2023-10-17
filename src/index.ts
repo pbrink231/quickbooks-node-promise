@@ -75,8 +75,8 @@ export interface AppConfig {
   appKey: string;
   appSecret: string;
   redirectUrl: string;
-  /** default is 69, check for your version in the documents */
-  minorversion?: number;
+  /** null for latest version */
+  minorversion?: number | null;
   /** default is false */
   useProduction?: string | boolean;
   storeStrategy: QBStoreStrategy;
@@ -192,7 +192,7 @@ class Quickbooks {
   redirectUrl: string;
   storeStrategy: QBStoreStrategy;
   useProduction: boolean;
-  minorversion: number;
+  minorversion?: number | null;
   debug: boolean;
   realmID: number | string;
   endpoint: string;
@@ -214,7 +214,7 @@ class Quickbooks {
       appConfig.useProduction === "true" || appConfig.useProduction === true
         ? true
         : false;
-    this.minorversion = appConfig.minorversion || 69;
+    this.minorversion = appConfig.minorversion;
     this.debug =
       appConfig.debug === "true" || appConfig.debug === true ? true : false;
 
@@ -584,7 +584,9 @@ class Quickbooks {
       opts.qs.requestid = uuidv4();
     }
 
+    if (this.minorversion) {
     opts.qs.minorversion = this.minorversion;
+    }
     opts.headers["Authorization"] = "Bearer " + token.access_token;
     opts.headers["accept"] = "application/json";
 
@@ -638,14 +640,15 @@ class Quickbooks {
       },
     };
     const qsv: {
-      minorversion?: number
-    } = {}
+      minorversion?: number;
+    } = {};
     if (this.minorversion) {
-      qsv.minorversion = this.minorversion
-    };
+      qsv.minorversion = this.minorversion;
+    }
 
-    const sendUrl = `${this.endpoint}${this.realmID}/${entityName.toLowerCase()}/${id}/pdf?${qs.stringify(qsv)}`;
-
+    const sendUrl = `${this.endpoint}${
+      this.realmID
+    }/${entityName.toLowerCase()}/${id}/pdf?${qs.stringify(qsv)}`;
 
     if ("production" !== process.env.NODE_ENV && this.debug) {
       console.log("invoking endpoint:", sendUrl);
