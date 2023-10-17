@@ -121,12 +121,22 @@ export interface QueryData extends QueryBase {
 export type QueryInput = string | QueryData | CriteriaItem | CriteriaItem[];
 
 interface QueryResponse {
+  startPosition: number;
+  totalCount: number;
+  maxResults: number;
+}
+interface QueryResponseData {
   QueryResponse: {
     startPosition: number;
     totalCount: number;
     maxResults: number;
     [module: string]: any;
   };
+  time: string;
+}
+
+interface GetResponseData {
+  [module: string]: any;
   time: string;
 }
 
@@ -718,7 +728,7 @@ class Quickbooks {
     let qs = {
       query: query,
     };
-    const data = await this.request<QueryResponse>(
+    const data = await this.request<QueryResponseData>(
       "get",
       { url: url, qs: qs },
       null
