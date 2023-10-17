@@ -25,78 +25,6 @@ console.log(`Hi my customer's name is ${customer.Name}`)
 npm i quickbooks-node-promise
 ```
 
-## Create Store Strategy
-The store strategy is used to Save and Retreive token information.  Both methods return a promise.
-
-```javascript
-class QBStoreStrategy {
-  /**
-   * Uses a realmID to lookup the token information.
-   * Should return back in an object
-   * 
-   * @param {number} realmID the quickbooks companyID
-   * @returns {object} Promise
-   */
-  getQBToken({ realmID }) {
-    return new Promise((resolve) => {
-      // Get token infomraiton using realmID here
-
-      // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
-      let newToken = {
-        realmID: my_realm_id // optional but nice to have
-        access_token: my_access_token,
-        refresh_token: my_refresh_token,
-        access_expire_timestamp: my_access_expire_timestamp,
-        refresh_expire_timestamp: my_refresh_expire_timestamp,
-        id_token: my_id_token // (Optional) Used only for user OpenID verification
-      }
-      resolve(newToken)
-    })
-  }
-
-  /**
-   * Used to store the new token information
-   * Will be looked up using the realmID   
-   * 
-   * @param {number} realmID the quickbooks companyID
-   * @param {object} token
-   * @param {string} token.access_token used to access quickbooks resource
-   * @param {string} token.refresh_token This should be securely stored
-   * @param {number} token.expires_in access_token expire time in seconds, 3600 usually
-   * @param {number} token.x_refresh_token_expires_in refresh_token expire time in seconds.
-   * @param {string} token.id_token (Optional) OpenID user token - sent only on original access, not included in refresh token
-   * @param {string} token.token_type This will be "Bearer"
-   * @param {object} access_expire_timestamp JS Date object when the access_token expires, calculated from expires_in
-   * @param {object} refresh_expire_timestamp JS Date object when the refresh_token expires, calculated from x_refresh_token_expires_in
-   * @returns {object} Promise
-   */
-  storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
-    return new Promise((resolve) => {
-      // Store information to DB or your location here now
-      saveToDB({
-        realmID: realmID
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
-        access_expire_timestamp: access_expire_timestamp,
-        refresh_expire_timestamp: refresh_expire_timestamp,
-        id_token: my_id_token // (Optional) Used only for user OpenID verification
-      })
-
-      // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
-      let newToken = {
-        realmID: my_realm_id
-        access_token: my_access_token,
-        refresh_token: my_refresh_token,
-        access_expire_timestamp: my_access_expire_timestamp,
-        refresh_expire_timestamp: my_refresh_expire_timestamp,
-        id_token: my_id_token // (Optional) Used only for user OpenID verification
-      }
-      resolve(newToken)
-    })
-  }
-}
-```
-
 ## Config setup
 
 A config setup is needed for each app.  Some values have defaults but should supply your own
@@ -107,10 +35,10 @@ QBAppconfig = {
   appKey: QB_APP_KEY,
   appSecret: QB_APP_SECRET,
   redirectUrl: QB_REDIRECT_URL,
-  minorversion: 69, /* default if ommited is 69, check for your version in the documents */
-  useProduction: QB_USE_PROD, /* default is false */
-  debug: (NODE_ENV == "production" ? false : true), /* default is false */
-  storeStrategy: new QBStoreStrategy(),  // if ommited uses storage inside the created object
+  storeStrategy: new DefaultStore(), /* should create your own, can use the exported DefaultStore */
+  minorversion: 69, /* OPTIONAL, default is the latest */
+  useProduction: QB_USE_PROD, /* OPTIONAL, default is false */
+  debug: (NODE_ENV == "production" ? false : true), /* OPTIONAL, default is false */
   scope: [
     QuickBooks.scopes.Accounting,
     QuickBooks.scopes.OpenId,
@@ -140,8 +68,55 @@ QuickBooks.scopes = {
 }
 ```
 
+## Create Store Strategy
+The store strategy is used to Save and Retreive token information.  Both methods return a promise.  The example below uses memory to store the token.  Should create your own store strategy to save to a database or some other location.
 
-
+```ts
+class QBStore implements QBStoreStrategy {
+  realmInfo: { [key: string]: StoreTokenData } = {};
+  constructor() {
+    this.realmInfo = {};
+  }
+  /**
+   * Uses a realmID to lookup the token information.
+   * Must return a promise with the token information
+   * give { realmID: number} as input
+   */
+  getQBToken(getTokenData: StoreGetTokenData) {
+    const realmID = getTokenData.realmID.toString();
+    return new Promise<StoreTokenData>((resolve, reject) => {
+      console.log("realm info", this.realmInfo[realmID]);
+      if (!this.realmInfo[realmID]) {
+        reject("missing realm informaiton");
+      }
+      const token = this.realmInfo[realmID];
+      resolve(token);
+    });
+  }
+  /**
+   * Used to store the new token information
+   * Will be looked up using the realmID
+   */
+  storeQBToken({
+    realmID,
+    token,
+    access_expire_timestamp,
+    refresh_expire_timestamp,
+  }: StoreSaveTokenData) {
+    return new Promise<StoreTokenData>((resolve) => {
+      this.realmInfo[realmID] = {
+        realmID: realmID,
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+        access_expire_timestamp: access_expire_timestamp,
+        refresh_expire_timestamp: refresh_expire_timestamp,
+      };
+      const storeToken = this.realmInfo[realmID];
+      resolve(storeToken);
+    });
+  }
+}
+```
 
 <a name="QuickBooks"></a>
 
