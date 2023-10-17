@@ -1,13 +1,19 @@
 {
-    "compilerOptions": {
-      "module": "commonjs",
-      "noImplicitAny": true,
-      "removeComments": true,
-      "preserveConstEnums": true,
-      "resolveJsonModule": true,
-      "sourceMap": true,
-      "target": "es6",
-      "lib": ["es5", "es6", "dom", "dom.iterable"],
-      "esModuleInterop": true,
-    },
-  }
+  "compilerOptions": {
+    "module": "commonjs",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "preserveConstEnums": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "target": "es6",
+    "lib": ["es5", "es6", "dom", "dom.iterable"],
+    "esModuleInterop": true,
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src",
+  },
+  "include": [
+    "src/"
+  ]
+}
