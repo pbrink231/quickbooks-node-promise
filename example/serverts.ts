@@ -11,48 +11,47 @@ import express from "express";
 const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD } =
   process.env;
 
-  class QBStore implements QBStoreStrategy {
-    realmInfo: { [key: string]: StoreTokenData } = {};
-    constructor() {
-      this.realmInfo = {};
-    }
-    getQBToken(getTokenData: StoreGetTokenData) {
-      const realmID = getTokenData.realmID.toString();
-      return new Promise<StoreTokenData>((resolve, reject) => {
-        console.log("realm info", this.realmInfo[realmID]);
-        if (!this.realmInfo[realmID]) {
-          reject("missing realm informaiton");
-        }
-        const token = this.realmInfo[realmID];
-        resolve(token);
-      });
-    }
-    storeQBToken({
-      realmID,
-      token,
-      access_expire_timestamp,
-      refresh_expire_timestamp,
-    }: StoreSaveTokenData) {
-      return new Promise<StoreTokenData>((resolve) => {
-        this.realmInfo[realmID] = {
-          realmID: realmID,
-          access_token: token.access_token,
-          refresh_token: token.refresh_token,
-          access_expire_timestamp: access_expire_timestamp,
-          refresh_expire_timestamp: refresh_expire_timestamp,
-        };
-        const storeToken = this.realmInfo[realmID];
-        resolve(storeToken);
-      });
-    }
+class QBStore implements QBStoreStrategy {
+  realmInfo: { [key: string]: StoreTokenData } = {};
+  constructor() {
+    this.realmInfo = {};
   }
-  
+  getQBToken(getTokenData: StoreGetTokenData) {
+    const realmID = getTokenData.realmID.toString();
+    return new Promise<StoreTokenData>((resolve, reject) => {
+      console.log("realm info", this.realmInfo[realmID]);
+      if (!this.realmInfo[realmID]) {
+        reject("missing realm informaiton");
+      }
+      const token = this.realmInfo[realmID];
+      resolve(token);
+    });
+  }
+  storeQBToken({
+    realmID,
+    token,
+    access_expire_timestamp,
+    refresh_expire_timestamp,
+  }: StoreSaveTokenData) {
+    return new Promise<StoreTokenData>((resolve) => {
+      this.realmInfo[realmID] = {
+        realmID: realmID,
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+        access_expire_timestamp: access_expire_timestamp,
+        refresh_expire_timestamp: refresh_expire_timestamp,
+      };
+      const storeToken = this.realmInfo[realmID];
+      resolve(storeToken);
+    });
+  }
+}
 
 // QB config
 const QBAppconfig: AppConfig = {
-  appKey: QB_APP_KEY ?? '',
-  appSecret: QB_APP_SECRET ?? '',
-  redirectUrl: QB_REDIRECT_URL ?? '',
+  appKey: QB_APP_KEY ?? "",
+  appSecret: QB_APP_SECRET ?? "",
+  redirectUrl: QB_REDIRECT_URL ?? "",
   useProduction: QB_USE_PROD /* default is false */,
   debug: NODE_ENV == "production" ? false : true /* default is false */,
   storeStrategy: new QBStore(),
@@ -95,16 +94,18 @@ app.get("/quickbooks/callback", async (req, res) => {
     res.status(500).send("authCode is required");
     return;
   }
-  Quickbooks.createToken(QBAppconfig, authCode, realmID)
-    .then((newToken) => {
-      res.send(newToken); // Should not send token out
-    })
-    .catch((err) => {
-      console.log("Error getting token", err);
-      res.send(err).status(500);
-    });
+  try {
+    const newToken = await Quickbooks.createToken(
+      QBAppconfig,
+      authCode,
+      realmID
+    );
+    res.send(newToken); // Should not send token out
+  } catch (err) {
+    console.log("Error getting token", err);
+    res.send(err).status(500);
+  }
 });
-
 
 app.get("/quickbooks/getinvoice", async (req, res) => {
   const realmID = req.query.realmID;
@@ -143,15 +144,13 @@ app.get("/quickbooks/findinvoices", async (req, res) => {
 
   var qbo = new Quickbooks(QBAppconfig, realmID);
 
-  qbo
-    .findAccounts()
-    .then((jsonResponse) => {
-      res.send(jsonResponse.QueryResponse.Account);
-    })
-    .catch((err: any) => {
-      console.log("could not run accounts because", err);
-      res.send(err);
-    });
+  try {
+    const foundAccounts = await qbo.findAccounts();
+    res.send(foundAccounts.QueryResponse.Account);
+  } catch (err: any) {
+    console.log("could not run accounts because", err);
+    res.send(err);
+  }
 });
 
 app.get("/quickbooks/getInvoicePDF", async (req, res) => {
