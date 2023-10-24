@@ -30,13 +30,13 @@ export const getDateCheck = (dateItem: Date | string | number) => {
  */
 export const dateNotExpired = (
   expired_timestamp: Date | number | string,
-  compareTime: number
+  bufferTimeSeconds: number
 ) => {
   const dateToCheck = getDateCheck(expired_timestamp);
   if (!dateToCheck) return false;
 
   // use buffer on time
-  const dif = dateToCheck - compareTime;
+  const dif = dateToCheck - (bufferTimeSeconds * 1000);
   return dif > Date.now();
 };
 

@@ -163,4 +163,65 @@ app.get("/quickbooks/getInvoicePDF", async (req, res) => {
   }
 });
 
+app.get("/quickbooks/createInvoice", async (req, res) => {
+  const realmID = req.query.realmID;
+  const entityID = req.query.entityID;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("Realm is required");
+    return;
+  }
+  if (!entityID || typeof entityID !== "string") {
+    res.status(500).send("Entity ID is required");
+    return;
+  }
+
+  var qbo = new Quickbooks(QBAppconfig, realmID);
+
+  try {
+    const pdfData = await qbo.createInvoice({
+      DueDate: "2021-09-30",
+      Line: [
+        {
+          Amount: 100.0,
+          DetailType: "SalesItemLineDetail",
+          SalesItemLineDetail: {
+            ItemRef: {
+              value: "1",
+            },
+          },
+        },
+      ],
+    });
+    res.contentType("application/pdf");
+    res.send(pdfData);
+  } catch (err) {
+    console.log("could not get invoice", err);
+    res.send(err);
+  }
+});
+
+app.get("/quickbooks/reports", async (req, res) => {
+  const realmID = req.query.realmID;
+  const entityID = req.query.entityID;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("Realm is required");
+    return;
+  }
+  if (!entityID || typeof entityID !== "string") {
+    res.status(500).send("Entity ID is required");
+    return;
+  }
+
+  var qbo = new Quickbooks(QBAppconfig, realmID);
+
+  try {
+    //  @ts-ignore
+    const pdfData = await qbo.getReports(entityID);
+    res.send(pdfData);
+  } catch (err) {
+    console.log("could not get report", err);
+    res.send(err);
+  }
+});
+
 app.listen(port, () => console.log(`Listening on port ${port}`));
