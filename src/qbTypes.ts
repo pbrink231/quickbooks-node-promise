@@ -2069,7 +2069,7 @@ export interface CreditMemo {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional
    *
@@ -3069,7 +3069,7 @@ export interface Deposit_Line_DepositLine {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
 }
 
 export interface Deposit_CashBack_CashBackInfo {
@@ -3912,7 +3912,7 @@ export interface Estimate {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional
    *
@@ -4165,7 +4165,7 @@ export interface Exchangerate {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional ,max character: Exactly 3 chars
    *
@@ -4818,7 +4818,7 @@ For India locale, use state code values from the list below:
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional
    *
@@ -5259,7 +5259,7 @@ export interface JournalCode {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional
    *
@@ -7099,7 +7099,7 @@ export interface PurchaseOrder {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional ,minorVersion: 17
    *
@@ -7696,7 +7696,7 @@ export interface RefundReceipt {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional
    *
@@ -8332,7 +8332,7 @@ export interface SalesReceipt {
    *
    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
    */
-  CustomField?: CustomField;
+  CustomField?: CustomField[];
   /**
    * META: Optional
    *

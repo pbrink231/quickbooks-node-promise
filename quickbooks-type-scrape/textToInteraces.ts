@@ -5,9 +5,10 @@ const indent = "  ";
 
 const typeConversion: {
   [key: string]: {
-    newType: string;
+    newType?: string;
     addOnDescription?: string;
     hasParent?: boolean;
+    isList?: boolean;
   };
 } = {
   String: { newType: "string" },
@@ -48,6 +49,7 @@ const typeConversion: {
   },
   "Internal use": { newType: "any", addOnDescription: "Internal use" },
   TelephoneNumber: { newType: "string", addOnDescription: "Telephone Number" },
+  CustomField: { isList: true },
 };
 
 export const processTypesForText = (entityData: TypeInformation) => {
@@ -232,6 +234,18 @@ export const processTypesForText = (entityData: TypeInformation) => {
         useType = childType.typeRefName;
       }
 
+      // check if metadata starts with "* Required" to know if required
+      let isReq =
+        attribute.metaData?.startsWith("* Required") &&
+        !attribute.metaData?.startsWith("* Required for update")
+          ? ""
+          : "?";
+      let isReadOnly = attribute.metaData?.includes("read only")
+        ? "readonly "
+        : "";
+      let isList = attribute.isList ? "[]" : "";
+      let attrNames = attribute.name.split(" ");
+
       // convert type
       if (useType && typeConversion[useType]) {
         const typeCheck = typeConversion[useType];
@@ -240,6 +254,9 @@ export const processTypesForText = (entityData: TypeInformation) => {
         }
         if (typeCheck.addOnDescription) {
           addOn = typeCheck.addOnDescription;
+        }
+        if (typeCheck.isList !== undefined) {
+          isList = typeCheck.isList ? "[]" : "";
         }
       }
 
@@ -299,17 +316,6 @@ export const processTypesForText = (entityData: TypeInformation) => {
         }
         typeText += `   */\n`;
       }
-      // check if metadata starts with "* Required" to know if required
-      const isReq =
-        attribute.metaData?.startsWith("* Required") &&
-        !attribute.metaData?.startsWith("* Required for update")
-          ? ""
-          : "?";
-      const isReadOnly = attribute.metaData?.includes("read only")
-        ? "readonly "
-        : "";
-      const isList = attribute.isList ? "[]" : "";
-      const attrNames = attribute.name.split(" ");
 
       for (const attrName of attrNames) {
         if (isList && attribute.type?.includes("|")) {
