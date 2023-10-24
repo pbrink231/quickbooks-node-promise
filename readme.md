@@ -1,19 +1,20 @@
 # Overview
 
-This library was created for Quickbooks OAuth2.  It converted a lot of node-quickbooks into promises.
+This library was created for Quickbooks OAuth2. It converted a lot of node-quickbooks into promises.
 
 Will handle the authentication and auto renew Access Tokens when they are expired.
 
 ## Example grabbing resource
+
 ```javascript
 const QuickBooks = require("quickbooks-node-promise");
 const qbo = new QuickBooks(appConfig, realmID);
 const customers = await qbo.findCustomers({ Id: "1234" });
-const customer = customer.QueryResponse.Customer[0]
-console.log(`Hi my customer's name is ${customer.Name}`)
+const customer = customer.QueryResponse.Customer[0];
+console.log(`Hi my customer's name is ${customer.Name}`);
 ```
 
-#  Setup
+# Setup
 
 **Check the example for node express setup endpoints**
 
@@ -25,81 +26,9 @@ console.log(`Hi my customer's name is ${customer.Name}`)
 npm i quickbooks-node-promise
 ```
 
-## Create Store Strategy
-The store strategy is used to Save and Retreive token information.  Both methods return a promise.
-
-```javascript
-class QBStoreStrategy {
-  /**
-   * Uses a realmID to lookup the token information.
-   * Should return back in an object
-   * 
-   * @param {number} realmID the quickbooks companyID
-   * @returns {object} Promise
-   */
-  getQBToken({ realmID }) {
-    return new Promise((resolve) => {
-      // Get token infomraiton using realmID here
-
-      // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
-      let newToken = {
-        realmID: my_realm_id // optional but nice to have
-        access_token: my_access_token,
-        refresh_token: my_refresh_token,
-        access_expire_timestamp: my_access_expire_timestamp,
-        refresh_expire_timestamp: my_refresh_expire_timestamp,
-        id_token: my_id_token // (Optional) Used only for user OpenID verification
-      }
-      resolve(newToken)
-    })
-  }
-
-  /**
-   * Used to store the new token information
-   * Will be looked up using the realmID   
-   * 
-   * @param {number} realmID the quickbooks companyID
-   * @param {object} token
-   * @param {string} token.access_token used to access quickbooks resource
-   * @param {string} token.refresh_token This should be securely stored
-   * @param {number} token.expires_in access_token expire time in seconds, 3600 usually
-   * @param {number} token.x_refresh_token_expires_in refresh_token expire time in seconds.
-   * @param {string} token.id_token (Optional) OpenID user token - sent only on original access, not included in refresh token
-   * @param {string} token.token_type This will be "Bearer"
-   * @param {object} access_expire_timestamp JS Date object when the access_token expires, calculated from expires_in
-   * @param {object} refresh_expire_timestamp JS Date object when the refresh_token expires, calculated from x_refresh_token_expires_in
-   * @returns {object} Promise
-   */
-  storeQBToken({ realmID, token, access_expire_timestamp, refresh_expire_timestamp }) {
-    return new Promise((resolve) => {
-      // Store information to DB or your location here now
-      saveToDB({
-        realmID: realmID
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
-        access_expire_timestamp: access_expire_timestamp,
-        refresh_expire_timestamp: refresh_expire_timestamp,
-        id_token: my_id_token // (Optional) Used only for user OpenID verification
-      })
-
-      // Return object which includes the access_expire_timestamp & refresh_expire_timestamp
-      let newToken = {
-        realmID: my_realm_id
-        access_token: my_access_token,
-        refresh_token: my_refresh_token,
-        access_expire_timestamp: my_access_expire_timestamp,
-        refresh_expire_timestamp: my_refresh_expire_timestamp,
-        id_token: my_id_token // (Optional) Used only for user OpenID verification
-      }
-      resolve(newToken)
-    })
-  }
-}
-```
-
 ## Config setup
 
-A config setup is needed for each app.  Some values have defaults but should supply your own
+A config setup is needed for each app. Some values have defaults but should supply your own
 
 ```javascript
 // QB config
@@ -107,46 +36,164 @@ QBAppconfig = {
   appKey: QB_APP_KEY,
   appSecret: QB_APP_SECRET,
   redirectUrl: QB_REDIRECT_URL,
-  minorversion: 69, /* default if ommited is 69, check for your version in the documents */
-  useProduction: QB_USE_PROD, /* default is false */
-  debug: (NODE_ENV == "production" ? false : true), /* default is false */
-  storeStrategy: new QBStoreStrategy(),  // if ommited uses storage inside the created object
+  storeStrategy:
+    new DefaultStore() /* should create your own, can use the exported DefaultStore */,
+  minorversion: 69 /* OPTIONAL, default is the latest */,
+  useProduction: QB_USE_PROD /* OPTIONAL, default is false */,
+  debug:
+    NODE_ENV == "production" ? false : true /* OPTIONAL, default is false */,
   scope: [
     QuickBooks.scopes.Accounting,
     QuickBooks.scopes.OpenId,
     QuickBooks.scopes.Profile,
     QuickBooks.scopes.Email,
     QuickBooks.scopes.Phone,
-    QuickBooks.scopes.Address
-  ]
-}
+    QuickBooks.scopes.Address,
+  ],
+};
 ```
 
 ### Scopes available:
 
 ```javascript
 QuickBooks.scopes = {
-  Accounting: 'com.intuit.quickbooks.accounting',
-  Payment: 'com.intuit.quickbooks.payment',
-  Payroll: 'com.intuit.quickbooks.payroll',
-  TimeTracking: 'com.intuit.quickbooks.payroll.timetracking',
-  Benefits: 'com.intuit.quickbooks.payroll.benefits',
-  Profile: 'profile',
-  Email:  'email',
-  Phone: 'phone',
-  Address: 'address',
-  OpenId: 'openid',
-  Intuit_name: 'intuit_name'
+  Accounting: "com.intuit.quickbooks.accounting",
+  Payment: "com.intuit.quickbooks.payment",
+  Payroll: "com.intuit.quickbooks.payroll",
+  TimeTracking: "com.intuit.quickbooks.payroll.timetracking",
+  Benefits: "com.intuit.quickbooks.payroll.benefits",
+  Profile: "profile",
+  Email: "email",
+  Phone: "phone",
+  Address: "address",
+  OpenId: "openid",
+  Intuit_name: "intuit_name",
+};
+```
+
+## Create Store Strategy
+
+The store strategy is used to Save and Retreive token information. Both methods return a promise. The example below uses memory to store the token. Should create your own store strategy to save to a database or some other location.
+
+```ts
+class QBStore implements QBStoreStrategy {
+  realmInfo: { [key: string]: StoreTokenData } = {};
+  constructor() {
+    this.realmInfo = {};
+  }
+  /**
+   * Uses a realmID to lookup the token information.
+   * Must return a promise with the token information
+   * give { realmID: number} as input
+   */
+  getQBToken(getTokenData: StoreGetTokenData) {
+    const realmID = getTokenData.realmID.toString();
+    return new Promise<StoreTokenData>((resolve, reject) => {
+      console.log("realm info", this.realmInfo[realmID]);
+      if (!this.realmInfo[realmID]) {
+        reject("missing realm informaiton");
+      }
+      const token = this.realmInfo[realmID];
+      resolve(token);
+    });
+  }
+  /**
+   * Used to store the new token information
+   * Will be looked up using the realmID
+   */
+  storeQBToken({
+    realmID,
+    token,
+    access_expire_timestamp,
+    refresh_expire_timestamp,
+  }: StoreSaveTokenData) {
+    return new Promise<StoreTokenData>((resolve) => {
+      this.realmInfo[realmID] = {
+        realmID: realmID,
+        access_token: token.access_token,
+        refresh_token: token.refresh_token,
+        access_expire_timestamp: access_expire_timestamp,
+        refresh_expire_timestamp: refresh_expire_timestamp,
+      };
+      const storeToken = this.realmInfo[realmID];
+      resolve(storeToken);
+    });
+  }
 }
 ```
 
+## Query
 
+The query is used to search for a resource. The query is a javascript object, array of query items that will be converted to a query string. You can also create your own query string instead. The query string is used to search for the resource.
 
+There are two main methods for querying. find[EntityName] and count[EntityName]. The find method will return the resource and the count method will return the count of the resource.
+
+### Examples
+```javascript
+const customers = await qbo.findCustomers({
+  Id: "1234",
+  limit: 10,
+});
+
+const customers = await qbo.findCustomers({
+  field: "Id",
+  value: "1234",
+  operator: "=", // optional, default is "="
+});
+
+const customers = await qbo.findCustomers({
+  limit: 10,
+  items: [
+    {
+      field: "Id",
+      value: "1234"
+    },
+  ],
+});
+
+const customers = await qbo.findCustomers("SELECT * FROM Customer WHERE Id = '1234'");
+```
+
+### Sorting query
+
+You can sort the query by using the sort property or for single sorting the asc or desc fields.  You can only use 1 of the 3 methods on a query. The sort property is an array of either string or array. if the item is an array, the first item in the array is the field name and the second item is the direction. The direction can be "asc" or "desc". If the item is a string, it will be the field name and sorted asc. The example below will sort by Id ascending and some of them will then sort by Name ascending.
+
+```javascript
+const customers = await qbo.findCustomers({
+  asc: "Id",
+  limit: 10,
+});
+
+const customers = await qbo.findCustomers({
+  desc: "Id",
+  limit: 10,
+});
+
+const customers = await qbo.findCustomers({
+  sort: [["Id", "desc"], ["Name", "asc"]],
+  limit: 10,
+});
+
+const customers = await qbo.findCustomers({
+  sort: [["Id", "desc"], "Name"],
+  limit: 10,
+});
+
+const customers = await qbo.findCustomers({
+  sort: ["Id", "Name"],
+  limit: 10,
+});
+
+const customers = await qbo.findCustomers({
+  sort: ["Id", "desc"],
+  limit: 10,
+});
+```
 
 <a name="QuickBooks"></a>
 
 # QuickBooks Methods
-**Kind**: global class  
+**Kind**: global class
 
 * [QuickBooks](#QuickBooks)
     * [new QuickBooks(appConfig, realmID)](#new_QuickBooks_new)
@@ -365,15 +412,15 @@ of this class should be instantiated on behalf of each user and company accessin
 ### quickBooks.authorizeUrl() ΓçÆ <code>string</code>
 Redirect link to Authorization Page
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>string</code> - authorize Uri  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>string</code> - authorize Uri
 <a name="QuickBooks+createToken"></a>
 
 ### quickBooks.createToken(authCode, realmID) ΓçÆ <code>object</code>
 Creates new token for the realmID from the returned authorization code received in the callback request
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>object</code> - new token with expiration dates from storeStrategy  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>object</code> - new token with expiration dates from storeStrategy
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -385,7 +432,7 @@ Creates new token for the realmID from the returned authorization code received 
 ### quickBooks.saveToken(token)
 Save token
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -396,14 +443,14 @@ Save token
 ### quickBooks.getToken()
 Get token
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 <a name="QuickBooks+refreshWithAccessToken"></a>
 
 ### quickBooks.refreshWithAccessToken(token) ΓçÆ <code>Token</code>
 Use the refresh token to obtain a new access token.
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>Token</code> - returns fresh token with access_token and refresh_token  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>Token</code> - returns fresh token with access_token and refresh_token
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -414,14 +461,14 @@ Use the refresh token to obtain a new access token.
 ### quickBooks.refreshAccessToken() ΓçÆ <code>Token</code>
 Use the refresh token to obtain a new access token.
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>Token</code> - returns fresh token with access_token and refresh_token  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>Token</code> - returns fresh token with access_token and refresh_token
 <a name="QuickBooks+revokeAccess"></a>
 
 ### quickBooks.revokeAccess(useRefresh)
 Use either refresh token or access token to revoke access (OAuth2).
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Description |
 | --- | --- |
@@ -432,25 +479,25 @@ Use either refresh token or access token to revoke access (OAuth2).
 ### quickBooks.validateIdToken()
 Validate id_token
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 <a name="QuickBooks+getPublicKey"></a>
 
 ### quickBooks.getPublicKey(modulus, exponent)
 get Public Key
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param |
 | --- |
-| modulus | 
-| exponent | 
+| modulus |
+| exponent |
 
 <a name="QuickBooks+getUserInfo"></a>
 
 ### quickBooks.getUserInfo()
 Get user info (OAuth2).
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 <a name="QuickBooks+batch"></a>
 
 ### quickBooks.batch(items)
@@ -462,7 +509,7 @@ The following batch items are supported:
      query
 The maximum number of batch items in a single request is 25.
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -473,7 +520,7 @@ The maximum number of batch items in a single request is 25.
 ### quickBooks.changeDataCapture(entities, since)
 The change data capture (CDC) operation returns a list of entities that have changed since a specified time.
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -486,7 +533,7 @@ The change data capture (CDC) operation returns a list of entities that have cha
 Uploads a file as an Attachable in QBO, optionally linking it to the specified
 QBO Entity.
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -501,7 +548,7 @@ QBO Entity.
 ### quickBooks.createAccount(account)
 Creates the Account in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -512,7 +559,7 @@ Creates the Account in QuickBooks
 ### quickBooks.createAttachable(attachable)
 Creates the Attachable in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -523,7 +570,7 @@ Creates the Attachable in QuickBooks
 ### quickBooks.createBill(bill)
 Creates the Bill in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -534,7 +581,7 @@ Creates the Bill in QuickBooks
 ### quickBooks.createBillPayment(billPayment)
 Creates the BillPayment in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -545,7 +592,7 @@ Creates the BillPayment in QuickBooks
 ### quickBooks.createClass(class)
 Creates the Class in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -556,7 +603,7 @@ Creates the Class in QuickBooks
 ### quickBooks.createCreditMemo(creditMemo)
 Creates the CreditMemo in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -567,7 +614,7 @@ Creates the CreditMemo in QuickBooks
 ### quickBooks.createCustomer(customer)
 Creates the Customer in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -578,7 +625,7 @@ Creates the Customer in QuickBooks
 ### quickBooks.createDepartment(department)
 Creates the Department in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -589,7 +636,7 @@ Creates the Department in QuickBooks
 ### quickBooks.createDeposit(deposit)
 Creates the Deposit in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -600,7 +647,7 @@ Creates the Deposit in QuickBooks
 ### quickBooks.createEmployee(employee)
 Creates the Employee in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -611,7 +658,7 @@ Creates the Employee in QuickBooks
 ### quickBooks.createEstimate(estimate)
 Creates the Estimate in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -622,7 +669,7 @@ Creates the Estimate in QuickBooks
 ### quickBooks.createInvoice(invoice)
 Creates the Invoice in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -633,7 +680,7 @@ Creates the Invoice in QuickBooks
 ### quickBooks.createItem(item)
 Creates the Item in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -644,7 +691,7 @@ Creates the Item in QuickBooks
 ### quickBooks.createJournalCode(journalCode)
 Creates the JournalCode in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -655,7 +702,7 @@ Creates the JournalCode in QuickBooks
 ### quickBooks.createJournalEntry(journalEntry)
 Creates the JournalEntry in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -666,7 +713,7 @@ Creates the JournalEntry in QuickBooks
 ### quickBooks.createPayment(payment)
 Creates the Payment in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -677,7 +724,7 @@ Creates the Payment in QuickBooks
 ### quickBooks.createPaymentMethod(paymentMethod)
 Creates the PaymentMethod in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -688,7 +735,7 @@ Creates the PaymentMethod in QuickBooks
 ### quickBooks.createPurchase(purchase)
 Creates the Purchase in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -699,7 +746,7 @@ Creates the Purchase in QuickBooks
 ### quickBooks.createPurchaseOrder(purchaseOrder)
 Creates the PurchaseOrder in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -710,7 +757,7 @@ Creates the PurchaseOrder in QuickBooks
 ### quickBooks.createRefundReceipt(refundReceipt)
 Creates the RefundReceipt in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -721,7 +768,7 @@ Creates the RefundReceipt in QuickBooks
 ### quickBooks.createSalesReceipt(salesReceipt)
 Creates the SalesReceipt in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -732,7 +779,7 @@ Creates the SalesReceipt in QuickBooks
 ### quickBooks.createTaxAgency(taxAgency)
 Creates the TaxAgency in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -743,7 +790,7 @@ Creates the TaxAgency in QuickBooks
 ### quickBooks.createTaxService(taxService)
 Creates the TaxService in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -754,7 +801,7 @@ Creates the TaxService in QuickBooks
 ### quickBooks.createTerm(term)
 Creates the Term in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -765,7 +812,7 @@ Creates the Term in QuickBooks
 ### quickBooks.createTimeActivity(timeActivity)
 Creates the TimeActivity in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -776,7 +823,7 @@ Creates the TimeActivity in QuickBooks
 ### quickBooks.createTransfer(transfer)
 Creates the Transfer in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -787,7 +834,7 @@ Creates the Transfer in QuickBooks
 ### quickBooks.createVendor(vendor)
 Creates the Vendor in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -798,7 +845,7 @@ Creates the Vendor in QuickBooks
 ### quickBooks.createVendorCredit(vendorCredit)
 Creates the VendorCredit in QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -809,7 +856,7 @@ Creates the VendorCredit in QuickBooks
 ### quickBooks.getAccount(Id)
 Retrieves the Account from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -820,7 +867,7 @@ Retrieves the Account from QuickBooks
 ### quickBooks.getAttachable(Id)
 Retrieves the Attachable from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -831,7 +878,7 @@ Retrieves the Attachable from QuickBooks
 ### quickBooks.getBill(Id)
 Retrieves the Bill from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -842,7 +889,7 @@ Retrieves the Bill from QuickBooks
 ### quickBooks.getBillPayment(Id)
 Retrieves the BillPayment from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -853,7 +900,7 @@ Retrieves the BillPayment from QuickBooks
 ### quickBooks.getClass(Id)
 Retrieves the Class from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -864,7 +911,7 @@ Retrieves the Class from QuickBooks
 ### quickBooks.getCompanyInfo(Id)
 Retrieves the CompanyInfo from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -875,7 +922,7 @@ Retrieves the CompanyInfo from QuickBooks
 ### quickBooks.getCreditMemo(Id)
 Retrieves the CreditMemo from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -886,7 +933,7 @@ Retrieves the CreditMemo from QuickBooks
 ### quickBooks.getCustomer(Id)
 Retrieves the Customer from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -897,7 +944,7 @@ Retrieves the Customer from QuickBooks
 ### quickBooks.getDepartment(Id)
 Retrieves the Department from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -908,7 +955,7 @@ Retrieves the Department from QuickBooks
 ### quickBooks.getDeposit(Id)
 Retrieves the Deposit from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -919,7 +966,7 @@ Retrieves the Deposit from QuickBooks
 ### quickBooks.getEmployee(Id)
 Retrieves the Employee from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -930,7 +977,7 @@ Retrieves the Employee from QuickBooks
 ### quickBooks.getEstimate(Id)
 Retrieves the Estimate from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -941,7 +988,7 @@ Retrieves the Estimate from QuickBooks
 ### quickBooks.getExchangeRate(options)
 Retrieves an ExchangeRate from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -952,7 +999,7 @@ Retrieves an ExchangeRate from QuickBooks
 ### quickBooks.getEstimatePdf(Id)
 Retrieves the Estimate PDF from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -964,7 +1011,7 @@ Retrieves the Estimate PDF from QuickBooks
 Emails the Estimate PDF from QuickBooks to the address supplied in Estimate.BillEmail.EmailAddress
 or the specified 'sendTo' address
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -976,7 +1023,7 @@ or the specified 'sendTo' address
 ### quickBooks.getInvoice(Id)
 Retrieves the Invoice from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -987,7 +1034,7 @@ Retrieves the Invoice from QuickBooks
 ### quickBooks.getInvoicePdf(Id)
 Retrieves the Invoice PDF from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -999,7 +1046,7 @@ Retrieves the Invoice PDF from QuickBooks
 Emails the Invoice PDF from QuickBooks to the address supplied in Invoice.BillEmail.EmailAddress
 or the specified 'sendTo' address
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1011,7 +1058,7 @@ or the specified 'sendTo' address
 ### quickBooks.getItem(Id)
 Retrieves the Item from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1022,7 +1069,7 @@ Retrieves the Item from QuickBooks
 ### quickBooks.getJournalCode(Id)
 Retrieves the JournalCode from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1033,7 +1080,7 @@ Retrieves the JournalCode from QuickBooks
 ### quickBooks.getJournalEntry(Id)
 Retrieves the JournalEntry from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1044,7 +1091,7 @@ Retrieves the JournalEntry from QuickBooks
 ### quickBooks.getPayment(Id)
 Retrieves the Payment from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1055,7 +1102,7 @@ Retrieves the Payment from QuickBooks
 ### quickBooks.getPaymentMethod(Id)
 Retrieves the PaymentMethod from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1066,13 +1113,13 @@ Retrieves the PaymentMethod from QuickBooks
 ### quickBooks.getPreferences()
 Retrieves the Preferences from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 <a name="QuickBooks+getPurchase"></a>
 
 ### quickBooks.getPurchase(Id)
 Retrieves the Purchase from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1083,7 +1130,7 @@ Retrieves the Purchase from QuickBooks
 ### quickBooks.getPurchaseOrder(Id)
 Retrieves the PurchaseOrder from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1094,7 +1141,7 @@ Retrieves the PurchaseOrder from QuickBooks
 ### quickBooks.getRefundReceipt(Id)
 Retrieves the RefundReceipt from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1105,7 +1152,7 @@ Retrieves the RefundReceipt from QuickBooks
 ### quickBooks.getReports(Id)
 Retrieves the Reports from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1116,7 +1163,7 @@ Retrieves the Reports from QuickBooks
 ### quickBooks.getSalesReceipt(Id)
 Retrieves the SalesReceipt from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1127,7 +1174,7 @@ Retrieves the SalesReceipt from QuickBooks
 ### quickBooks.getSalesReceiptPdf(Id)
 Retrieves the SalesReceipt PDF from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1139,7 +1186,7 @@ Retrieves the SalesReceipt PDF from QuickBooks
 Emails the SalesReceipt PDF from QuickBooks to the address supplied in SalesReceipt.BillEmail.EmailAddress
 or the specified 'sendTo' address
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1151,7 +1198,7 @@ or the specified 'sendTo' address
 ### quickBooks.getTaxAgency(Id)
 Retrieves the TaxAgency from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1162,7 +1209,7 @@ Retrieves the TaxAgency from QuickBooks
 ### quickBooks.getTaxCode(Id)
 Retrieves the TaxCode from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1173,7 +1220,7 @@ Retrieves the TaxCode from QuickBooks
 ### quickBooks.getTaxRate(Id)
 Retrieves the TaxRate from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1184,7 +1231,7 @@ Retrieves the TaxRate from QuickBooks
 ### quickBooks.getTerm(Id)
 Retrieves the Term from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1195,7 +1242,7 @@ Retrieves the Term from QuickBooks
 ### quickBooks.getTimeActivity(Id)
 Retrieves the TimeActivity from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1206,7 +1253,7 @@ Retrieves the TimeActivity from QuickBooks
 ### quickBooks.getTransfer(Id)
 Retrieves the Transfer from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1217,7 +1264,7 @@ Retrieves the Transfer from QuickBooks
 ### quickBooks.getVendor(Id)
 Retrieves the Vendor from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1228,7 +1275,7 @@ Retrieves the Vendor from QuickBooks
 ### quickBooks.getVendorCredit(Id)
 Retrieves the VendorCredit from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1239,7 +1286,7 @@ Retrieves the VendorCredit from QuickBooks
 ### quickBooks.updateAccount(account)
 Updates QuickBooks version of Account
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1250,7 +1297,7 @@ Updates QuickBooks version of Account
 ### quickBooks.updateAttachable(attachable)
 Updates QuickBooks version of Attachable
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1261,7 +1308,7 @@ Updates QuickBooks version of Attachable
 ### quickBooks.updateBill(bill)
 Updates QuickBooks version of Bill
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1272,7 +1319,7 @@ Updates QuickBooks version of Bill
 ### quickBooks.updateBillPayment(billPayment)
 Updates QuickBooks version of BillPayment
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1283,7 +1330,7 @@ Updates QuickBooks version of BillPayment
 ### quickBooks.updateClass(class)
 Updates QuickBooks version of Class
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1294,7 +1341,7 @@ Updates QuickBooks version of Class
 ### quickBooks.updateCompanyInfo(companyInfo)
 Updates QuickBooks version of CompanyInfo
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1305,7 +1352,7 @@ Updates QuickBooks version of CompanyInfo
 ### quickBooks.updateCreditMemo(creditMemo)
 Updates QuickBooks version of CreditMemo
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1316,7 +1363,7 @@ Updates QuickBooks version of CreditMemo
 ### quickBooks.updateCustomer(customer)
 Updates QuickBooks version of Customer
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1327,7 +1374,7 @@ Updates QuickBooks version of Customer
 ### quickBooks.updateDepartment(department)
 Updates QuickBooks version of Department
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1338,7 +1385,7 @@ Updates QuickBooks version of Department
 ### quickBooks.updateDeposit(deposit)
 Updates QuickBooks version of Deposit
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1349,7 +1396,7 @@ Updates QuickBooks version of Deposit
 ### quickBooks.updateEmployee(employee)
 Updates QuickBooks version of Employee
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1360,7 +1407,7 @@ Updates QuickBooks version of Employee
 ### quickBooks.updateEstimate(estimate)
 Updates QuickBooks version of Estimate
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1371,7 +1418,7 @@ Updates QuickBooks version of Estimate
 ### quickBooks.updateInvoice(invoice)
 Updates QuickBooks version of Invoice
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1382,7 +1429,7 @@ Updates QuickBooks version of Invoice
 ### quickBooks.updateItem(item)
 Updates QuickBooks version of Item
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1393,7 +1440,7 @@ Updates QuickBooks version of Item
 ### quickBooks.updateJournalCode(journalCode)
 Updates QuickBooks version of JournalCode
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1404,7 +1451,7 @@ Updates QuickBooks version of JournalCode
 ### quickBooks.updateJournalEntry(journalEntry)
 Updates QuickBooks version of JournalEntry
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1415,7 +1462,7 @@ Updates QuickBooks version of JournalEntry
 ### quickBooks.updatePayment(payment)
 Updates QuickBooks version of Payment
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1426,7 +1473,7 @@ Updates QuickBooks version of Payment
 ### quickBooks.updatePaymentMethod(paymentMethod)
 Updates QuickBooks version of PaymentMethod
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1437,7 +1484,7 @@ Updates QuickBooks version of PaymentMethod
 ### quickBooks.updatePreferences(preferences)
 Updates QuickBooks version of Preferences
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1448,7 +1495,7 @@ Updates QuickBooks version of Preferences
 ### quickBooks.updatePurchase(purchase)
 Updates QuickBooks version of Purchase
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1459,7 +1506,7 @@ Updates QuickBooks version of Purchase
 ### quickBooks.updatePurchaseOrder(purchaseOrder)
 Updates QuickBooks version of PurchaseOrder
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1470,7 +1517,7 @@ Updates QuickBooks version of PurchaseOrder
 ### quickBooks.updateRefundReceipt(refundReceipt)
 Updates QuickBooks version of RefundReceipt
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1481,7 +1528,7 @@ Updates QuickBooks version of RefundReceipt
 ### quickBooks.updateSalesReceipt(salesReceipt)
 Updates QuickBooks version of SalesReceipt
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1492,7 +1539,7 @@ Updates QuickBooks version of SalesReceipt
 ### quickBooks.updateTaxAgency(taxAgency)
 Updates QuickBooks version of TaxAgency
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1503,7 +1550,7 @@ Updates QuickBooks version of TaxAgency
 ### quickBooks.updateTaxCode(taxCode)
 Updates QuickBooks version of TaxCode
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1514,7 +1561,7 @@ Updates QuickBooks version of TaxCode
 ### quickBooks.updateTaxRate(taxRate)
 Updates QuickBooks version of TaxRate
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1525,7 +1572,7 @@ Updates QuickBooks version of TaxRate
 ### quickBooks.updateTerm(term)
 Updates QuickBooks version of Term
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1536,7 +1583,7 @@ Updates QuickBooks version of Term
 ### quickBooks.updateTimeActivity(timeActivity)
 Updates QuickBooks version of TimeActivity
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1547,7 +1594,7 @@ Updates QuickBooks version of TimeActivity
 ### quickBooks.updateTransfer(Transfer)
 Updates QuickBooks version of Transfer
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1558,7 +1605,7 @@ Updates QuickBooks version of Transfer
 ### quickBooks.updateVendor(vendor)
 Updates QuickBooks version of Vendor
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1569,7 +1616,7 @@ Updates QuickBooks version of Vendor
 ### quickBooks.updateVendorCredit(vendorCredit)
 Updates QuickBooks version of VendorCredit
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1580,7 +1627,7 @@ Updates QuickBooks version of VendorCredit
 ### quickBooks.updateExchangeRate(exchangeRate)
 Updates QuickBooks version of ExchangeRate
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1591,7 +1638,7 @@ Updates QuickBooks version of ExchangeRate
 ### quickBooks.deleteAttachable(idOrEntity)
 Deletes the Attachable from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1602,7 +1649,7 @@ Deletes the Attachable from QuickBooks
 ### quickBooks.deleteBill(idOrEntity)
 Deletes the Bill from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1613,7 +1660,7 @@ Deletes the Bill from QuickBooks
 ### quickBooks.deleteBillPayment(idOrEntity)
 Deletes the BillPayment from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1624,7 +1671,7 @@ Deletes the BillPayment from QuickBooks
 ### quickBooks.deleteCreditMemo(idOrEntity)
 Deletes the CreditMemo from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1635,7 +1682,7 @@ Deletes the CreditMemo from QuickBooks
 ### quickBooks.deleteDeposit(idOrEntity)
 Deletes the Deposit from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1646,7 +1693,7 @@ Deletes the Deposit from QuickBooks
 ### quickBooks.deleteEstimate(idOrEntity)
 Deletes the Estimate from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1657,7 +1704,7 @@ Deletes the Estimate from QuickBooks
 ### quickBooks.deleteInvoice(idOrEntity)
 Deletes the Invoice from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1668,7 +1715,7 @@ Deletes the Invoice from QuickBooks
 ### quickBooks.deleteJournalCode(idOrEntity)
 Deletes the JournalCode from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1679,7 +1726,7 @@ Deletes the JournalCode from QuickBooks
 ### quickBooks.deleteJournalEntry(idOrEntity)
 Deletes the JournalEntry from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1690,7 +1737,7 @@ Deletes the JournalEntry from QuickBooks
 ### quickBooks.deletePayment(idOrEntity)
 Deletes the Payment from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1701,7 +1748,7 @@ Deletes the Payment from QuickBooks
 ### quickBooks.deletePurchase(idOrEntity)
 Deletes the Purchase from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1712,7 +1759,7 @@ Deletes the Purchase from QuickBooks
 ### quickBooks.deletePurchaseOrder(idOrEntity)
 Deletes the PurchaseOrder from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1723,7 +1770,7 @@ Deletes the PurchaseOrder from QuickBooks
 ### quickBooks.deleteRefundReceipt(idOrEntity)
 Deletes the RefundReceipt from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1734,7 +1781,7 @@ Deletes the RefundReceipt from QuickBooks
 ### quickBooks.deleteSalesReceipt(idOrEntity)
 Deletes the SalesReceipt from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1745,7 +1792,7 @@ Deletes the SalesReceipt from QuickBooks
 ### quickBooks.deleteTimeActivity(idOrEntity)
 Deletes the TimeActivity from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1756,7 +1803,7 @@ Deletes the TimeActivity from QuickBooks
 ### quickBooks.deleteTransfer(idOrEntity)
 Deletes the Transfer from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1767,7 +1814,7 @@ Deletes the Transfer from QuickBooks
 ### quickBooks.deleteVendorCredit(idOrEntity)
 Deletes the VendorCredit from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1778,7 +1825,7 @@ Deletes the VendorCredit from QuickBooks
 ### quickBooks.voidInvoice(idOrEntity)
 Voids the Invoice from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1789,7 +1836,7 @@ Voids the Invoice from QuickBooks
 ### quickBooks.voidPayment(payment)
 Voids QuickBooks version of Payment
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1800,7 +1847,7 @@ Voids QuickBooks version of Payment
 ### quickBooks.findAccounts(criteria)
 Finds all Accounts in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1811,7 +1858,7 @@ Finds all Accounts in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findAttachables(criteria)
 Finds all Attachables in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1822,7 +1869,7 @@ Finds all Attachables in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findBills(criteria)
 Finds all Bills in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1833,7 +1880,7 @@ Finds all Bills in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findBillPayments(criteria)
 Finds all BillPayments in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1844,7 +1891,7 @@ Finds all BillPayments in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findBudgets(criteria)
 Finds all Budgets in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1855,7 +1902,7 @@ Finds all Budgets in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findClasses(criteria)
 Finds all Classs in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1866,7 +1913,7 @@ Finds all Classs in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findCompanyInfos(criteria)
 Finds all CompanyInfos in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1877,7 +1924,7 @@ Finds all CompanyInfos in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findCreditMemos(criteria)
 Finds all CreditMemos in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1888,7 +1935,7 @@ Finds all CreditMemos in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findCustomers(criteria)
 Finds all Customers in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1899,7 +1946,7 @@ Finds all Customers in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findDepartments(criteria)
 Finds all Departments in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1910,7 +1957,7 @@ Finds all Departments in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findDeposits(criteria)
 Finds all Deposits in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1921,7 +1968,7 @@ Finds all Deposits in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findEmployees(criteria)
 Finds all Employees in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1932,7 +1979,7 @@ Finds all Employees in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findEstimates(criteria)
 Finds all Estimates in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1943,7 +1990,7 @@ Finds all Estimates in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findInvoices(criteria)
 Finds all Invoices in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1954,7 +2001,7 @@ Finds all Invoices in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findItems(criteria)
 Finds all Items in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1965,7 +2012,7 @@ Finds all Items in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findJournalCodes(criteria)
 Finds all JournalCodes in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1976,7 +2023,7 @@ Finds all JournalCodes in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findJournalEntries(criteria)
 Finds all JournalEntrys in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1987,7 +2034,7 @@ Finds all JournalEntrys in QuickBooks, optionally matching the specified criteri
 ### quickBooks.findPayments(criteria)
 Finds all Payments in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -1998,7 +2045,7 @@ Finds all Payments in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findPaymentMethods(criteria)
 Finds all PaymentMethods in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2009,7 +2056,7 @@ Finds all PaymentMethods in QuickBooks, optionally matching the specified criter
 ### quickBooks.findPreferenceses(criteria)
 Finds all Preferencess in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2020,7 +2067,7 @@ Finds all Preferencess in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findPurchases(criteria)
 Finds all Purchases in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2031,7 +2078,7 @@ Finds all Purchases in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findPurchaseOrders(criteria)
 Finds all PurchaseOrders in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2042,7 +2089,7 @@ Finds all PurchaseOrders in QuickBooks, optionally matching the specified criter
 ### quickBooks.findRefundReceipts(criteria)
 Finds all RefundReceipts in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2053,7 +2100,7 @@ Finds all RefundReceipts in QuickBooks, optionally matching the specified criter
 ### quickBooks.findSalesReceipts(criteria)
 Finds all SalesReceipts in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2064,7 +2111,7 @@ Finds all SalesReceipts in QuickBooks, optionally matching the specified criteri
 ### quickBooks.findTaxAgencies(criteria)
 Finds all TaxAgencys in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2075,7 +2122,7 @@ Finds all TaxAgencys in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findTaxCodes(criteria)
 Finds all TaxCodes in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2086,7 +2133,7 @@ Finds all TaxCodes in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findTaxRates(criteria)
 Finds all TaxRates in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2097,7 +2144,7 @@ Finds all TaxRates in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findTerms(criteria)
 Finds all Terms in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2108,7 +2155,7 @@ Finds all Terms in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findTimeActivities(criteria)
 Finds all TimeActivitys in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2119,7 +2166,7 @@ Finds all TimeActivitys in QuickBooks, optionally matching the specified criteri
 ### quickBooks.findTransfers(criteria)
 Finds all Transfers in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2130,7 +2177,7 @@ Finds all Transfers in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findVendors(criteria)
 Finds all Vendors in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2141,7 +2188,7 @@ Finds all Vendors in QuickBooks, optionally matching the specified criteria
 ### quickBooks.findVendorCredits(criteria)
 Finds all VendorCredits in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2152,7 +2199,7 @@ Finds all VendorCredits in QuickBooks, optionally matching the specified criteri
 ### quickBooks.findExchangeRates(criteria)
 Finds all ExchangeRates in QuickBooks, optionally matching the specified criteria
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2163,7 +2210,7 @@ Finds all ExchangeRates in QuickBooks, optionally matching the specified criteri
 ### quickBooks.reportBalanceSheet(options)
 Retrieves the BalanceSheet Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2174,7 +2221,7 @@ Retrieves the BalanceSheet Report from QuickBooks
 ### quickBooks.reportProfitAndLoss(options)
 Retrieves the ProfitAndLoss Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2185,7 +2232,7 @@ Retrieves the ProfitAndLoss Report from QuickBooks
 ### quickBooks.reportProfitAndLossDetail(options)
 Retrieves the ProfitAndLossDetail Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2196,7 +2243,7 @@ Retrieves the ProfitAndLossDetail Report from QuickBooks
 ### quickBooks.reportTrialBalance(options)
 Retrieves the TrialBalance Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2207,7 +2254,7 @@ Retrieves the TrialBalance Report from QuickBooks
 ### quickBooks.reportCashFlow(options)
 Retrieves the CashFlow Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2218,7 +2265,7 @@ Retrieves the CashFlow Report from QuickBooks
 ### quickBooks.reportInventoryValuationSummary(options)
 Retrieves the InventoryValuationSummary Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2229,7 +2276,7 @@ Retrieves the InventoryValuationSummary Report from QuickBooks
 ### quickBooks.reportCustomerSales(options)
 Retrieves the CustomerSales Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2240,7 +2287,7 @@ Retrieves the CustomerSales Report from QuickBooks
 ### quickBooks.reportItemSales(options)
 Retrieves the ItemSales Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2251,7 +2298,7 @@ Retrieves the ItemSales Report from QuickBooks
 ### quickBooks.reportCustomerIncome(options)
 Retrieves the CustomerIncome Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2262,7 +2309,7 @@ Retrieves the CustomerIncome Report from QuickBooks
 ### quickBooks.reportCustomerBalance(options)
 Retrieves the CustomerBalance Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2273,7 +2320,7 @@ Retrieves the CustomerBalance Report from QuickBooks
 ### quickBooks.reportCustomerBalanceDetail(options)
 Retrieves the CustomerBalanceDetail Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2284,7 +2331,7 @@ Retrieves the CustomerBalanceDetail Report from QuickBooks
 ### quickBooks.reportAgedReceivables(options)
 Retrieves the AgedReceivables Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2295,7 +2342,7 @@ Retrieves the AgedReceivables Report from QuickBooks
 ### quickBooks.reportAgedReceivableDetail(options)
 Retrieves the AgedReceivableDetail Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2306,7 +2353,7 @@ Retrieves the AgedReceivableDetail Report from QuickBooks
 ### quickBooks.reportVendorBalance(options)
 Retrieves the VendorBalance Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2317,7 +2364,7 @@ Retrieves the VendorBalance Report from QuickBooks
 ### quickBooks.reportVendorBalanceDetail(options)
 Retrieves the VendorBalanceDetail Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2328,7 +2375,7 @@ Retrieves the VendorBalanceDetail Report from QuickBooks
 ### quickBooks.reportAgedPayables(options)
 Retrieves the AgedPayables Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2339,7 +2386,7 @@ Retrieves the AgedPayables Report from QuickBooks
 ### quickBooks.reportAgedPayableDetail(options)
 Retrieves the AgedPayableDetail Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2350,7 +2397,7 @@ Retrieves the AgedPayableDetail Report from QuickBooks
 ### quickBooks.reportVendorExpenses(options)
 Retrieves the VendorExpenses Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2361,7 +2408,7 @@ Retrieves the VendorExpenses Report from QuickBooks
 ### quickBooks.reportTransactionList(options)
 Retrieves the TransactionList Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2372,7 +2419,7 @@ Retrieves the TransactionList Report from QuickBooks
 ### quickBooks.reportGeneralLedgerDetail(options)
 Retrieves the GeneralLedgerDetail Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2383,7 +2430,7 @@ Retrieves the GeneralLedgerDetail Report from QuickBooks
 ### quickBooks.reportTaxSummary(options)
 Retrieves the TaxSummary Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2394,7 +2441,7 @@ Retrieves the TaxSummary Report from QuickBooks
 ### quickBooks.reportDepartmentSales(options)
 Retrieves the DepartmentSales Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2405,7 +2452,7 @@ Retrieves the DepartmentSales Report from QuickBooks
 ### quickBooks.reportClassSales(options)
 Retrieves the ClassSales Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2416,7 +2463,7 @@ Retrieves the ClassSales Report from QuickBooks
 ### quickBooks.reportAccountListDetail(options)
 Retrieves the AccountListDetail Report from QuickBooks
 
-**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: instance method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2427,8 +2474,8 @@ Retrieves the AccountListDetail Report from QuickBooks
 ### QuickBooks.authorizeUrl(appConfig) ΓçÆ <code>string</code>
 Redirect link to Authorization Page
 
-**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>string</code> - authorize Uri  
+**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>string</code> - authorize Uri
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2439,8 +2486,8 @@ Redirect link to Authorization Page
 ### QuickBooks.createToken(appConfig, authCode, realmID) ΓçÆ <code>object</code>
 Creates new token for the realmID from the returned authorization code received in the callback request
 
-**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>object</code> - new token with expiration dates from storeStrategy  
+**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>object</code> - new token with expiration dates from storeStrategy
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2453,7 +2500,7 @@ Creates new token for the realmID from the returned authorization code received 
 ### QuickBooks.\_dateNotExpired(expired_timestamp) ΓçÆ <code>boolean</code>
 Helper Method to check token expiry { set Token Object }
 
-**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2464,8 +2511,8 @@ Helper Method to check token expiry { set Token Object }
 ### QuickBooks.isAccessTokenValid(token) ΓçÆ <code>boolean</code>
 Check if access_token is valid
 
-**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>boolean</code> - token has expired or not  
+**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>boolean</code> - token has expired or not
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2476,8 +2523,8 @@ Check if access_token is valid
 ### QuickBooks.isRefreshTokenValid(token) ΓçÆ <code>boolean</code>
 Check if there is a valid (not expired) access token
 
-**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)  
-**Returns**: <code>boolean</code> - token has expired or not  
+**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)
+**Returns**: <code>boolean</code> - token has expired or not
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2488,7 +2535,7 @@ Check if there is a valid (not expired) access token
 ### QuickBooks.saveToken(store, info)
 Save token
 
-**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -2500,7 +2547,8 @@ Save token
 ### QuickBooks.getToken()
 Get token
 
-**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)  
+**Kind**: static method of [<code>QuickBooks</code>](#QuickBooks)
 
 
 
+```
