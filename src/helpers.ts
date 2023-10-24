@@ -1,4 +1,13 @@
-import { AppConfig, CriteriaItem, QueryBase, QueryData, QueryInput } from ".";
+import {
+  AppConfig,
+  CriteriaItem,
+  QueryBase,
+  QueryData,
+  QueryDataWithProperties,
+  QueryInput,
+  QuerySort,
+  QuerySortInput,
+} from ".";
 
 export const checkConfig = (appConfig: AppConfig) => {
   if (!appConfig.appKey) throw new Error("appKey is missing");
@@ -36,32 +45,148 @@ export const dateNotExpired = (
   if (!dateToCheck) return false;
 
   // use buffer on time
-  const dif = dateToCheck - (bufferTimeSeconds * 1000);
+  const dif = dateToCheck - bufferTimeSeconds * 1000;
   return dif > Date.now();
 };
 
+const convertKeysToCriteria = (obj: QueryDataWithProperties): QueryData => {
+  const criterias: CriteriaItem[] = [];
+  const baseQuery: QueryBase = {};
+  for (const key in obj) {
+    // ignore base query items
+    if (
+      key === "limit"
+    ) {
+      baseQuery[key] = obj[key];
+      continue;
+    }
+    if (key === "offset") {
+      baseQuery[key] = obj[key];
+      continue;
+    }
+    if (key === "fetchAll") {
+      baseQuery[key] = obj[key];
+      continue;
+    }
+    if (key === "count") {
+      baseQuery[key] = obj[key];
+      continue;
+    }
+    if (key === "asc") {
+      baseQuery[key] = obj[key];
+      continue;
+    }
+    if (key === "desc") {
+      baseQuery[key] = obj[key];
+      continue;
+    }
+    if (key === "sort") {
+      baseQuery.sort = cleanSortData(obj[key])
+      continue;
+    }
+    if (key === "items") {
+      for (const item of obj[key]) {
+        criterias.push(item);
+      }
+      continue;
+    }
+    if (obj.hasOwnProperty(key)) {
+      criterias.push({
+        field: key,
+        value: obj[key],
+      });
+      continue;
+    }
+  }
+  return {
+    ...baseQuery,
+    items: criterias,
+  };
+};
+
 export const getQueryItems = (
-  queryData: QueryData | CriteriaItem | CriteriaItem[]
+  queryDataInput: QueryDataWithProperties | CriteriaItem | CriteriaItem[]
 ): [CriteriaItem[], QueryBase] => {
-  if (Array.isArray(queryData)) {
-    return [queryData, {}];
+  if (Array.isArray(queryDataInput)) {
+    return [queryDataInput, {}];
   }
   if (
-    typeof queryData === "object" &&
-    !Array.isArray(queryData) &&
-    queryData.hasOwnProperty("items")
+    typeof queryDataInput === "object" &&
+    !Array.isArray(queryDataInput) &&
+    queryDataInput.hasOwnProperty("items")
   ) {
-    const { items, ...queryBase } = queryData as QueryData;
+    const { items, ...queryBase } = convertKeysToCriteria(
+      queryDataInput as QueryDataWithProperties
+    );
     return [items, queryBase];
   }
   if (
-    typeof queryData === "object" &&
-    !Array.isArray(queryData) &&
-    queryData.hasOwnProperty("field")
+    typeof queryDataInput === "object" &&
+    !Array.isArray(queryDataInput) &&
+    queryDataInput.hasOwnProperty("field") &&
+    queryDataInput.hasOwnProperty("value")
   ) {
-    return [[queryData as CriteriaItem], {}];
+    return [[queryDataInput as CriteriaItem], {}];
   }
-  throw new Error("Invalid Query Data");
+  if (typeof queryDataInput === "object" && !Array.isArray(queryDataInput)) {
+    const { items, ...queryBase } = convertKeysToCriteria(
+      queryDataInput as QueryDataWithProperties
+    );
+    return [items, queryBase];
+  }
+  throw new Error(
+    "Invalid Query Data, must be CriteriaItem, CriteriaItem[] or QueryDataWithProperties"
+  );
+};
+
+const cleanSortData = (sortData: QuerySortInput): QuerySort => {
+  if (!sortData) throw new Error("Invalid sort value");
+
+  if (!Array.isArray(sortData) && typeof sortData === "string") {
+    return [[sortData, "ASC"]];
+  }
+  if (Array.isArray(sortData) && sortData.length === 0) {
+    return [];
+  }
+  if (Array.isArray(sortData) && sortData.length > 0) {
+    if (sortData.length == 2 && typeof sortData[0] === "string" && typeof sortData[1] === "string" && sortData[0] != "") {
+      const sortField: string = sortData[0];
+      const sortDirection: string = sortData[1].toUpperCase();
+      if (sortDirection === "ASC" || sortDirection === "DESC") {
+        return [[sortField, sortDirection]];
+      }
+    }
+    const newSort: [string, "ASC" | "DESC"][] = [];
+    for (const sortItem of sortData) {
+      if (typeof sortItem === "string") {
+        newSort.push([sortItem, "ASC"]);
+        continue;
+      }
+      if (
+        Array.isArray(sortItem) &&
+        sortItem.length === 2 &&
+        typeof sortItem[0] === "string" &&
+        typeof sortItem[1] === "string"
+      ) {
+        const newSortField = sortItem[0];
+        const newSortDirection = sortItem[1].toUpperCase();
+        if (
+          newSortField != "" &&
+          (newSortDirection === "ASC" || newSortDirection === "DESC")
+        ) {
+          const newSortItem: [string, "ASC" | "DESC"] = [
+            newSortField,
+            newSortDirection,
+          ];
+          newSort.push(newSortItem);
+          continue;
+        }
+      }
+      throw new Error("Invalid sort value");
+    }
+    return newSort;
+  }
+  throw new Error("Invalid sort value");
 };
 
 export const getBaseQueryItems = (
@@ -83,8 +208,7 @@ export const getBaseQueryItems = (
       continue;
     }
     if (item.field === "sort") {
-      if (!Array.isArray(item.value)) throw new Error("Invalid sort value");
-      baseQuery.sort = item.value;
+      baseQuery.sort = cleanSortData(item.value);
       continue;
     }
     if (item.field === "fetchAll") {
@@ -101,7 +225,11 @@ export const getBaseQueryItems = (
 };
 
 const cleanValue = (x: any) => {
-  return typeof x === "string" ? "'" + x.replace(/'/g, "\\'") + "'" : x;
+  if (x === undefined || x === null) return `' '`;
+  if (typeof x === "string") return `'${x.replace(/'/g, "\\'")}'`;
+  if (typeof x === "boolean" && x === true) return `true`;
+  if (typeof x === "boolean" && x === false) return `false`;
+  return `'${x.toString()}'`;
 };
 
 const getSqlValue = (x: any, operator: string) => {
@@ -118,10 +246,20 @@ const criteriaToSql = (criteriaItems: CriteriaItem[], queryBase: QueryBase) => {
     if (sql != "") {
       sql += " and ";
     }
-    const operator =
-      criterion.operator ?? Array.isArray(criterion.value) ? "IN" : "=";
-    let value = operator === "IN" ? criterion.value : [criterion.value];
-    sql += `${criterion.field} ${operator} ${getSqlValue(value, operator)}`;
+    let operator = criterion.operator;
+    if (Array.isArray(criterion.value) && !operator) {
+      operator = "IN";
+    }
+    if (!operator) {
+      operator = "=";
+    }
+    if (Array.isArray(criterion.value) && operator !== "IN") {
+      throw new Error("Invalid operator for array value");
+    }
+    sql += `${criterion.field} ${operator} ${getSqlValue(
+      criterion.value,
+      operator
+    )}`;
   }
   if (sql != "") {
     sql = " where " + sql;
@@ -132,26 +270,31 @@ const criteriaToSql = (criteriaItems: CriteriaItem[], queryBase: QueryBase) => {
     sql += ` orderby ${queryBase.sort
       .map((x) => `${x[0]}${x[1] ? ` ${x[1]}` : ""}`)
       .join(",")}`;
-  if (queryBase.offset) sql += ` startposition ${queryBase.offset}`;
+  if (queryBase.offset) sql += ` startposition ${queryBase.offset + 1}`;
   if (queryBase.limit) sql += ` maxresults ${queryBase.limit}`;
   return sql;
 };
 
 export const getQueryString = (
   entityName: string,
-  queryData?: QueryInput | null
+  queryDataInput: QueryInput | null,
+  useCount?: boolean
 ): [string, QueryData | null] => {
   let query = "select * from " + entityName;
 
-  if (!queryData) {
+  if (useCount) {
+    query = query.replace("select * from", "select count(*) from");
+  }
+
+  if (queryDataInput === null) {
     return [query, null];
   }
 
-  if (typeof queryData === "string") {
-    return [queryData, null];
+  if (typeof queryDataInput === "string") {
+    return [queryDataInput, null];
   }
 
-  let [criteriaItems, queryBaseInitial] = getQueryItems(queryData);
+  let [criteriaItems, queryBaseInitial] = getQueryItems(queryDataInput);
   const [criteriaItemsClean, criteriaBase] = getBaseQueryItems(criteriaItems);
 
   if (queryBaseInitial.limit && criteriaBase.limit) {
@@ -188,12 +331,40 @@ export const getQueryString = (
     ...criteriaBase,
   };
 
-  if (queryBase.count) {
-    query = query.replace("select * from", "select count(*) from");
+  if (queryBase.hasOwnProperty("fetchAll")) {
+    queryBase.fetchAll = queryBase.fetchAll ? true : false;
   }
+  if (queryBase.hasOwnProperty("count")) {
+    queryBase.count = queryBase.count ? true : false;
+    if (queryBase.count && !useCount) {
+      throw new Error(
+        "count is depricated and cannot be used in query,  use count[entityName] instead"
+      );
+    }
+    if (queryBase.count) {
+      query = query.replace("select * from", "select count(*) from");
+    }
+  }
+
   if (!queryBase.limit || queryBase.limit > 1000 || queryBase.limit < 1) {
-    queryBase.limit = 1000;
+    if (queryBase.fetchAll && (!queryBase.limit || queryBase.limit > 1000)) {
+      queryBase.limit = 1000;
+    } else {
+      queryBase.limit = 100;
+    }
   }
+  if (queryBase.limit) {
+    const limit = Number(queryBase.limit);
+    if (isNaN(limit)) throw new Error("Invalid limit value");
+  }
+  if (queryBase.offset) {
+    const offset = Number(queryBase.offset);
+    if (isNaN(offset)) throw new Error("Invalid offset value");
+  }
+  if (queryBase.sort) {
+    if (!Array.isArray(queryBase.sort)) throw new Error("Invalid sort value");
+  }
+
   query += criteriaToSql(criteriaItemsClean, queryBase);
   const queryDataClean: QueryData = {
     ...queryBase,

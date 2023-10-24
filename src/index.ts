@@ -200,6 +200,19 @@ export enum ReportName {
   VendorExpenses = "VendorExpenses",
 }
 
+export type CreateInput<T extends keyof QuickbooksTypes> = Partial<
+  QuickbooksTypes[T]
+>;
+
+export type UpdateInput<T extends keyof QuickbooksTypes> = Partial<
+  QuickbooksTypes[T]
+>;
+
+export type DeleteInput<T extends keyof QuickbooksTypes> =
+  | number
+  | string
+  | Partial<QuickbooksTypes[T]>;
+
 export interface RequestOptions {
   url: string;
   qs?: Record<string, any>;
@@ -227,21 +240,47 @@ export interface CriteriaItem {
   count?: boolean;
 }
 
+export type QuerySortInput = ([string, "ASC" | "DESC" | null] | string)[] | [string, "ASC" | "DESC" | null] | string ;
+
+export type QuerySort = [string, "ASC" | "DESC"][];
+
 export interface QueryBase {
-  count?: boolean;
   limit?: number;
   offset?: number;
   asc?: string;
   desc?: string;
-  sort?: [string, "ASC" | "DESC" | null][];
+  sort?: QuerySort;
   fetchAll?: boolean;
+  /**
+   * @deprecated The method should not be used
+   */
+  count?: boolean;
 }
 
 export interface QueryData extends QueryBase {
-  items: CriteriaItem[];
+  items?: CriteriaItem[];
 }
 
-export type QueryInput = string | QueryData | CriteriaItem | CriteriaItem[];
+export interface QueryDataWithProperties {
+  limit?: number;
+  offset?: number;
+  asc?: string;
+  desc?: string;
+  fetchAll?: boolean;
+  sort?: QuerySortInput;
+  items?: CriteriaItem[];
+    /**
+   * @deprecated The method should not be used
+   */
+    count?: boolean;
+  [key: string]: any;
+}
+
+export type QueryInput =
+  | string
+  | QueryDataWithProperties
+  | CriteriaItem
+  | CriteriaItem[];
 
 interface GetExchangeRateOptions {
   /** Currency code, 3 characters */
@@ -274,6 +313,37 @@ class QBFetchError extends Error {
   constructor(msg: string, response: Response) {
     super(msg);
     this.response = response;
+  }
+}
+
+interface ResponseErrorJson {
+  warnings: null | any;
+  intuitObject: null | any;
+  fault: {
+    error: {
+      message: string;
+      detail: string;
+      code: string;
+      element: null | any;
+    }[];
+    type: string;
+  };
+  report: null | any;
+  queryResponse: null | any;
+  batchItemResponse: any[];
+  attachableResponse: any[];
+  syncErrorResponse: null | any;
+  requestId: null | any;
+  time: number;
+  status: null | any;
+  cdcresponse: any[];
+}
+
+class QBResponseError extends Error {
+  errorResponse: ResponseErrorJson;
+  constructor(msg: string, errorResponse: ResponseErrorJson) {
+    super(msg);
+    this.errorResponse = errorResponse;
   }
 }
 
@@ -776,10 +846,11 @@ class Quickbooks {
       try {
         const body = await response.json();
         if (body?.Fault?.Error) {
-          throw new Error(`Error of type ${body.Fault.Error.type}`);
+          throw new QBResponseError(`Error of type ${body.Fault.type}`, body);
         }
       } catch (e) {
         // ignore
+        throw e;
       }
       throw new QBFetchError(response.statusText, response);
     }
@@ -824,10 +895,14 @@ class Quickbooks {
   };
 
   // **********************  CRUD Api **********************
-  create = <K extends keyof QuickbooksTypes>(entityName: K, entity: Partial<QuickbooksTypes[K]>) => {
+  create = <K extends keyof QuickbooksTypes>(
+    entityName: K,
+    entity: Partial<QuickbooksTypes[K]>
+  ) => {
     const url = "/" + entityName.toLowerCase();
-    return this.request<{ 
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & Record<K, QuickbooksTypes[K]>)[P]
+    return this.request<{
+      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+        Record<K, QuickbooksTypes[K]>)[P];
     }>("post", { url: url }, entity);
   };
 
@@ -838,28 +913,32 @@ class Quickbooks {
   ) => {
     let url = "/" + entityName.toLowerCase();
     if (id) url = `${url}/${id}`;
-    return this.request<{ 
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & Record<K, QuickbooksTypes[K]>)[P]
-    }>(
-      "get",
-      { url: url, qs: options },
-      null
-    );
+    return this.request<{
+      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+        Record<K, QuickbooksTypes[K]>)[P];
+    }>("get", { url: url, qs: options }, null);
   };
 
-  update = <K extends Exclude<keyof QuickbooksTypes, EntityName.Exchangerate>>(entityName: K, entity: Partial<QuickbooksTypes[K]>) => {
+  update = <K extends Exclude<keyof QuickbooksTypes, EntityName.Exchangerate>>(
+    entityName: K,
+    entity: Partial<QuickbooksTypes[K]>
+  ) => {
     if (entityName === EntityName.Exchangerate) {
       throw new Error("Exchangerate entity cannot be updated");
     }
     let url = "/" + entityName.toLowerCase();
     let qs = { operation: "update" };
     let opts = { url: url, qs: qs };
-    return this.request<{ 
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & Record<K, QuickbooksTypes[K]>)[P]
+    return this.request<{
+      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+        Record<K, QuickbooksTypes[K]>)[P];
     }>("post", opts, entity);
   };
 
-  delete = async <K extends keyof QuickbooksTypes>(entityName: EntityName, idOrEntity: string | number | Partial<QuickbooksTypes[K]>) => {
+  delete = async <K extends keyof QuickbooksTypes>(
+    entityName: EntityName,
+    idOrEntity: string | number | Partial<QuickbooksTypes[K]>
+  ) => {
     // requires minimum Id and SyncToken
     // if passed Id as numeric value then grab entity and send it to delete
     let url = "/" + entityName.toLowerCase();
@@ -876,19 +955,26 @@ class Quickbooks {
     }
   };
 
-  void = async <K extends keyof QuickbooksTypes>(entityName: K, idOrEntity: string | number | Partial<QuickbooksTypes[K]>) => {
+  void = async <K extends keyof QuickbooksTypes>(
+    entityName: K,
+    idOrEntity: string | number | Partial<QuickbooksTypes[K]>
+  ) => {
     // requires minimum Id and SyncToken
     // if passed Id as numeric value then grab entity and send it to delete
     const url = "/" + entityName.toLowerCase();
     let qs = { operation: "void" };
     if (_.isObject(idOrEntity)) {
       return this.request<{
-        [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & Record<K, QuickbooksTypes[K]>)[P]
+        [P in keyof (BaseRequest &
+          Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+          Record<K, QuickbooksTypes[K]>)[P];
       }>("post", { url: url, qs: qs }, idOrEntity);
     } else {
       const entity = await this.read(entityName, idOrEntity);
-      return this.request<{ 
-        [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & Record<K, QuickbooksTypes[K]>)[P]
+      return this.request<{
+        [P in keyof (BaseRequest &
+          Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+          Record<K, QuickbooksTypes[K]>)[P];
       }>("post", { url: url, qs: qs }, entity);
     }
   };
@@ -898,26 +984,28 @@ class Quickbooks {
     entityName: K,
     queryInput?: QueryInput | null
   ) => {
-    const [query, queryData] = getQueryString(entityName, queryInput);
+    const [query, queryData] = getQueryString(entityName, queryInput ?? null);
+    if ("production" !== process.env.NODE_ENV && this.debug) {
+      console.log("using query:", query);
+      console.log("query data:", queryData);
+    }
     const url = "/query";
     let qs = {
       query: query,
     };
 
+    if (queryData?.count) {
+      throw new Error("Count is not supported, use count[Entity] for count");
+    }
+
     const data = await this.request<{
-      QueryResponse: { [P in keyof (QueryRequest & Record<K, Array<QuickbooksTypes[K]>>)]: (QueryRequest & Record<K, Array<QuickbooksTypes[K]>>)[P] };
+      QueryResponse: {
+        [P in keyof (QueryRequest &
+          Record<K, Array<QuickbooksTypes[K]>>)]?: (QueryRequest &
+          Record<K, Array<QuickbooksTypes[K]>>)[P];
+      };
       time: string;
     }>("get", { url: url, qs: qs }, null);
-    const fields = Object.keys(data.QueryResponse);
-    const key = _.find(fields, (k) => {
-      return k.toLowerCase() === entityName.toLowerCase();
-    });
-    if (data.QueryResponse[entityName]) {
-      throw new Error(
-        "Could not find entity in response: " +
-          util.inspect(data, { showHidden: false, depth: null })
-      );
-    }
     if (
       queryData?.fetchAll &&
       queryData?.limit &&
@@ -928,19 +1016,44 @@ class Quickbooks {
       Array.isArray(data.QueryResponse[entityName])
     ) {
       if (!queryData.offset) {
-        queryData.offset = queryData.limit + 1;
+        queryData.offset = queryData.limit;
       } else {
-        queryData.offset = queryData.offset + queryData.limit + 1;
+        queryData.offset = queryData.offset + queryData.limit;
       }
-      const more = await this.query(entityName, queryInput);
-      (data.QueryResponse[entityName] as QuickbooksTypes[K][]) = data.QueryResponse[entityName].concat(
-        more.QueryResponse[entityName] || []
-      );
-      (data.QueryResponse.maxResults as number) =
-        data.QueryResponse.maxResults + (more.QueryResponse.maxResults || 0);
-      data.time = more.time || data.time;
+      const more = await this.query(entityName, queryData);
+      if (data.QueryResponse[entityName]) {
+        (data.QueryResponse[entityName] as QuickbooksTypes[K][]) =
+          data.QueryResponse[entityName].concat(
+            more.QueryResponse[entityName] || []
+          );
+        (data.QueryResponse.maxResults as number) =
+          data.QueryResponse.maxResults + (more.QueryResponse.maxResults || 0);
+        (data.QueryResponse.totalCount as number) =
+          data.QueryResponse.totalCount + (more.QueryResponse.totalCount || 0);
+        data.time = more.time || data.time;
+      }
     }
     return data;
+  };
+
+  queryCount = async <K extends keyof QuickbooksTypes>(
+    entityName: K,
+    queryInput?: QueryInput | null
+  ) => {
+    const [query, queryData] = getQueryString(
+      entityName,
+      queryInput ?? null,
+      true
+    );
+    const url = "/query";
+    let qs = {
+      query: query,
+    };
+
+    return this.request<{
+      QueryResponse: { totalCount: number };
+      time: string;
+    }>("get", { url: url, qs: qs }, null);
   };
 
   // **********************  Report Api **********************
@@ -1082,12 +1195,8 @@ class Quickbooks {
    *
    * @param  {object} account - The unsaved account, to be persisted in QuickBooks
    */
-  createAccount = (account: Partial<QuickbooksTypes[
-      EntityName.Account]>) => {
-    return this.create(
-      EntityName.Account,
-      account
-    );
+  createAccount = (account: CreateInput<EntityName.Account>) => {
+    return this.create(EntityName.Account, account);
   };
 
   /**
@@ -1095,7 +1204,7 @@ class Quickbooks {
    *
    * @param  {object} attachable - The unsaved attachable, to be persisted in QuickBooks
    */
-  createAttachable = (attachable: Partial<QuickbooksTypes[EntityName.Attachable]>) => {
+  createAttachable = (attachable: CreateInput<EntityName.Attachable>) => {
     return this.create(EntityName.Attachable, attachable);
   };
 
@@ -1104,7 +1213,7 @@ class Quickbooks {
    *
    * @param  {object} bill - The unsaved bill, to be persisted in QuickBooks
    */
-  createBill = (bill: Partial<QuickbooksTypes[EntityName.Bill]>) => {
+  createBill = (bill: CreateInput<EntityName.Bill>) => {
     return this.create(EntityName.Bill, bill);
   };
 
@@ -1113,7 +1222,7 @@ class Quickbooks {
    *
    * @param  {object} billPayment - The unsaved billPayment, to be persisted in QuickBooks
    */
-  createBillPayment = (billPayment: Partial<QuickbooksTypes[EntityName.BillPayment]>) => {
+  createBillPayment = (billPayment: CreateInput<EntityName.BillPayment>) => {
     return this.create(EntityName.BillPayment, billPayment);
   };
 
@@ -1122,7 +1231,7 @@ class Quickbooks {
    *
    * @param classqb - The unsaved class, to be persisted in QuickBooks
    */
-  createClass = (classqb: Partial<QuickbooksTypes[EntityName.Class]>) => {
+  createClass = (classqb: CreateInput<EntityName.Class>) => {
     return this.create(EntityName.Class, classqb);
   };
 
@@ -1131,7 +1240,7 @@ class Quickbooks {
    *
    * @param  {object} creditMemo - The unsaved creditMemo, to be persisted in QuickBooks
    */
-  createCreditMemo = (creditMemo: Partial<QuickbooksTypes[EntityName.CreditMemo]>) => {
+  createCreditMemo = (creditMemo: CreateInput<EntityName.CreditMemo>) => {
     return this.create(EntityName.CreditMemo, creditMemo);
   };
 
@@ -1140,7 +1249,7 @@ class Quickbooks {
    *
    * @param  {object} customer - The unsaved customer, to be persisted in QuickBooks
    */
-  createCustomer = (customer: Partial<QuickbooksTypes[EntityName.Customer]>) => {
+  createCustomer = (customer: CreateInput<EntityName.Customer>) => {
     return this.create(EntityName.Customer, customer);
   };
 
@@ -1149,7 +1258,7 @@ class Quickbooks {
    *
    * @param  {object} department - The unsaved department, to be persisted in QuickBooks
    */
-  createDepartment = (department: Partial<QuickbooksTypes[EntityName.Department]>) => {
+  createDepartment = (department: CreateInput<EntityName.Department>) => {
     return this.create(EntityName.Department, department);
   };
 
@@ -1158,7 +1267,7 @@ class Quickbooks {
    *
    * @param  {object} deposit - The unsaved Deposit, to be persisted in QuickBooks
    */
-  createDeposit = (deposit: Partial<QuickbooksTypes[EntityName.Deposit]>) => {
+  createDeposit = (deposit: CreateInput<EntityName.Deposit>) => {
     return this.create(EntityName.Deposit, deposit);
   };
 
@@ -1167,7 +1276,7 @@ class Quickbooks {
    *
    * @param  {object} employee - The unsaved employee, to be persisted in QuickBooks
    */
-  createEmployee = (employee: Partial<QuickbooksTypes[EntityName.Employee]>) => {
+  createEmployee = (employee: CreateInput<EntityName.Employee>) => {
     return this.create(EntityName.Employee, employee);
   };
 
@@ -1176,7 +1285,7 @@ class Quickbooks {
    *
    * @param  {object} estimate - The unsaved estimate, to be persisted in QuickBooks
    */
-  createEstimate = (estimate: Partial<QuickbooksTypes[EntityName.Estimate]>) => {
+  createEstimate = (estimate: CreateInput<EntityName.Estimate>) => {
     return this.create(EntityName.Estimate, estimate);
   };
 
@@ -1185,7 +1294,7 @@ class Quickbooks {
    *
    * @param  {object} invoice - The unsaved invoice, to be persisted in QuickBooks
    */
-  createInvoice = (invoice: Partial<QuickbooksTypes[EntityName.Invoice]>) => {
+  createInvoice = (invoice: CreateInput<EntityName.Invoice>) => {
     return this.create(EntityName.Invoice, invoice);
   };
 
@@ -1194,7 +1303,7 @@ class Quickbooks {
    *
    * @param  {object} item - The unsaved item, to be persisted in QuickBooks
    */
-  createItem = (item: Partial<QuickbooksTypes[EntityName.Item]>) => {
+  createItem = (item: CreateInput<EntityName.Item>) => {
     return this.create(EntityName.Item, item);
   };
 
@@ -1203,7 +1312,7 @@ class Quickbooks {
    *
    * @param  {object} journalCode - The unsaved journalCode, to be persisted in QuickBooks
    */
-  createJournalCode = (journalCode: Partial<QuickbooksTypes[EntityName.JournalCode]>) => {
+  createJournalCode = (journalCode: CreateInput<EntityName.JournalCode>) => {
     return this.create(EntityName.JournalCode, journalCode);
   };
 
@@ -1212,7 +1321,7 @@ class Quickbooks {
    *
    * @param  {object} journalEntry - The unsaved journalEntry, to be persisted in QuickBooks
    */
-  createJournalEntry = (journalEntry: Partial<QuickbooksTypes[EntityName.JournalEntry]>) => {
+  createJournalEntry = (journalEntry: CreateInput<EntityName.JournalEntry>) => {
     return this.create(EntityName.JournalEntry, journalEntry);
   };
 
@@ -1222,7 +1331,7 @@ class Quickbooks {
  * @param  {object} payment - The unsaved payment, to be persisted in QuickBooks
 
  */
-  createPayment = (payment: Partial<QuickbooksTypes[EntityName.Payment]>) => {
+  createPayment = (payment: CreateInput<EntityName.Payment>) => {
     return this.create(EntityName.Payment, payment);
   };
 
@@ -1231,7 +1340,9 @@ class Quickbooks {
    *
    * @param  {object} paymentMethod - The unsaved paymentMethod, to be persisted in QuickBooks
    */
-  createPaymentMethod = (paymentMethod: Partial<QuickbooksTypes[EntityName.PaymentMethod]>) => {
+  createPaymentMethod = (
+    paymentMethod: CreateInput<EntityName.PaymentMethod>
+  ) => {
     return this.create(EntityName.PaymentMethod, paymentMethod);
   };
 
@@ -1240,7 +1351,7 @@ class Quickbooks {
    *
    * @param  {object} purchase - The unsaved purchase, to be persisted in QuickBooks
    */
-  createPurchase = (purchase: Partial<QuickbooksTypes[EntityName.Purchase]>) => {
+  createPurchase = (purchase: CreateInput<EntityName.Purchase>) => {
     return this.create(EntityName.Purchase, purchase);
   };
 
@@ -1249,7 +1360,9 @@ class Quickbooks {
    *
    * @param  {object} purchaseOrder - The unsaved purchaseOrder, to be persisted in QuickBooks
    */
-  createPurchaseOrder = (purchaseOrder: Partial<QuickbooksTypes[EntityName.PurchaseOrder]>) => {
+  createPurchaseOrder = (
+    purchaseOrder: CreateInput<EntityName.PurchaseOrder>
+  ) => {
     return this.create(EntityName.PurchaseOrder, purchaseOrder);
   };
 
@@ -1258,7 +1371,9 @@ class Quickbooks {
    *
    * @param  {object} refundReceipt - The unsaved refundReceipt, to be persisted in QuickBooks
    */
-  createRefundReceipt = (refundReceipt: Partial<QuickbooksTypes[EntityName.RefundReceipt]>) => {
+  createRefundReceipt = (
+    refundReceipt: CreateInput<EntityName.RefundReceipt>
+  ) => {
     return this.create(EntityName.RefundReceipt, refundReceipt);
   };
 
@@ -1267,7 +1382,7 @@ class Quickbooks {
    *
    * @param  {object} salesReceipt - The unsaved salesReceipt, to be persisted in QuickBooks
    */
-  createSalesReceipt = (salesReceipt: Partial<QuickbooksTypes[EntityName.SalesReceipt]>) => {
+  createSalesReceipt = (salesReceipt: CreateInput<EntityName.SalesReceipt>) => {
     return this.create(EntityName.SalesReceipt, salesReceipt);
   };
 
@@ -1276,7 +1391,7 @@ class Quickbooks {
    *
    * @param  {object} taxAgency - The unsaved taxAgency, to be persisted in QuickBooks
    */
-  createTaxAgency = (taxAgency: Partial<QuickbooksTypes[EntityName.TaxAgency]>) => {
+  createTaxAgency = (taxAgency: CreateInput<EntityName.TaxAgency>) => {
     return this.create(EntityName.TaxAgency, taxAgency);
   };
 
@@ -1285,7 +1400,7 @@ class Quickbooks {
    *
    * @param  {object} term - The unsaved term, to be persisted in QuickBooks
    */
-  createTerm = (term: Partial<QuickbooksTypes[EntityName.Term]>) => {
+  createTerm = (term: CreateInput<EntityName.Term>) => {
     return this.create(EntityName.Term, term);
   };
 
@@ -1294,7 +1409,7 @@ class Quickbooks {
    *
    * @param  {object} timeActivity - The unsaved timeActivity, to be persisted in QuickBooks
    */
-  createTimeActivity = (timeActivity: Partial<QuickbooksTypes[EntityName.TimeActivity]>) => {
+  createTimeActivity = (timeActivity: CreateInput<EntityName.TimeActivity>) => {
     return this.create(EntityName.TimeActivity, timeActivity);
   };
 
@@ -1303,7 +1418,7 @@ class Quickbooks {
    *
    * @param  {object} transfer - The unsaved Transfer, to be persisted in QuickBooks
    */
-  createTransfer = (transfer: Partial<QuickbooksTypes[EntityName.Transfer]>) => {
+  createTransfer = (transfer: CreateInput<EntityName.Transfer>) => {
     return this.create(EntityName.Transfer, transfer);
   };
 
@@ -1312,7 +1427,7 @@ class Quickbooks {
    *
    * @param  {object} vendor - The unsaved vendor, to be persisted in QuickBooks
    */
-  createVendor = (vendor: Partial<QuickbooksTypes[EntityName.Vendor]>) => {
+  createVendor = (vendor: CreateInput<EntityName.Vendor>) => {
     return this.create(EntityName.Vendor, vendor);
   };
 
@@ -1321,7 +1436,7 @@ class Quickbooks {
    *
    * @param  {object} vendorCredit - The unsaved vendorCredit, to be persisted in QuickBooks
    */
-  createVendorCredit = (vendorCredit: Partial<QuickbooksTypes[EntityName.VendorCredit]>) => {
+  createVendorCredit = (vendorCredit: CreateInput<EntityName.VendorCredit>) => {
     return this.create(EntityName.VendorCredit, vendorCredit);
   };
 
@@ -1726,7 +1841,7 @@ class Quickbooks {
    *
    * @param account - The persistent Account, including Id and SyncToken fields
    */
-  updateAccount = (account: Partial<QuickbooksTypes[EntityName.Account]>) => {
+  updateAccount = (account: UpdateInput<EntityName.Account>) => {
     return this.update(EntityName.Account, account);
   };
 
@@ -1735,7 +1850,7 @@ class Quickbooks {
    *
    * @param bill - The persistent Bill, including Id and SyncToken fields
    */
-  updateBill = (bill: Partial<QuickbooksTypes[EntityName.Bill]>) => {
+  updateBill = (bill: UpdateInput<EntityName.Bill>) => {
     return this.update(EntityName.Bill, bill);
   };
 
@@ -1744,7 +1859,7 @@ class Quickbooks {
    *
    * @param billPayment - The persistent BillPayment, including Id and SyncToken fields
    */
-  updateBillPayment = (billPayment: Partial<QuickbooksTypes[EntityName.BillPayment]>) => {
+  updateBillPayment = (billPayment: UpdateInput<EntityName.BillPayment>) => {
     return this.update(EntityName.BillPayment, billPayment);
   };
 
@@ -1753,7 +1868,7 @@ class Quickbooks {
    *
    * @param classqb - The persistent Class, including Id and SyncToken fields
    */
-  updateClass = (classqb: Partial<QuickbooksTypes[EntityName.Class]>) => {
+  updateClass = (classqb: UpdateInput<EntityName.Class>) => {
     return this.update(EntityName.Class, classqb);
   };
 
@@ -1762,7 +1877,7 @@ class Quickbooks {
    *
    * @param companyInfo - The persistent CompanyInfo, including Id and SyncToken fields
    */
-  updateCompanyInfo = (companyInfo: Partial<QuickbooksTypes[EntityName.CompanyInfo]>) => {
+  updateCompanyInfo = (companyInfo: UpdateInput<EntityName.CompanyInfo>) => {
     return this.update(EntityName.CompanyInfo, companyInfo);
   };
 
@@ -1771,7 +1886,7 @@ class Quickbooks {
    *
    * @param creditMemo - The persistent CreditMemo, including Id and SyncToken fields
    */
-  updateCreditMemo = (creditMemo: Partial<QuickbooksTypes[EntityName.CreditMemo]>) => {
+  updateCreditMemo = (creditMemo: UpdateInput<EntityName.CreditMemo>) => {
     return this.update(EntityName.CreditMemo, creditMemo);
   };
 
@@ -1780,7 +1895,7 @@ class Quickbooks {
    *
    * @param customer - The persistent Customer, including Id and SyncToken fields
    */
-  updateCustomer = (customer: Partial<QuickbooksTypes[EntityName.Customer]>) => {
+  updateCustomer = (customer: UpdateInput<EntityName.Customer>) => {
     return this.update(EntityName.Customer, customer);
   };
 
@@ -1789,7 +1904,7 @@ class Quickbooks {
    *
    * @param department - The persistent Department, including Id and SyncToken fields
    */
-  updateDepartment = (department: Partial<QuickbooksTypes[EntityName.Department]>) => {
+  updateDepartment = (department: UpdateInput<EntityName.Department>) => {
     return this.update(EntityName.Department, department);
   };
 
@@ -1798,7 +1913,7 @@ class Quickbooks {
    *
    * @param deposit - The persistent Deposit, including Id and SyncToken fields
    */
-  updateDeposit = (deposit: Partial<QuickbooksTypes[EntityName.Deposit]>) => {
+  updateDeposit = (deposit: UpdateInput<EntityName.Deposit>) => {
     return this.update(EntityName.Deposit, deposit);
   };
 
@@ -1807,7 +1922,7 @@ class Quickbooks {
    *
    * @param employee - The persistent Employee, including Id and SyncToken fields
    */
-  updateEmployee = (employee: Partial<QuickbooksTypes[EntityName.Employee]>) => {
+  updateEmployee = (employee: UpdateInput<EntityName.Employee>) => {
     return this.update(EntityName.Employee, employee);
   };
 
@@ -1816,7 +1931,7 @@ class Quickbooks {
    *
    * @param estimate - The persistent Estimate, including Id and SyncToken fields
    */
-  updateEstimate = (estimate: Partial<QuickbooksTypes[EntityName.Estimate]>) => {
+  updateEstimate = (estimate: UpdateInput<EntityName.Estimate>) => {
     return this.update(EntityName.Estimate, estimate);
   };
 
@@ -1825,7 +1940,7 @@ class Quickbooks {
    *
    * @param invoice - The persistent Invoice, including Id and SyncToken fields
    */
-  updateInvoice = (invoice: Partial<QuickbooksTypes[EntityName.Invoice]>) => {
+  updateInvoice = (invoice: UpdateInput<EntityName.Invoice>) => {
     return this.update(EntityName.Invoice, invoice);
   };
 
@@ -1834,7 +1949,7 @@ class Quickbooks {
    *
    * @param item - The persistent Item, including Id and SyncToken fields
    */
-  updateItem = (item: Partial<QuickbooksTypes[EntityName.Item]>) => {
+  updateItem = (item: UpdateInput<EntityName.Item>) => {
     return this.update(EntityName.Item, item);
   };
 
@@ -1843,7 +1958,7 @@ class Quickbooks {
    *
    * @param journalCode - The persistent JournalCode, including Id and SyncToken fields
    */
-  updateJournalCode = (journalCode: Partial<QuickbooksTypes[EntityName.JournalCode]>) => {
+  updateJournalCode = (journalCode: UpdateInput<EntityName.JournalCode>) => {
     return this.update(EntityName.JournalCode, journalCode);
   };
 
@@ -1852,7 +1967,7 @@ class Quickbooks {
    *
    * @param journalEntry - The persistent JournalEntry, including Id and SyncToken fields
    */
-  updateJournalEntry = (journalEntry: Partial<QuickbooksTypes[EntityName.JournalEntry]>) => {
+  updateJournalEntry = (journalEntry: UpdateInput<EntityName.JournalEntry>) => {
     return this.update(EntityName.JournalEntry, journalEntry);
   };
 
@@ -1861,7 +1976,7 @@ class Quickbooks {
    *
    * @param payment - The persistent Payment, including Id and SyncToken fields
    */
-  updatePayment = (payment: Partial<QuickbooksTypes[EntityName.Payment]>) => {
+  updatePayment = (payment: UpdateInput<EntityName.Payment>) => {
     return this.update(EntityName.Payment, payment);
   };
 
@@ -1870,7 +1985,9 @@ class Quickbooks {
    *
    * @param paymentMethod - The persistent PaymentMethod, including Id and SyncToken fields
    */
-  updatePaymentMethod = (paymentMethod: Partial<QuickbooksTypes[EntityName.PaymentMethod]>) => {
+  updatePaymentMethod = (
+    paymentMethod: UpdateInput<EntityName.PaymentMethod>
+  ) => {
     return this.update(EntityName.PaymentMethod, paymentMethod);
   };
 
@@ -1879,7 +1996,7 @@ class Quickbooks {
    *
    * @param preferences - The persistent Preferences, including Id and SyncToken fields
    */
-  updatePreferences = (preferences: Partial<QuickbooksTypes[EntityName.Preferences]>) => {
+  updatePreferences = (preferences: UpdateInput<EntityName.Preferences>) => {
     return this.update(EntityName.Preferences, preferences);
   };
 
@@ -1888,7 +2005,7 @@ class Quickbooks {
    *
    * @param purchase - The persistent Purchase, including Id and SyncToken fields
    */
-  updatePurchase = (purchase: Partial<QuickbooksTypes[EntityName.Purchase]>) => {
+  updatePurchase = (purchase: UpdateInput<EntityName.Purchase>) => {
     return this.update(EntityName.Purchase, purchase);
   };
 
@@ -1897,7 +2014,9 @@ class Quickbooks {
    *
    * @param purchaseOrder - The persistent PurchaseOrder, including Id and SyncToken fields
    */
-  updatePurchaseOrder = (purchaseOrder: Partial<QuickbooksTypes[EntityName.PurchaseOrder]>) => {
+  updatePurchaseOrder = (
+    purchaseOrder: UpdateInput<EntityName.PurchaseOrder>
+  ) => {
     return this.update(EntityName.PurchaseOrder, purchaseOrder);
   };
 
@@ -1906,7 +2025,9 @@ class Quickbooks {
    *
    * @param refundReceipt - The persistent RefundReceipt, including Id and SyncToken fields
    */
-  updateRefundReceipt = (refundReceipt: Partial<QuickbooksTypes[EntityName.RefundReceipt]>) => {
+  updateRefundReceipt = (
+    refundReceipt: UpdateInput<EntityName.RefundReceipt>
+  ) => {
     return this.update(EntityName.RefundReceipt, refundReceipt);
   };
 
@@ -1915,7 +2036,7 @@ class Quickbooks {
    *
    * @param salesReceipt - The persistent SalesReceipt, including Id and SyncToken fields
    */
-  updateSalesReceipt = (salesReceipt: Partial<QuickbooksTypes[EntityName.SalesReceipt]>) => {
+  updateSalesReceipt = (salesReceipt: UpdateInput<EntityName.SalesReceipt>) => {
     return this.update(EntityName.SalesReceipt, salesReceipt);
   };
 
@@ -1924,7 +2045,7 @@ class Quickbooks {
    *
    * @param taxAgency - The persistent TaxAgency, including Id and SyncToken fields
    */
-  updateTaxAgency = (taxAgency: Partial<QuickbooksTypes[EntityName.TaxAgency]>) => {
+  updateTaxAgency = (taxAgency: UpdateInput<EntityName.TaxAgency>) => {
     return this.update(EntityName.TaxAgency, taxAgency);
   };
 
@@ -1933,7 +2054,7 @@ class Quickbooks {
    *
    * @param taxCode - The persistent TaxCode, including Id and SyncToken fields
    */
-  updateTaxCode = (taxCode: Partial<QuickbooksTypes[EntityName.TaxCode]>) => {
+  updateTaxCode = (taxCode: UpdateInput<EntityName.TaxCode>) => {
     return this.update(EntityName.TaxCode, taxCode);
   };
 
@@ -1942,7 +2063,7 @@ class Quickbooks {
    *
    * @param taxRate - The persistent TaxRate, including Id and SyncToken fields
    */
-  updateTaxRate = (taxRate: Partial<QuickbooksTypes[EntityName.TaxRate]>) => {
+  updateTaxRate = (taxRate: UpdateInput<EntityName.TaxRate>) => {
     return this.update(EntityName.TaxRate, taxRate);
   };
 
@@ -1951,7 +2072,7 @@ class Quickbooks {
    *
    * @param term - The persistent Term, including Id and SyncToken fields
    */
-  updateTerm = (term: Partial<QuickbooksTypes[EntityName.Term]>) => {
+  updateTerm = (term: UpdateInput<EntityName.Term>) => {
     return this.update(EntityName.Term, term);
   };
 
@@ -1960,7 +2081,7 @@ class Quickbooks {
    *
    * @param timeActivity - The persistent TimeActivity, including Id and SyncToken fields
    */
-  updateTimeActivity = (timeActivity: Partial<QuickbooksTypes[EntityName.TimeActivity]>) => {
+  updateTimeActivity = (timeActivity: UpdateInput<EntityName.TimeActivity>) => {
     return this.update(EntityName.TimeActivity, timeActivity);
   };
 
@@ -1969,7 +2090,7 @@ class Quickbooks {
    *
    * @param Transfer - The persistent Transfer, including Id and SyncToken fields
    */
-  updateTransfer = (transfer: Partial<QuickbooksTypes[EntityName.Transfer]>) => {
+  updateTransfer = (transfer: UpdateInput<EntityName.Transfer>) => {
     return this.update(EntityName.Transfer, transfer);
   };
 
@@ -1978,7 +2099,7 @@ class Quickbooks {
    *
    * @param vendor - The persistent Vendor, including Id and SyncToken fields
    */
-  updateVendor = (vendor: Partial<QuickbooksTypes[EntityName.Vendor]>) => {
+  updateVendor = (vendor: UpdateInput<EntityName.Vendor>) => {
     return this.update(EntityName.Vendor, vendor);
   };
 
@@ -1987,7 +2108,7 @@ class Quickbooks {
    *
    * @param vendorCredit - The persistent VendorCredit, including Id and SyncToken fields
    */
-  updateVendorCredit = (vendorCredit: Partial<QuickbooksTypes[EntityName.VendorCredit]>) => {
+  updateVendorCredit = (vendorCredit: UpdateInput<EntityName.VendorCredit>) => {
     return this.update(EntityName.VendorCredit, vendorCredit);
   };
 
@@ -1996,7 +2117,7 @@ class Quickbooks {
    *
    * @param exchangeRate - The persistent ExchangeRate, including Id and SyncToken fields
    */
-  updateExchangeRate = (exchangeRate: Partial<QuickbooksTypes[EntityName.Exchangerate]>) => {
+  updateExchangeRate = (exchangeRate: UpdateInput<EntityName.Exchangerate>) => {
     return this.update(EntityName.Exchangerate, exchangeRate);
   };
 
@@ -2005,7 +2126,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Attachable to be deleted, or the Id of the Attachable, in which case an extra GET request will be issued to first retrieve the Attachable
    */
-  deleteAttachable = (idOrEntity: number | string | QuickbooksTypes[EntityName.Attachable]) => {
+  deleteAttachable = (idOrEntity: DeleteInput<EntityName.Attachable>) => {
     return this.delete(EntityName.Attachable, idOrEntity);
   };
 
@@ -2014,7 +2135,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Bill to be deleted, or the Id of the Bill, in which case an extra GET request will be issued to first retrieve the Bill
    */
-  deleteBill = (idOrEntity: number | string | QuickbooksTypes[EntityName.Bill]) => {
+  deleteBill = (idOrEntity: DeleteInput<EntityName.Bill>) => {
     return this.delete(EntityName.Bill, idOrEntity);
   };
 
@@ -2023,7 +2144,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent BillPayment to be deleted, or the Id of the BillPayment, in which case an extra GET request will be issued to first retrieve the BillPayment
    */
-  deleteBillPayment = (idOrEntity: number | string | QuickbooksTypes[EntityName.BillPayment]) => {
+  deleteBillPayment = (idOrEntity: DeleteInput<EntityName.BillPayment>) => {
     return this.delete(EntityName.BillPayment, idOrEntity);
   };
 
@@ -2032,7 +2153,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent CreditMemo to be deleted, or the Id of the CreditMemo, in which case an extra GET request will be issued to first retrieve the CreditMemo
    */
-  deleteCreditMemo = (idOrEntity: number | string | QuickbooksTypes[EntityName.CreditMemo]) => {
+  deleteCreditMemo = (idOrEntity: DeleteInput<EntityName.CreditMemo>) => {
     return this.delete(EntityName.CreditMemo, idOrEntity);
   };
 
@@ -2041,7 +2162,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Deposit to be deleted, or the Id of the Deposit, in which case an extra GET request will be issued to first retrieve the Deposit
    */
-  deleteDeposit = (idOrEntity: number | string | QuickbooksTypes[EntityName.Deposit]) => {
+  deleteDeposit = (idOrEntity: DeleteInput<EntityName.Deposit>) => {
     return this.delete(EntityName.Deposit, idOrEntity);
   };
 
@@ -2050,7 +2171,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Estimate to be deleted, or the Id of the Estimate, in which case an extra GET request will be issued to first retrieve the Estimate
    */
-  deleteEstimate = (idOrEntity: number | string | QuickbooksTypes[EntityName.Estimate]) => {
+  deleteEstimate = (idOrEntity: DeleteInput<EntityName.Estimate>) => {
     return this.delete(EntityName.Estimate, idOrEntity);
   };
 
@@ -2059,7 +2180,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Invoice to be deleted, or the Id of the Invoice, in which case an extra GET request will be issued to first retrieve the Invoice
    */
-  deleteInvoice = (idOrEntity: number | string | QuickbooksTypes[EntityName.Invoice]) => {
+  deleteInvoice = (idOrEntity: DeleteInput<EntityName.Invoice>) => {
     return this.delete(EntityName.Invoice, idOrEntity);
   };
 
@@ -2068,7 +2189,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent JournalCode to be deleted, or the Id of the JournalCode, in which case an extra GET request will be issued to first retrieve the JournalCode
    */
-  deleteJournalCode = (idOrEntity: number | string | QuickbooksTypes[EntityName.JournalCode]) => {
+  deleteJournalCode = (idOrEntity: DeleteInput<EntityName.JournalCode>) => {
     return this.delete(EntityName.JournalCode, idOrEntity);
   };
 
@@ -2077,7 +2198,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent JournalEntry to be deleted, or the Id of the JournalEntry, in which case an extra GET request will be issued to first retrieve the JournalEntry
    */
-  deleteJournalEntry = (idOrEntity: number | string | QuickbooksTypes[EntityName.JournalEntry]) => {
+  deleteJournalEntry = (idOrEntity: DeleteInput<EntityName.JournalEntry>) => {
     return this.delete(EntityName.JournalEntry, idOrEntity);
   };
 
@@ -2086,7 +2207,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Payment to be deleted, or the Id of the Payment, in which case an extra GET request will be issued to first retrieve the Payment
    */
-  deletePayment = (idOrEntity: number | string | QuickbooksTypes[EntityName.Payment]) => {
+  deletePayment = (idOrEntity: DeleteInput<EntityName.Payment>) => {
     return this.delete(EntityName.Payment, idOrEntity);
   };
 
@@ -2095,7 +2216,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Purchase to be deleted, or the Id of the Purchase, in which case an extra GET request will be issued to first retrieve the Purchase
    */
-  deletePurchase = (idOrEntity: number | string | QuickbooksTypes[EntityName.Purchase]) => {
+  deletePurchase = (idOrEntity: DeleteInput<EntityName.Purchase>) => {
     return this.delete(EntityName.Purchase, idOrEntity);
   };
 
@@ -2104,7 +2225,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent PurchaseOrder to be deleted, or the Id of the PurchaseOrder, in which case an extra GET request will be issued to first retrieve the PurchaseOrder
    */
-  deletePurchaseOrder = (idOrEntity: number | string | QuickbooksTypes[EntityName.PurchaseOrder]) => {
+  deletePurchaseOrder = (idOrEntity: DeleteInput<EntityName.PurchaseOrder>) => {
     return this.delete(EntityName.PurchaseOrder, idOrEntity);
   };
 
@@ -2113,7 +2234,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent RefundReceipt to be deleted, or the Id of the RefundReceipt, in which case an extra GET request will be issued to first retrieve the RefundReceipt
    */
-  deleteRefundReceipt = (idOrEntity: number | string | QuickbooksTypes[EntityName.RefundReceipt]) => {
+  deleteRefundReceipt = (idOrEntity: DeleteInput<EntityName.RefundReceipt>) => {
     return this.delete(EntityName.RefundReceipt, idOrEntity);
   };
 
@@ -2122,7 +2243,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent SalesReceipt to be deleted, or the Id of the SalesReceipt, in which case an extra GET request will be issued to first retrieve the SalesReceipt
    */
-  deleteSalesReceipt = (idOrEntity: number | string | QuickbooksTypes[EntityName.SalesReceipt]) => {
+  deleteSalesReceipt = (idOrEntity: DeleteInput<EntityName.SalesReceipt>) => {
     return this.delete(EntityName.SalesReceipt, idOrEntity);
   };
 
@@ -2131,7 +2252,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent TimeActivity to be deleted, or the Id of the TimeActivity, in which case an extra GET request will be issued to first retrieve the TimeActivity
    */
-  deleteTimeActivity = (idOrEntity: number | string | QuickbooksTypes[EntityName.TimeActivity]) => {
+  deleteTimeActivity = (idOrEntity: DeleteInput<EntityName.TimeActivity>) => {
     return this.delete(EntityName.TimeActivity, idOrEntity);
   };
 
@@ -2140,7 +2261,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Transfer to be deleted, or the Id of the Transfer, in which case an extra GET request will be issued to first retrieve the Transfer
    */
-  deleteTransfer = (idOrEntity: number | string | QuickbooksTypes[EntityName.Transfer]) => {
+  deleteTransfer = (idOrEntity: DeleteInput<EntityName.Transfer>) => {
     return this.delete(EntityName.Transfer, idOrEntity);
   };
 
@@ -2149,7 +2270,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent VendorCredit to be deleted, or the Id of the VendorCredit, in which case an extra GET request will be issued to first retrieve the VendorCredit
    */
-  deleteVendorCredit = (idOrEntity: number | string | QuickbooksTypes[EntityName.VendorCredit]) => {
+  deleteVendorCredit = (idOrEntity: DeleteInput<EntityName.VendorCredit>) => {
     return this.delete(EntityName.VendorCredit, idOrEntity);
   };
 
@@ -2158,7 +2279,7 @@ class Quickbooks {
    *
    * @param idOrEntity - The persistent Invoice to be voided, or the Id of the Invoice, in which case an extra GET request will be issued to first retrieve the Invoice
    */
-  voidInvoice = (idOrEntity: number | string | Partial<QuickbooksTypes[EntityName.Invoice]>) => {
+  voidInvoice = (idOrEntity: DeleteInput<EntityName.Invoice>) => {
     return this.void(EntityName.Invoice, idOrEntity);
   };
 
@@ -2167,7 +2288,7 @@ class Quickbooks {
    *
    * @param payment - The persistent Payment, including Id and SyncToken fields
    */
-  voidPayment = (payment: Partial<QuickbooksTypes[EntityName.Payment]>) => {
+  voidPayment = (payment: UpdateInput<EntityName.Payment>) => {
     // if object then add sparse true
     if (typeof payment === "object") {
       payment.sparse = true;
@@ -2470,6 +2591,303 @@ class Quickbooks {
    */
   findExchangeRates = (criteria?: QueryInput) => {
     return this.query(EntityName.Exchangerate, criteria);
+  };
+
+  /**
+   * Finds all Accounts in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countAccounts = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Account, criteria);
+  };
+
+  /**
+   * Finds all Attachables in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countAttachables = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Attachable, criteria);
+  };
+
+  /**
+   * Finds all Bills in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countBills = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Bill, criteria);
+  };
+
+  /**
+   * Finds all BillPayments in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countBillPayments = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.BillPayment, criteria);
+  };
+
+  /**
+   * Finds all Budgets in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countBudgets = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Budget, criteria);
+  };
+
+  /**
+   * Finds all Classs in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countClasses = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Class, criteria);
+  };
+
+  /**
+   * Finds all CompanyInfos in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countCompanyInfos = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.CompanyInfo, criteria);
+  };
+
+  /**
+   * Finds all CreditMemos in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countCreditMemos = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.CreditMemo, criteria);
+  };
+
+  /**
+   * Finds all Customers in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countCustomers = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Customer, criteria);
+  };
+
+  /**
+   * Finds all Departments in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countDepartments = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Department, criteria);
+  };
+
+  /**
+   * Finds all Deposits in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countDeposits = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Deposit, criteria);
+  };
+
+  /**
+   * Finds all Employees in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countEmployees = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Employee, criteria);
+  };
+
+  /**
+   * Finds all Estimates in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countEstimates = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Estimate, criteria);
+  };
+
+  /**
+   * Finds all Invoices in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countInvoices = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Invoice, criteria);
+  };
+
+  /**
+   * Finds all Items in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countItems = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Item, criteria);
+  };
+
+  /**
+   * Finds all JournalCodes in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countJournalCodes = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.JournalCode, criteria);
+  };
+
+  /**
+   * Finds all JournalEntrys in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countJournalEntries = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.JournalEntry, criteria);
+  };
+
+  /**
+   * Finds all Payments in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countPayments = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Payment, criteria);
+  };
+
+  /**
+   * Finds all PaymentMethods in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countPaymentMethods = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.PaymentMethod, criteria);
+  };
+
+  /**
+   * Finds all Preferencess in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countPreferenceses = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Preferences, criteria);
+  };
+
+  /**
+   * Finds all Purchases in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countPurchases = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Purchase, criteria);
+  };
+
+  /**
+   * Finds all PurchaseOrders in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countPurchaseOrders = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.PurchaseOrder, criteria);
+  };
+
+  /**
+   * Finds all RefundReceipts in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countRefundReceipts = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.RefundReceipt, criteria);
+  };
+
+  /**
+   * Finds all SalesReceipts in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countSalesReceipts = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.SalesReceipt, criteria);
+  };
+
+  /**
+   * Finds all TaxAgencys in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countTaxAgencies = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.TaxAgency, criteria);
+  };
+
+  /**
+   * Finds all TaxCodes in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countTaxCodes = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.TaxCode, criteria);
+  };
+
+  /**
+   * Finds all TaxRates in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countTaxRates = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.TaxRate, criteria);
+  };
+
+  /**
+   * Finds all Terms in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countTerms = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Term, criteria);
+  };
+
+  /**
+   * Finds all TimeActivitys in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countTimeActivities = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.TimeActivity, criteria);
+  };
+
+  /**
+   * Finds all Transfers in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countTransfers = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Transfer, criteria);
+  };
+
+  /**
+   * Finds all Vendors in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countVendors = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Vendor, criteria);
+  };
+
+  /**
+   * Finds all VendorCredits in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countVendorCredits = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.VendorCredit, criteria);
+  };
+
+  /**
+   * Finds all ExchangeRates in QuickBooks, optionally matching the specified criteria
+   *
+   * @param criteria - (Optional) String or single-valued map converted to a where clause of the form "where key = 'value'"
+   */
+  countExchangeRates = (criteria?: QueryInput) => {
+    return this.queryCount(EntityName.Exchangerate, criteria);
   };
 
   /**

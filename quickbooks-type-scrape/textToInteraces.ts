@@ -65,12 +65,12 @@ export const processTypesForText = (entityData: TypeInformation) => {
   for (const typeName in allTypes) {
     const type = allTypes[typeName];
     if (!type.typeRefName) {
-      console.log("skipping type for combining", typeName);
+    //   console.log("skipping type for combining", typeName);
       continue;
     }
     const combineTypeName = type.typeRefName;
     if (combineCheckedTypes.includes(combineTypeName)) {
-      console.log("already checked type for combining", typeName);
+    //   console.log("already checked type for combining", typeName);
       continue;
     }
     combineCheckedTypes.push(combineTypeName);

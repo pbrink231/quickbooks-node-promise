@@ -1,3 +1,11 @@
+## [3.1.0]
+
+- Fixed query requesting
+- Added optional to query response properties which is possible if offset is too high
+- Updated sorted at to allow simplier method
+- updated readme with how to use sorted at
+- Export Doc comments to npm types
+
 ## [3.0.2]
 
 - Fixed inoice item enum text correctly
