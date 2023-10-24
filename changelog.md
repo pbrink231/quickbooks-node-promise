@@ -1,3 +1,8 @@
+## [3.0.0]
+
+- Updated with typescript types on main item
+- Scraper app to auto generate types
+
 ## [2.0.4]
 
 - Fixed pointing to the correct types file in package.json
