@@ -52,6 +52,10 @@ const typeConversion: {
   CustomField: { isList: true },
 };
 
+const enumValueFixes: { [key: string]: string } = {
+  SubtotalLineDetail: "SubTotalLineDetail",
+};
+
 export const processTypesForText = (entityData: TypeInformation) => {
   // Join types that have the same typeRefName and attributes
   // check attributes are the same for name, metaData, and description
@@ -274,7 +278,12 @@ export const processTypesForText = (entityData: TypeInformation) => {
         while (
           (enumValuesMatch = enumValuesRegex.exec(attribute.description))
         ) {
-          enumValues.push(`"${enumValuesMatch[1]}"`);
+          let enumTest = enumValuesMatch[1];
+          if (enumValueFixes[enumTest]) {
+            enumTest = enumValueFixes[enumTest];
+          }
+
+          enumValues.push(`"${enumTest}"`);
         }
         console.log("enum values", attribute.name, enumValues);
         if (enumValues.length === 0) {

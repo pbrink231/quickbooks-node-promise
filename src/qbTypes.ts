@@ -1869,7 +1869,7 @@ Available in all objects that use lines and support the update operation.
    *
    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
    */
-  DetailType: "SubtotalLineDetail";
+  DetailType: "SubTotalLineDetail";
   /**
    * META: * Required ,max character: Max 15 digits in 10.5 format
    *
@@ -3782,7 +3782,7 @@ Available in all objects that use lines and support the update operation.
    *
    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
    */
-  DetailType: "SubtotalLineDetail";
+  DetailType: "SubTotalLineDetail";
   /**
    * META: * Required ,max character: Max 15 digits in 10.5 format
    *
@@ -4469,7 +4469,7 @@ Available in all objects that use lines and support the update operation.
    *
    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
    */
-  DetailType: "SubtotalLineDetail";
+  DetailType: "SubTotalLineDetail";
   /**
    * META: * Required ,max character: Max 15 digits in 10.5 format
    *
@@ -7543,7 +7543,7 @@ Available in all objects that use lines and support the update operation.
    *
    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
    */
-  DetailType: "SubtotalLineDetail";
+  DetailType: "SubTotalLineDetail";
   /**
    * META: * Required ,max character: Max 15 digits in 10.5 format
    *
@@ -8194,7 +8194,7 @@ Available in all objects that use lines and support the update operation.
    *
    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
    */
-  DetailType: "SubtotalLineDetail";
+  DetailType: "SubTotalLineDetail";
   /**
    * META: * Required ,max character: Max 15 digits in 10.5 format
    *

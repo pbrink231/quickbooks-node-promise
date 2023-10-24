@@ -1,3 +1,11 @@
+## [3.0.2]
+
+- Fixed inoice item enum text correctly
+
+## [3.0.1]
+
+- Fixed custom field to be an array
+
 ## [3.0.0]
 
 - Updated with typescript types on main item
