@@ -4,7 +4,7 @@ This library was created for Quickbooks OAuth2. It converted a lot of node-quick
 
 Will handle the authentication and auto renew Access Tokens when they are expired.
 
-## Example grabbing resource
+## Example grabbing a customer from Quickbooks
 
 ```javascript
 const QuickBooks = require("quickbooks-node-promise");
@@ -124,11 +124,23 @@ class QBStore implements QBStoreStrategy {
 
 ## Query
 
-The query is used to search for a resource. The query is a javascript object, array of query items that will be converted to a query string. You can also create your own query string instead. The query string is used to search for the resource.
+The query is used to search for a resources. The query is a javascript object, array of query items that will be converted to a query string. You can also create your own query string instead.  Quickbooks does not allow OR in the where statement so all filters will be joined by AND.
 
-There are two main methods for querying. find[EntityName] and count[EntityName]. The find method will return the resource and the count method will return the count of the resource.
+There are two main methods for querying. find[EntityName] and count[EntityName]. The find method will return the resources and the count method will return the count of the resources.
 
-### Examples
+### Special query properties
+
+- limit: The limit is the number of resources to return. The default is 100. The max is 1000.  special default of 1000 if fetchAll is true
+- offset: The offset is the number of resources to skip. The default is 0. converts to startposition in the query string by adding 1
+- asc: The asc is the field name to sort by in ascending order. The default is undefined. Cannot be used with desc or sort
+- desc: The desc is the field name to sort by in descending order. The default is undefined. Cannot be used with asc or sort
+- sort: The sort is an array of field names to sort by. The default is undefined. Cannot be used with asc or desc
+- fetchAll: The fetchAll is a boolean to fetch all the resources. The default is false. If true, will make multiple requests to get all the resources.  Limit and offset will be used so setting a smaller limit will make more requests to fetch all the resources.  If limit is not set, a default limit of 1000 will be used.
+
+### Find
+
+The find method is used to find resources.  
+
 ```javascript
 const customers = await qbo.findCustomers({
   Id: "1234",
@@ -152,11 +164,46 @@ const customers = await qbo.findCustomers({
 });
 
 const customers = await qbo.findCustomers("SELECT * FROM Customer WHERE Id = '1234'");
+
+// return object looks like:
+// {
+//     QueryResponse: {
+//         startPosition?: number;
+//         totalCount?: number;
+//         maxResults?: number;
+//         Customer?: Customer[];
+//     };
+//     time: string;
+// }
+```
+
+### Count
+
+The count method is used to count the number of resources. The count method will return a queryrequest with a single property called totalCount. The totalCount is the number of resources that match the query.  You can use the same input for count[EntittyName] as you do for find[EntityName].
+
+```javascript
+const count = await qbo.countCustomers({
+  Id: "1234",
+});
+
+const count = await qbo.countCustomers({
+  field: "Name",
+  value: "hello%world",
+  operator: "like",
+});
+
+// return object looks like:
+// {
+//     QueryResponse: {
+//         totalCount: number;
+//     };
+//     time: string;
+// }
 ```
 
 ### Sorting query
 
-You can sort the query by using the sort property or for single sorting the asc or desc fields.  You can only use 1 of the 3 methods on a query. The sort property is an array of either string or array. if the item is an array, the first item in the array is the field name and the second item is the direction. The direction can be "asc" or "desc". If the item is a string, it will be the field name and sorted asc. The example below will sort by Id ascending and some of them will then sort by Name ascending.
+You can sort the query by using the sort property or for single sorting the asc or desc fields.  You can only use 1 of the 3 methods on a query. The sort property is an array of either string or array. if the item is an array, the first item in the array is the field name and the second item is the direction. The direction can be ASC or DESC. If the item is a string, it will be the field name and sorted ASC.  If the sort field is an array of 2 strings, the first item is the field name and the second item is the direction. The direction can be ASC or DESC.  capitlization of ASC or DESC does not matter
 
 ```javascript
 const customers = await qbo.findCustomers({

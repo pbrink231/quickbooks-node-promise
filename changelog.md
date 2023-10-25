@@ -1,3 +1,8 @@
+## [3.1.1]
+
+- Updated readme with better query informaiton
+- Updated operator with specific types
+
 ## [3.1.0]
 
 - Fixed query requesting

@@ -233,7 +233,7 @@ interface QueryRequest {
 export interface CriteriaItem {
   field: string;
   value: string;
-  operator?: string;
+  operator?: "IN" | "=" | "<" | ">" | "<=" | ">=" | "LIKE" | null;
   /**
    * @deprecated The method should not be used
    */
