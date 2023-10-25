@@ -71,7 +71,7 @@ QuickBooks.scopes = {
 };
 ```
 
-## Create Store Strategy
+### Create Store Strategy
 
 The store strategy is used to Save and Retreive token information. Both methods return a promise. The example below uses memory to store the token. Should create your own store strategy to save to a database or some other location.
 
@@ -124,7 +124,7 @@ class QBStore implements QBStoreStrategy {
 
 ## Query
 
-The query is used to search for a resources. The query is a javascript object, array of query items that will be converted to a query string. You can also create your own query string instead.  Quickbooks does not allow OR in the where statement so all filters will be joined by AND.
+The query is used to search for a resources. The query is a javascript object or an array of query items that will be converted to a query string. You can also create your own query string instead.  Quickbooks does not allow OR in the where statement so all filters will be joined by AND.
 
 There are two main methods for querying. find[EntityName] and count[EntityName]. The find method will return the resources and the count method will return the count of the resources.
 
@@ -136,6 +136,10 @@ There are two main methods for querying. find[EntityName] and count[EntityName].
 - desc: The desc is the field name to sort by in descending order. The default is undefined. Cannot be used with asc or sort
 - sort: The sort is an array of field names to sort by. The default is undefined. Cannot be used with asc or desc
 - fetchAll: The fetchAll is a boolean to fetch all the resources. The default is false. If true, will make multiple requests to get all the resources.  Limit and offset will be used so setting a smaller limit will make more requests to fetch all the resources.  If limit is not set, a default limit of 1000 will be used.
+- items: The items is an array of query items. The default is undefined. The items array is an array of query items.  The query item is an object with the following properties:
+  - field: The field is the field name to filter by. Required
+  - value: The value is the value to filter by. Required
+  - operator: The operator is the operator to use for the filter. The default is "=".
 
 ### Find
 
