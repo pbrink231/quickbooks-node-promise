@@ -107,8 +107,20 @@ app.get("/quickbooks/findinvoices", async (req, res) => {
 
   var qbo = new Quickbooks(QBAppconfig, realmID);
 
+  const queryData: QueryDataWithProperties = {
+    offset: 1,
+    limit: 10,
+    items: [
+      {
+        field: "DocNumber",
+        value: "%01",
+        operator: "LIKE",
+      },
+    ],
+  };
+
   try {
-    const foundInvoices = await qbo.findInvoices();
+    const foundInvoices = await qbo.findInvoices(queryData);
     res.send(foundInvoices.QueryResponse.Invoice);
   } catch (err: any) {
     console.log("could not run accounts because", err);
