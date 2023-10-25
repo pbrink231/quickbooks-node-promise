@@ -1,3 +1,7 @@
+## [3.1.2]
+
+- Updated readme for more query information
+
 ## [3.1.1]
 
 - Updated readme with better query informaiton
