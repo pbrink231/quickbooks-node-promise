@@ -71,7 +71,7 @@ QuickBooks.scopes = {
 };
 ```
 
-## Create Store Strategy
+### Create Store Strategy
 
 The store strategy is used to Save and Retreive token information. Both methods return a promise. The example below uses memory to store the token. Should create your own store strategy to save to a database or some other location.
 
