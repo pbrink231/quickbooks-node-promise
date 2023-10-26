@@ -10,6 +10,7 @@ import Quickbooks, {
 } from "../src/index";
 import "dotenv/config";
 import express from "express";
+import { Invoice } from "../src/qbTypes";
 
 const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD } =
   process.env;
@@ -140,7 +141,7 @@ app.post("/quickbooks/findinvoicesquery", async (req, res) => {
   var qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
-    const foundInvoices= await qbo.findInvoices(body);
+    const foundInvoices = await qbo.findInvoices(body);
     res.send(foundInvoices);
   } catch (err: any) {
     console.log("could not run accounts because", err);
@@ -168,7 +169,7 @@ app.post("/quickbooks/countinvoicesquery", async (req, res) => {
   var qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
-    const countInvoices= await qbo.countInvoices(body);
+    const countInvoices = await qbo.countInvoices(body);
     res.send(countInvoices);
   } catch (err: any) {
     res.send(err);
@@ -253,6 +254,117 @@ app.get("/quickbooks/reports", async (req, res) => {
   try {
     //  @ts-ignore
     const pdfData = await qbo.getReports(entityID);
+    res.send(pdfData);
+  } catch (err) {
+    console.log("could not get report", err);
+    res.send(err);
+  }
+});
+
+app.get("/quickbooks/bigInvoice", async (req, res) => {
+  const realmID = req.query.realmID;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("Realm is required");
+    return;
+  }
+
+  const newInvoice: Invoice = {
+    CustomField: [
+      {
+        DefinitionId: "1",
+        StringValue: "483 - Testing",
+      },
+    ],
+    DocNumber: "1045",
+    TxnDate: "2019-05-18",
+    CurrencyRef: {
+      value: "USD",
+    },
+    Line: [
+      {
+        Id: "1",
+        Description: "Some first item here description here",
+        Amount: 300,
+        DetailType: "SalesItemLineDetail",
+        SalesItemLineDetail: {
+          ItemRef: {
+            value: "24",
+            name: "another item",
+          },
+          UnitPrice: 20,
+          Qty: 15,
+          TaxCodeRef: {
+            value: "NON",
+          },
+        },
+      },
+      {
+        Id: "2",
+        LineNum: 2,
+        Description: "and here",
+        Amount: 12,
+        DetailType: "SalesItemLineDetail",
+        SalesItemLineDetail: {
+          ItemRef: {
+            value: "25",
+            name: "item 3",
+          },
+          UnitPrice: 12,
+          Qty: 1,
+          TaxCodeRef: {
+            value: "NON",
+          },
+        },
+      },
+      {
+        Amount: 82.95,
+        DetailType: "DiscountLineDetail",
+        DiscountLineDetail: {},
+      },
+      {
+        Amount: 312,
+        DetailType: "SubTotalLineDetail",
+        SubTotalLineDetail: {},
+      },
+    ],
+    CustomerRef: {
+      value: "61",
+      name: "JLSPORT",
+    },
+    CustomerMemo: {
+      value: "Thank you for your business and have a great day!",
+    },
+    BillAddr: {
+      Id: "98",
+      Line1: "4 Shadbush",
+      City: "Westport",
+      Country: "USA",
+      CountrySubDivisionCode: "CT",
+      PostalCode: "06880",
+    },
+    SalesTermRef: {
+      value: "11",
+    },
+    DueDate: "2019-06-17",
+    ShipMethodRef: {
+      value: "fedex",
+      name: "fedex",
+    },
+    ShipDate: "2019-05-22",
+    TrackingNum: "aaaaaaa",
+    TotalAmt: 312,
+    ApplyTaxAfterDiscount: true,
+    PrintStatus: "NotSet",
+    EmailStatus: "NotSet",
+    BillEmail: {
+      Address: "peterg@varpro.org",
+    },
+  };
+
+  var qbo = new Quickbooks(QBAppconfig, realmID);
+
+  try {
+    const pdfData = await qbo.createInvoice(newInvoice);
     res.send(pdfData);
   } catch (err) {
     console.log("could not get report", err);

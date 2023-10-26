@@ -4463,7 +4463,7 @@ Available in all objects that use lines and support the update operation.
    *
    * DESCRIPTION: Subtotal <strong>LineDetail</strong>
    */
-  SubtotalLineDetail: LineDetail;
+  SubTotalLineDetail: LineDetail;
   /**
    * META: * Required
    *
