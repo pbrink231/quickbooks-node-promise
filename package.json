@@ -41,6 +41,7 @@
   "scripts": {
     "start": "ts-node example/serverts.ts",
     "scrape": "ts-node quickbooks-type-scrape/index.ts",
-    "prepublish": "tsc"
+    "prepublish": "tsc",
+    "publish": "npm run prepublish && npm publish"
   }
 }
