@@ -1,60 +1,11 @@
 import { TypeInformation } from ".";
 import { EntityName } from "../src";
-
-const indent = "  ";
-
-const typeConversion: {
-  [key: string]: {
-    newType?: string;
-    addOnDescription?: string;
-    hasParent?: boolean;
-    isList?: boolean;
-  };
-} = {
-  String: { newType: "string" },
-  Boolean: { newType: "boolean" },
-  Number: { newType: "number" },
-  Decimal: { newType: "number", addOnDescription: "Decimal" },
-  BigDecimal: { newType: "number", addOnDescription: "Big Decimal" },
-  "Numeric Id": { newType: "number", addOnDescription: "Numeric Id" },
-  IdType: { newType: "number", addOnDescription: "Id Type" },
-  Integer: { newType: "number", addOnDescription: "Integer" },
-  DateTime: {
-    newType: "string",
-    addOnDescription:
-      "Local time zone: YYYY-MM-DDTHH:MM:SS UTC: YYYY-MM-DDT HH :MM: SSZ Specific time zone: YYYY-MM-DDT HH :MM:SS +/- HH :MM",
-  },
-  Date: {
-    newType: "string",
-    addOnDescription:
-      "Local timezone: YYYY-MM-DD UTC: YYYY-MM-DDZ Specific time zone: YYYY-MM-DD+/-HH:MM",
-  },
-  WeekEnum: {
-    newType:
-      '"Sunday" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday"',
-    addOnDescription: "Week Enum",
-  },
-  "Positive Integer": {
-    newType: "number",
-    addOnDescription: "Positive Integer",
-  },
-  Sting: { newType: "string", addOnDescription: "Miss spelled String" },
-  "Percentage as String": {
-    newType: "string",
-    addOnDescription: "Percentage as String",
-  },
-  "Integer as String": {
-    newType: "string",
-    addOnDescription: "Integer as String",
-  },
-  "Internal use": { newType: "any", addOnDescription: "Internal use" },
-  TelephoneNumber: { newType: "string", addOnDescription: "Telephone Number" },
-  CustomField: { isList: true },
-};
-
-const enumValueFixes: { [key: string]: string } = {
-  SubtotalLineDetail: "SubTotalLineDetail",
-};
+import {
+  enumValueFixes,
+  indent,
+  typeAttributeFixes,
+  typeConversion,
+} from "./processFixes";
 
 export const processTypesForText = (entityData: TypeInformation) => {
   // Join types that have the same typeRefName and attributes
@@ -65,12 +16,12 @@ export const processTypesForText = (entityData: TypeInformation) => {
   for (const typeName in allTypes) {
     const type = allTypes[typeName];
     if (!type.typeRefName) {
-    //   console.log("skipping type for combining", typeName);
+      //   console.log("skipping type for combining", typeName);
       continue;
     }
     const combineTypeName = type.typeRefName;
     if (combineCheckedTypes.includes(combineTypeName)) {
-    //   console.log("already checked type for combining", typeName);
+      //   console.log("already checked type for combining", typeName);
       continue;
     }
     combineCheckedTypes.push(combineTypeName);
@@ -187,6 +138,7 @@ export const processTypesForText = (entityData: TypeInformation) => {
     let typeText = `export interface ${mainTypeName} {\n`;
 
     for (const attribute of type.attributes) {
+      let useName = attribute.name;
       let useType = attribute.type;
       let addOn: string | null = null;
 
@@ -194,37 +146,19 @@ export const processTypesForText = (entityData: TypeInformation) => {
         throw new Error("pulledAttrName not set");
       }
 
-      if (typeName === "Preferences" && attribute.name === "OtherPrefs") {
-        typeText += `${indent}/**
-  ${indent} * Other Preferences
-  ${indent} *
-  ${indent} * Other preferences that are not listed in the Preferences list
-  ${indent} * This is a list of pre determined names and values for those names
-  ${indent} *
-  ${indent} * DESCRIPTION: Specifies extension of Preference resource to allow extension of Name-Value pair based extension at the top level.
-  ${indent} */
-  ${indent}OtherPrefs?: { Name: string, Value: string}[];\n`;
-        continue;
-      }
-
-      if (typeName === "CompanyInfo" && attribute.name === "NameValue") {
-        typeText += `${indent}/**
-  ${indent} * META: Optional
-  ${indent} *
-  ${indent} * DESCRIPTION: Any other preference not covered with the standard set of attributes. See Data Services Extensions, below, for special reserved name/value pairs.
-  ${indent} * NameValue.Name--Name of the element.
-  ${indent} * NameValue.Value--Value of the element.
-  ${indent} */
-  ${indent}NameValue?: { Name: string, Value: string}[];\n`;
-        continue;
-      }
-
-      if (
-        typeName === "Preferences_AccountingInfoPrefs" &&
-        attribute.name === "FirstMonthOfFiscalYear"
-      ) {
-        useType =
-          '"January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December"';
+      // check typeAttribute fixes
+      const typeAttributeFix = typeAttributeFixes[typeName]?.[attribute.name];
+      if (typeAttributeFix) {
+        if (typeAttributeFix.interfaceValue) {
+          typeText += typeAttributeFix.interfaceValue;
+          continue;
+        }
+        if (typeAttributeFix.fixedName) {
+          useName = typeAttributeFix.fixedName;
+        }
+        if (typeAttributeFix.fixedType) {
+          useType = typeAttributeFix.fixedType;
+        }
       }
 
       // check if parent is a combined type
@@ -248,7 +182,7 @@ export const processTypesForText = (entityData: TypeInformation) => {
         ? "readonly "
         : "";
       let isList = attribute.isList ? "[]" : "";
-      let attrNames = attribute.name.split(" ");
+      let attrNames = useName.split(" ");
 
       // convert type
       if (useType && typeConversion[useType]) {
@@ -285,7 +219,7 @@ export const processTypesForText = (entityData: TypeInformation) => {
 
           enumValues.push(`"${enumTest}"`);
         }
-        console.log("enum values", attribute.name, enumValues);
+        console.log("enum values", useName, enumValues);
         if (enumValues.length === 0) {
           enumValues.push("string");
           addOn += "\n   *\n   * No values given for enum";
