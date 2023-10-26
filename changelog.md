@@ -1,3 +1,10 @@
+## [3.1.3]
+
+- Moved fixes into own file for easy changes
+- Fixed invoice subtotal spelling attribute
+- Added larger invoice create example on server
+- Removed old js server example
+
 ## [3.1.2]
 
 - Updated readme for more query information
