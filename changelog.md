@@ -1,3 +1,7 @@
+## [3.1.4]
+
+- NPM version error fix with bumping version
+
 ## [3.1.3]
 
 - Moved fixes into own file for easy changes
