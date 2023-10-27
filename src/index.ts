@@ -26,6 +26,7 @@ import jwt from "jsonwebtoken";
 import fetch, { Response } from "node-fetch";
 import util from "util";
 import Tokens from "csrf";
+import crypto from "crypto";
 import {
   checkConfig,
   dateNotExpired,
@@ -35,6 +36,30 @@ import {
 import { QuickbooksTypes } from "./qbTypes";
 
 const csrf = new Tokens();
+
+export interface WebhookEventNotification {
+  realmId: string;
+  dataChangeEvent: {
+    entities: WebhookEntity[];
+  };
+}
+
+export interface WebhookEntity {
+  /** The name of the entity that changed (customer, Invoice, etc.) */
+  name: EntityName;
+  /** The ID of the changed entity */
+  id: string;
+  /** The type of change */
+  operation: "Create" | "Update" | "Delete" | "Merge" | "Void";
+  /** The latest timestamp in UTC */
+  lastUpdated: string;
+  /** The ID of the deleted or merged entity (this only applies to merge events) */
+  deletedID?: string;
+}
+
+export interface WebhookPayload {
+  eventNotifications: WebhookEventNotification[]
+}
 
 export interface TokenData {
   access_token: string;
@@ -58,8 +83,8 @@ export interface StoreTokenData {
   realmID?: number | string;
   access_token: string;
   refresh_token: string;
-  access_expire_timestamp: number;
-  refresh_expire_timestamp: number;
+  access_expire_timestamp: number | Date;
+  refresh_expire_timestamp: number | Date;
   id_token?: string; // (Optional) Used only for user OpenID verification
 }
 
@@ -112,13 +137,14 @@ export interface AppConfig {
   appKey: string;
   appSecret: string;
   redirectUrl: string;
-  /** null for latest version */
-  minorversion?: number | null;
-  /** default is false */
-  useProduction?: string | boolean;
-  /** default uses internal memory storage, should supply this */
   storeStrategy: QBStoreStrategy;
   scope: string[];
+  /** null for latest version */
+  minorversion?: number | null;
+  /** Used for verifying the webook */
+  webhookVerifierToken?: string;
+  /** default is false */
+  useProduction?: string | boolean;
   /** default is false */
   debug?: boolean | string;
   /** CSRF Token */
@@ -240,7 +266,7 @@ export interface CriteriaItem {
   count?: boolean;
 }
 
-export type QuerySortInput = ([string, "ASC" | "DESC" | null] | string)[] | [string, "ASC" | "DESC" | null] | string ;
+export type QuerySortInput = ([string, "ASC" | "DESC" | null] | string)[] | [string, "ASC" | "DESC" | null] | string;
 
 export type QuerySort = [string, "ASC" | "DESC"][];
 
@@ -269,10 +295,10 @@ export interface QueryDataWithProperties {
   fetchAll?: boolean;
   sort?: QuerySortInput;
   items?: CriteriaItem[];
-    /**
-   * @deprecated The method should not be used
-   */
-    count?: boolean;
+  /**
+ * @deprecated The method should not be used
+ */
+  count?: boolean;
   [key: string]: any;
 }
 
@@ -782,6 +808,48 @@ class Quickbooks {
     return pem;
   };
 
+  static verifyWebhook = (
+    verifierToken: string,
+    payload: WebhookPayload,
+    signature: string,
+  ) => {
+    var webhookPayloadJson = JSON.stringify(payload);
+    // if signature is empty return 401
+    if (!signature) {
+      return false
+    }
+
+    // if payload is empty, don't do anything
+    if (!payload) {
+      return true;
+    }
+
+    /**
+     * Validates the payload with the intuit-signature hash
+     */
+    var hash = crypto.createHmac('sha256', verifierToken).update(webhookPayloadJson).digest('base64');
+    if (signature !== hash) {
+      return false
+    }
+    return true
+  }
+
+  static VerifyWebhookWithConfig = (
+    appConfig: AppConfig,
+    payload: WebhookPayload,
+    signature: string,
+  ) => {
+    return Quickbooks.verifyWebhook(appConfig.webhookVerifierToken, payload, signature,)
+  }
+
+  verifyWebhook = (
+    payload: WebhookPayload,
+    signature: string,
+  ) => {
+    return Quickbooks.verifyWebhook(this.config.webhookVerifierToken, payload, signature)
+  }
+
+
   /*** API HELPER FUNCTIONS  ***/
   request = async <T>(verb: string, options: RequestOptions, entity: any) => {
     let token = await this.getToken();
@@ -877,9 +945,8 @@ class Quickbooks {
       qsv.minorversion = this.minorversion;
     }
 
-    const sendUrl = `${this.endpoint}${
-      this.realmID
-    }/${entityName.toLowerCase()}/${id}/pdf?${qs.stringify(qsv)}`;
+    const sendUrl = `${this.endpoint}${this.realmID
+      }/${entityName.toLowerCase()}/${id}/pdf?${qs.stringify(qsv)}`;
 
     if ("production" !== process.env.NODE_ENV && this.debug) {
       console.log("invoking endpoint:", sendUrl);
@@ -967,14 +1034,14 @@ class Quickbooks {
       return this.request<{
         [P in keyof (BaseRequest &
           Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
-          Record<K, QuickbooksTypes[K]>)[P];
+            Record<K, QuickbooksTypes[K]>)[P];
       }>("post", { url: url, qs: qs }, idOrEntity);
     } else {
       const entity = await this.read(entityName, idOrEntity);
       return this.request<{
         [P in keyof (BaseRequest &
           Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
-          Record<K, QuickbooksTypes[K]>)[P];
+            Record<K, QuickbooksTypes[K]>)[P];
       }>("post", { url: url, qs: qs }, entity);
     }
   };
@@ -1002,7 +1069,7 @@ class Quickbooks {
       QueryResponse: {
         [P in keyof (QueryRequest &
           Record<K, Array<QuickbooksTypes[K]>>)]?: (QueryRequest &
-          Record<K, Array<QuickbooksTypes[K]>>)[P];
+            Record<K, Array<QuickbooksTypes[K]>>)[P];
       };
       time: string;
     }>("get", { url: url, qs: qs }, null);
@@ -1114,7 +1181,7 @@ class Quickbooks {
    */
   changeDataCapture = (
     entities: string | string[],
-    since: Date | number | string
+    since: Date | number
   ) => {
     const dateToCheck = getDateCheck(since);
     if (!dateToCheck) {

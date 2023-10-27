@@ -7,12 +7,13 @@ import Quickbooks, {
   StoreGetTokenData,
   StoreSaveTokenData,
   StoreTokenData,
+  WebhookPayload,
 } from "../src/index";
 import "dotenv/config";
 import express from "express";
 import { Invoice } from "../src/qbTypes";
 
-const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD } =
+const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD, QB_WEBHOOK_VERIFIER_TOKEN } =
   process.env;
 
 // QB config
@@ -23,6 +24,7 @@ const QBAppconfig: AppConfig = {
   useProduction: QB_USE_PROD /* default is false */,
   debug: NODE_ENV == "production" ? false : true /* default is false */,
   storeStrategy: new DefaultStore(),
+  webhookVerifierToken: QB_WEBHOOK_VERIFIER_TOKEN,
   scope: [
     Quickbooks.scopes.Accounting,
     Quickbooks.scopes.OpenId,
@@ -48,6 +50,28 @@ app.get("/quickbooks/requestToken", (req, res) => {
   let authUrl = Quickbooks.authorizeUrl(QBAppconfig);
   res.redirect(authUrl);
 });
+
+app.post("/qbwebhook", (req, res) => {
+  const webhookPayload = req.body as WebhookPayload
+  const signature = req.get('intuit-signature');
+  console.log("signature", signature, "webhookPayload", JSON.stringify(webhookPayload, null, 2))
+
+  if (!signature) {
+    console.log("no signature");
+    res.status(401).send('FORBIDDEN');
+    return;
+  }
+
+  const signatureCheck = Quickbooks.VerifyWebhookWithConfig(QBAppconfig, webhookPayload, signature);
+  if (!signatureCheck) {
+    console.log("signatureCheck failed");
+    res.status(401).send('FORBIDDEN');
+    return
+  }
+
+  console.log("webhookPayload is verified");
+  res.status(200).send('SUCCESS');
+})
 
 // QB token callback - This endpoint must match what you put in your quickbooks app and config
 app.get("/quickbooks/callback", async (req, res) => {
