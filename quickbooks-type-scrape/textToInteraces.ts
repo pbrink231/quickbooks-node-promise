@@ -7,6 +7,139 @@ import {
   typeConversion,
 } from "./processFixes";
 
+const cleanseDescription = (description: string, dontRepeat?: boolean) => {
+  let newDescription = description;
+
+  // replace <a> tag that could include other properties other than href with jsdoc @link
+  newDescription = newDescription.replace(/<a.*?href="(.*?)".*?>(.*?)<\/a>/g, function (match, group1, group2) {
+    const modifiedValue = group2.trim();
+
+    // Return the modified value wrapped in ** and add jsdoc @link
+    return `{@link ${group1} | ${modifiedValue}}`;
+  });
+
+  // replace <span style ... >{value}</span> with {value}
+  newDescription = newDescription.replace(/<span style=".*?">(.*?)<\/span>/g, function (match, group) {
+    return group.trim();
+  });
+
+  // replace <b></b> with ** at the start and ** at the end
+  newDescription = newDescription.replace(/<b>(.*?)<\/b>/g, function (match, group) {
+    const modifiedValue = group.trim();
+    return '**' + modifiedValue + '**';
+  });
+
+  // if .<br> or . <br> then replace with .\n
+  newDescription = newDescription.replace(/\. ?<br>/g, '.\n');
+
+  // if <br> then replace with ''
+  newDescription = newDescription.replace(/<br>/g, '');
+
+  // replace &amp; with &
+  newDescription = newDescription.replace(/&amp;/g, '&');
+
+  // remove <em> and </em>, remove new line characters before or after either one
+  newDescription = newDescription.replace(/<em>[\n\s]*(.*?)[\s\n]*<\/em>/g, function (match, group) {
+    return group.trim();
+  });
+
+  // replace all <em> and if have \n after it, then remove it
+  newDescription = newDescription.replace(/<em>\n/g, '');
+  // replace all </em> and if have \n before it, then remove it
+  newDescription = newDescription.replace(/\n<\/em>/g, '');
+
+  // replace <li></li> with , at the end
+  newDescription = newDescription.replace(/<li>([.\s\S]*?)<\/li>/g, function (match, group) {
+    return group.trim() + ',';
+  });
+
+  // replace <ul></ul> with space in front
+  newDescription = newDescription.replace(/<ul>([\s\S.]*?)<\/ul>/g, function (match, group) {
+    return ' ' + group.trim();
+  });
+
+
+  // replace <span class="literal">{value}</span> with **{value}** and remove spaces and newlines around {value}
+  // if span has \n before it, then remove it
+  const replaceRegex = /(?:\n)?<span class="(?:literal|litera)">([a-zA-Z0-9\.\=\s\S:\+\/-\_]*?)<\/span>/g;
+  const matches = newDescription.matchAll(replaceRegex);
+  const replacements: [number, string, string][] = [];
+  for (const match of matches) {
+    if (match.index === undefined) {
+      throw new Error("match index not set");
+    }
+    let modifiedValue = match[1].trim();
+
+    let startsWithNewLine = false;
+    let replaceNewLine = false;
+    if (match[0].startsWith('\n')) {
+      startsWithNewLine = true;
+    }
+    if (startsWithNewLine && !newDescription.substring(0, match.index).trim().endsWith('.')) {
+      // remove newline and add space
+      replaceNewLine = true;
+    }
+
+    let startString = '';
+    if (startsWithNewLine && !replaceNewLine) {
+      startString += '\n';
+    }
+    if (replaceNewLine) {
+      startString += ' ';
+    }
+
+    // if character after span is a alphanumeric, then add a space at the end
+    let endString = '';
+    if (newDescription.substring(match.index + match[0].length, match.index + match[0].length + 1).match(/[a-zA-Z0-9]/)) {
+      endString = ' ';
+    }
+
+    // Return the modified value wrapped in **
+    replacements.push([match.index, match[0], `${startString}**${modifiedValue}**${endString}`]);
+  }
+  // loop replacements in reverse order to not mess up index
+  replacements.reverse();
+  for (const replacement of replacements) {
+    // replace using index
+    const index = replacement[0]
+    const stringToReplace = replacement[1];
+    const newString = replacement[2];
+    newDescription = newDescription.substring(0, index) + newString + newDescription.substring(index + stringToReplace.length);
+  }
+
+  // replace <strong>{value}</strong> with **{value}** and remove spaces and newlines around {value}
+  newDescription = newDescription.replace(/<strong>([a-zA-Z0-9\.\=\s\S:\+\/-\_]*?)<\/strong>/g, function (match, group) {
+    const modifiedValue = group.trim();
+
+    // Return the modified value wrapped in **
+    return `**${modifiedValue}**`;
+  });
+
+  // replace <span>{value}</span> with {value}
+  newDescription = newDescription.replace(/<span>([a-zA-Z0-9\.\=\s\S:\+\/-\_]*?)<\/span>/g, function (match, group) {
+    return group.trim();
+  });
+
+  // replace <p></p> with ''
+  newDescription = newDescription.replace('<p></p>', '');
+  newDescription = newDescription.replace('<this is="" a="" required="" field.<="" li="">', '');
+  newDescription = newDescription.replace('</this>', '');
+
+  // remove <table></table>
+  newDescription = newDescription.replace(/<table>([\s\S.]*?)<\/table>/g, function (match, group) {
+    return '';
+  });
+
+  // remove trailing newlines and spaces
+  newDescription = newDescription.trimEnd();
+  
+  // replace \n with {indent} *
+  newDescription = newDescription.replace(/\n/g, `\n${indent} * `);
+
+  return newDescription;
+}
+
+
 export const processTypesForText = (entityData: TypeInformation) => {
   // Join types that have the same typeRefName and attributes
   // check attributes are the same for name, metaData, and description
@@ -175,7 +308,7 @@ export const processTypesForText = (entityData: TypeInformation) => {
       // check if metadata starts with "* Required" to know if required
       let isReq =
         attribute.metaData?.startsWith("* Required") &&
-        !attribute.metaData?.startsWith("* Required for update")
+          !attribute.metaData?.startsWith("* Required for update")
           ? ""
           : "?";
       let isReadOnly = attribute.metaData?.includes("read only")
@@ -251,10 +384,7 @@ export const processTypesForText = (entityData: TypeInformation) => {
           if (addSpacer) {
             typeText += `   *\n`;
           }
-          typeText += `   * DESCRIPTION: ${attribute.description.replace(
-            "\n",
-            `\n${indent} * `
-          )}\n`;
+          typeText += `   * DESCRIPTION: ${cleanseDescription(attribute.description)}\n`;
           addSpacer = true;
         }
         typeText += `   */\n`;

@@ -17,7 +17,7 @@ export const checkConfig = (appConfig: AppConfig) => {
   if (!appConfig.storeStrategy) throw new Error("storeStrategy is missing");
 };
 
-export const getDateCheck = (dateItem: Date | string | number) => {
+export const getDateCheck = (dateItem: Date | number) => {
   let dateToCheck: number | null = null;
   if (
     typeof dateItem == "object" &&
@@ -28,9 +28,6 @@ export const getDateCheck = (dateItem: Date | string | number) => {
   if (typeof dateItem == "number") {
     dateToCheck = new Date(dateItem).getTime();
   }
-  if (typeof dateItem == "string") {
-    dateToCheck = Date.parse(dateItem);
-  }
   return dateToCheck;
 };
 
@@ -38,7 +35,7 @@ export const getDateCheck = (dateItem: Date | string | number) => {
  * Helper Method to check token expiry { set Token Object }
  */
 export const dateNotExpired = (
-  expired_timestamp: Date | number | string,
+  expired_timestamp: Date | number,
   bufferTimeSeconds: number
 ) => {
   const dateToCheck = getDateCheck(expired_timestamp);

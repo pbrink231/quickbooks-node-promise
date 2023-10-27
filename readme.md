@@ -139,7 +139,7 @@ There are two main methods for querying. find[EntityName] and count[EntityName].
 - items: The items is an array of query items. The default is undefined. The items array is an array of query items.  The query item is an object with the following properties:
   - field: The field is the field name to filter by. Required
   - value: The value is the value to filter by. Required
-  - operator: The operator is the operator to use for the filter. The default is "=".
+  - operator: The operator is the operator to use for the filter. The default is "=". Available values are "=", "IN", "<", ">", "<=", ">=", "LIKE"
 
 ### Find
 
