@@ -39,7 +39,7 @@
     "ts-node": "^10.9.1"
   },
   "scripts": {
-    "start": "ts-node example/serverts.ts",
+    "dev": "ts-node example/server.ts",
     "scrape": "ts-node quickbooks-type-scrape/index.ts",
     "prepublish": "tsc",
     "send": "npm run prepublish && npm publish"
