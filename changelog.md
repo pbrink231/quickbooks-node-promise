@@ -1,3 +1,7 @@
+## [3.1.7]
+
+- updated package description
+
 ## [3.1.6]
 
 - Updated readme to include webhook information
