@@ -1,3 +1,7 @@
+## [3.1.6]
+
+- Updated readme to include webhook information
+
 ## [3.1.5]
 
 - Added operators usable to readme

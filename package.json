@@ -1,6 +1,6 @@
 {
   "name": "quickbooks-node-promise",
-  "version": "3.1.5",
+  "version": "3.1.6",
   "description": "Connect to QuickBooks Online API with OAuth 2",
   "author": "Peter Brink",
   "license": "ISC",
@@ -42,6 +42,6 @@
     "dev": "ts-node example/server.ts",
     "scrape": "ts-node quickbooks-type-scrape/index.ts",
     "prepublish": "tsc",
-    "send": "npm run prepublish && npm publish"
+    "sendnpm": "npm run prepublish && npm publish"
   }
 }
