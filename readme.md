@@ -14,6 +14,10 @@ const customer = customer.QueryResponse.Customer[0];
 console.log(`Hi my customer's name is ${customer.Name}`);
 ```
 
+## Fully typed using documentation
+
+![image](https://github.com/pbrink231/quickbooks-node-promise/assets/8224560/f69e5d97-3f33-4460-a851-036f47ff4347)
+
 # Setup
 
 **Check the example for node express setup endpoints**
