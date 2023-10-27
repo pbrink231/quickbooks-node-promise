@@ -239,7 +239,7 @@ app.get("/quickbooks/createInvoice", async (req, res) => {
   var qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
-    const pdfData = await qbo.createInvoice({
+    const newInvoiceData = await qbo.createInvoice({
       DueDate: "2021-09-30",
       Line: [
         {
@@ -254,7 +254,7 @@ app.get("/quickbooks/createInvoice", async (req, res) => {
       ],
     });
     res.contentType("application/pdf");
-    res.send(pdfData);
+    res.send(newInvoiceData);
   } catch (err) {
     console.log("could not get invoice", err);
     res.send(err);
