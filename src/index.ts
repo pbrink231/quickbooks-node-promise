@@ -58,8 +58,8 @@ export interface StoreTokenData {
   realmID?: number | string;
   access_token: string;
   refresh_token: string;
-  access_expire_timestamp: number;
-  refresh_expire_timestamp: number;
+  access_expire_timestamp: number | Date;
+  refresh_expire_timestamp: number | Date;
   id_token?: string; // (Optional) Used only for user OpenID verification
 }
 
@@ -1114,7 +1114,7 @@ class Quickbooks {
    */
   changeDataCapture = (
     entities: string | string[],
-    since: Date | number | string
+    since: Date | number
   ) => {
     const dateToCheck = getDateCheck(since);
     if (!dateToCheck) {
