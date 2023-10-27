@@ -2,7 +2,7 @@ export interface Account_CurrencyRef {
    /**
     * META: * Required
     *
-    * DESCRIPTION: A three letter string representing the ISO 4217 code for the currency. For example, <span class="literal">USD</span>, <span class="literal">AUD</span>, <span class="literal">EUR</span>, and so on.
+    * DESCRIPTION: A three letter string representing the ISO 4217 code for the currency. For example, **USD**, **AUD**, **EUR**, and so on.
     */
    value: string;
    /**
@@ -23,38 +23,24 @@ export interface ReferenceType {
    /**
     * META: Optional
     *
-    * DESCRIPTION: An identifying name for the object being referenced by <span class="literal">value</span> and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use <span class="literal">Customer.DisplayName</span> to populate this field. Optionally returned in responses, implementation dependent.
+    * DESCRIPTION: An identifying name for the object being referenced by **value** and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use **Customer.DisplayName** to populate this field. Optionally returned in responses, implementation dependent.
     */
    name?: string;
 }
 
 export interface DateTime {
    /**
-    * DESCRIPTION: Local time zone:
-    * <em>
- <span class="literal">YYYY-MM-DDTHH:MM:SS
- </span>
- </em>
- UTC:
- <em></em>
- <em>YYYY-MM-DD</em>T
- <em>HH</em>
- <em>:MM:</em>
- <em>SS</em>Z
- Specific time zone:
- <em></em>
- <span class="literal">
- <em>YYYY-MM-DD</em>T</span>
- <em>
- <span class="literal">HH</span>
- </em>
- <em>
- <span class="literal">:MM:SS</span>
- </em>
- <span class="literal">+/-
- <em>HH</em>
- <em>:MM</em>
- </span>
+    * DESCRIPTION: Local time zone: **YYYY-MM-DDTHH:MM:SS**
+    * UTC:
+    * 
+    * YYYY-MM-DDT
+    * HH
+    * :MM:
+    * SSZ
+    * Specific time zone:
+    *  **YYYY-MM-DDT** **HH** **:MM:SS** **+/-
+    * HH
+    * :MM**
     */
    dateTime?: string;
 }
@@ -90,32 +76,32 @@ export interface Account {
     * META: * Required ,max character: max 100 characters
     *
     * DESCRIPTION: User recognizable name for the Account.
-    * <span class="literal">Account.Name</span> attribute must not contain double quotes (") or colon (:).
+    * **Account.Name** attribute must not contain double quotes (") or colon (:).
     */
    Name: string;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: User-defined account number to help the user in identifying the account within the chart-of-accounts and in deciding what should be posted to the account. The <span class="literal">Account.AcctNum</span> attribute must not contain colon (:).<ul><li>Name must be unique.</li></ul>For French Locales:<ul><this is="" a="" required="" field.<="" li=""><li>Length must be between 6 and 20 characters</li><li>Must start with the account number from the master category list.</li><li>Name limited to alpha-numeric characters.</li></this></ul>
-    *  Max length for <span class="literal">Account.AcctNum</span>:<ul><li>AU &amp; CA: 20 characters.</li><li>US, UK &amp; IN: 7 characters</li></ul>
+    * DESCRIPTION: User-defined account number to help the user in identifying the account within the chart-of-accounts and in deciding what should be posted to the account. The **Account.AcctNum** attribute must not contain colon (:). Name must be unique.,For French Locales: Length must be between 6 and 20 characters,Must start with the account number from the master category list.,Name limited to alpha-numeric characters.,
+    *  Max length for **Account.AcctNum**: AU & CA: 20 characters.,US, UK & IN: 7 characters,
     */
    AcctNum?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <br>Reference to the currency in which this account holds amounts.
+    * DESCRIPTION: Reference to the currency in which this account holds amounts.
     */
    CurrencyRef?: Account_CurrencyRef;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <br>Specifies the Parent AccountId if this represents a SubAccount.
+    * DESCRIPTION: Specifies the Parent AccountId if this represents a SubAccount.
     */
    ParentRef?: ReferenceType;
    /**
@@ -133,39 +119,34 @@ export interface Account {
    /**
     * META: Optional
     *
-    * DESCRIPTION: <br>Descriptive information about the object. The MetaData values are set by Data Services and are read only for all applications.
+    * DESCRIPTION: Descriptive information about the object. The MetaData values are set by Data Services and are read only for all applications.
     */
    MetaData?: ModificationMetaData;
    /**
     * META: read only ,system defined
     *
-    * DESCRIPTION: Specifies whether this object represents a parent (false) or subaccount (true). Please note that accounts of these types - <span class="literal">OpeningBalanceEquity</span>, <span class="literal">UndepositedFunds</span>, <span class="literal">RetainedEarnings</span>, <span class="literal">CashReceiptIncome</span>, <span class="literal">CashExpenditureExpense</span>, <span class="literal">ExchangeGainOrLoss</span> cannot have a sub account and cannot be a sub account of another account.
+    * DESCRIPTION: Specifies whether this object represents a parent (false) or subaccount (true). Please note that accounts of these types - **OpeningBalanceEquity**, **UndepositedFunds**, **RetainedEarnings**, **CashReceiptIncome**, **CashExpenditureExpense**, **ExchangeGainOrLoss** cannot have a sub account and cannot be a sub account of another account.
     */
    readonly SubAccount?: boolean;
    /**
     * META: read only ,system defined
     *
     * DESCRIPTION: The classification of an account. Not supported for non-posting accounts.
-    *  Valid values include: <span class="literal">Asset</span>, <span class="literal">Equity</span>, <span class="literal">Expense</span>, <span class="literal">Liability</span>, <span class="literal">Revenue</span>
+    *  Valid values include: **Asset**, **Equity**, **Expense**, **Liability**, **Revenue**
     */
    readonly Classification?: string;
    /**
     * META: read only ,system defined
     *
-    * DESCRIPTION: Fully qualified name of the object; derived from <span class="literal">Name</span> and <span class="literal">ParentRef</span>. The fully qualified name prepends the topmost parent, followed by each subaccount separated by colons and takes the form of
-    * <span class="literal">Parent:Account1:SubAccount1:SubAccount2</span>. System generated. Limited to 5 levels.
+    * DESCRIPTION: Fully qualified name of the object; derived from **Name** and **ParentRef**. The fully qualified name prepends the topmost parent, followed by each subaccount separated by colons and takes the form of **Parent:Account1:SubAccount1:SubAccount2**. System generated. Limited to 5 levels.
     */
    readonly FullyQualifiedName?: string;
    /**
     * META: minorVersion: 5 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TxnLocationType?: string;
    /**
@@ -174,7 +155,6 @@ export interface Account {
     * No values given for enum
     *
     * DESCRIPTION: A detailed account classification that specifies the use of this account. The type is based on the Classification.
-    * <br>
     */
    AccountType?: string;
    /**
@@ -189,19 +169,18 @@ export interface Account {
     * META: minorVersion: 5 ,
     *
     * DESCRIPTION: A user friendly name for the account. It must be unique across all account categories. For France locales, only.
-    * For example, if an account is created under category 211 with <span class="literal">AccountAlias</span> of <span class="literal">Terrains</span>, then the system does not allow creation of an account with same <span class="literal">AccountAlias</span> of <span class="literal">Terrains</span> for any other category except 211. In other words, 211001 and 215001 accounts cannot have same AccountAlias because both belong to different account category.
- For France locales, only.
+    * For example, if an account is created under category 211 with **AccountAlias** of **Terrains**, then the system does not allow creation of an account with same **AccountAlias** of **Terrains** for any other category except 211. In other words, 211001 and 215001 accounts cannot have same AccountAlias because both belong to different account category.
+    * For France locales, only.
     */
    AccountAlias?: string;
    /**
     * META: minorVersion: 3 ,
     *
-    * DESCRIPTION: <br>Reference to the default tax code used by this account. Tax codes are referenced by the <span class="literal">TaxCode.Id</span> in the TaxCode object. Available when endpoint is invoked with the <span class="literal">minorversion=3</span> query parameter. For global locales, only.
+    * DESCRIPTION: Reference to the default tax code used by this account. Tax codes are referenced by the **TaxCode.Id** in the TaxCode object. Available when endpoint is invoked with the **minorversion=3** query parameter. For global locales, only.
     */
    TaxCodeRef?: ReferenceType;
    /**
     * DESCRIPTION: The account sub-type classification and is based on the AccountType value.
-    * <br>
     */
    AccountSubType?: string;
    /**
@@ -224,8 +203,7 @@ export interface CustomField {
    /**
     * META: Optional
     *
-    * DESCRIPTION: The value for the
-    * <span class="literal">StringType</span>custom field.
+    * DESCRIPTION: The value for the **StringType** custom field.
     */
    StringValue?: string;
    /**
@@ -237,8 +215,7 @@ export interface CustomField {
    /**
     * META: read only
     *
-    * DESCRIPTION: Data type of custom field. Only one type is currently supported:
-    * <span class="literal">StringType</span>.
+    * DESCRIPTION: Data type of custom field. Only one type is currently supported: **StringType**.
     */
    readonly Type?: "StringType";
 }
@@ -247,7 +224,7 @@ export interface Attachable_AttachableRef {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Used when <span class="literal">EntityRef.type</span> references a transaction object. This field indicates whether or not the attachment is sent with the transaction when <b>Save and Send</b> button is clicked in the QuickBooks UI or when the Send endpoint (send email) is invoked for the object.
+    * DESCRIPTION: Used when **EntityRef.type** references a transaction object. This field indicates whether or not the attachment is sent with the transaction when **Save and Send** button is clicked in the QuickBooks UI or when the Send endpoint (send email) is invoked for the object.
     */
    IncludeOnSend?: boolean;
    /**
@@ -259,36 +236,28 @@ export interface Attachable_AttachableRef {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Indicates whether or not to find attachable records that have no references to any entity. Combine with
-    * <span class="literal">AttachableRef.Inactive</span>to return hidden references.
+    * DESCRIPTION: Indicates whether or not to find attachable records that have no references to any entity. Combine with **AttachableRef.Inactive** to return hidden references.
     */
    NoRefOnly?: boolean;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <br>If the user tries to fetch a record without permission, the permission denied message is conveyed through this field.
+    * DESCRIPTION: If the user tries to fetch a record without permission, the permission denied message is conveyed through this field.
     */
    CustomField?: CustomField[];
    /**
     * META: Optional
     *
-    * DESCRIPTION: Indicates whether or not to include references to hidden entities when filtering. When set to
-    * <span class="literal">true</span> , hidden references are returned in the result set.
-  For filtering results, it works with
- <span class="literal">AttachableRef.EntityRef.Type</span> ,
- <span class="literal">AttachableRef.EntityRef.Value</span> and
- <span class="literal">AttachableRef.NoRefOnly</span> filters in combination.
+    * DESCRIPTION: Indicates whether or not to include references to hidden entities when filtering. When set to **true** , hidden references are returned in the result set.
+    *  For filtering results, it works with **AttachableRef.EntityRef.Type** , **AttachableRef.EntityRef.Value** and **AttachableRef.NoRefOnly** filters in combination.
     */
    Inactive?: boolean;
    /**
     * META: Optional
     *
     * DESCRIPTION: Object reference to which this attachment is linked.
-    * <li>
- Set <span class="literal">EntityRef.value</span> with the <span class="literal">Id</span> of the target object as returned in its response body when queried.
- </li>
- <li>Set <span class="literal">EntityRef.type</span> with the specific type of the target object. For example, <span class="literal">invoice</span>, <span class="literal">bill</span>, <span class="literal">item</span>, etc.
- </li>
+    * Set **EntityRef.value** with the **Id** of the target object as returned in its response body when queried.,
+    * Set **EntityRef.type** with the specific type of the target object. For example, **invoice**, **bill**, **item**, etc.,
     */
    EntityRef?: ReferenceType;
 }
@@ -306,7 +275,7 @@ export interface Attachable {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -318,13 +287,13 @@ export interface Attachable {
    /**
     * META: * Conditionally required ,  ,max character: max 2000 chars
     *
-    * DESCRIPTION: This note is either related to the attachment specified by <span class="literal">FileName</span> or is a standalone note. Required for standalone notes.
+    * DESCRIPTION: This note is either related to the attachment specified by **FileName** or is a standalone note. Required for standalone notes.
     */
    Note?: string;
    /**
     * META: Optional ,max character: max 100 chars
     *
-    * DESCRIPTION: Category of the attachment. Valid values include (case sensitive): <span class="literal">Contact Photo</span>, <span class="literal">Document</span>, <span class="literal">Image</span>, <span class="literal">Receipt</span>, <span class="literal">Signature</span>, <span class="literal">Sound</span>, <span class="literal">Other</span>.
+    * DESCRIPTION: Category of the attachment. Valid values include (case sensitive): **Contact Photo**, **Document**, **Image**, **Receipt**, **Signature**, **Sound**, **Other**.
     */
    Category?: string;
    /**
@@ -366,7 +335,7 @@ export interface Attachable {
    /**
     * META: Optional
     *
-    * DESCRIPTION: <br>Descriptive information about the entity. The MetaData values are set by Data Services and are read only for all applications.
+    * DESCRIPTION: Descriptive information about the entity. The MetaData values are set by Data Services and are read only for all applications.
     */
    MetaData?: ModificationMetaData;
    /**
@@ -421,7 +390,7 @@ export interface MarkupInfo {
    /**
     * META: Optional ,read only ,system defined
     *
-    * DESCRIPTION: The account associated with the markup. Available with invoice objects, only, and when linktxn specified a <span class="literal">ReimburseCharge</span>.
+    * DESCRIPTION: The account associated with the markup. Available with invoice objects, only, and when linktxn specified a **ReimburseCharge**.
     */
    readonly MarkUpIncomeAccountRef?: ReferenceType;
 }
@@ -433,25 +402,23 @@ export interface ItemBasedExpenseLineDetail {
     * ADDON: Decimal
     *
     * DESCRIPTION: The total amount of the line item including tax.
-    * Constraints: Available when endpoint is evoked with the
- <span class="literal">minorversion=1</span>query parameter.
+    * Constraints: Available when endpoint is evoked with the **minorversion=1** query parameter.
     */
    TaxInclusiveAmt?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Item. Query the Item name list resource to determine the appropriate Item object for this reference. Use <span class="literal">Item.Id</span> and <span class="literal">Item.Name</span> from that object for <span class="literal">ItemRef.value</span> and <span class="literal">ItemRef.name</span>, respectively. When a line lacks an ItemRef it is treated as documentation and the
-    * <span class="literal">Line.Amount</span> attribute is ignored.
- For France locales: The account associated with the referenced Item object is looked up in the account category list.
- <li>If this account has same location as specified in the transaction by the <span class="literal">TransactionLocationType</span> attribute and the same VAT as in the line item <span class="literal">TaxCodeRef</span> attribute, then the item account is used.</li>
- <li>If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.</li>
- <li>If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.</li>
+    * DESCRIPTION: Reference to the Item. Query the Item name list resource to determine the appropriate Item object for this reference. Use **Item.Id** and **Item.Name** from that object for **ItemRef.value** and **ItemRef.name**, respectively. When a line lacks an ItemRef it is treated as documentation and the **Line.Amount** attribute is ignored.
+    * For France locales: The account associated with the referenced Item object is looked up in the account category list.
+    * If this account has same location as specified in the transaction by the **TransactionLocationType** attribute and the same VAT as in the line item **TaxCodeRef** attribute, then the item account is used.,
+    * If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.,
+    * If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.,
     */
    ItemRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef?: ReferenceType;
    /**
@@ -463,13 +430,13 @@ export interface ItemBasedExpenseLineDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the expense. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerLine</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the expense. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerLine** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxCode</span>for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the **TaxCode** for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively.
     */
    TaxCodeRef?: ReferenceType;
    /**
@@ -482,10 +449,7 @@ export interface ItemBasedExpenseLineDetail {
     * META: Optional
     *
     * DESCRIPTION: The billable status of the expense.
-    * Valid values:
- <span class="literal">Billable</span>,
- <span class="literal">NotBillable</span>,
- <span class="literal">HasBeenBilled</span>
+    * Valid values: **Billable**, **NotBillable**, **HasBeenBilled**
     */
    BillableStatus?: "Billable" | "NotBillable" | "HasBeenBilled";
    /**
@@ -501,10 +465,9 @@ export interface ItemBasedExpenseLineDetail {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Unit price of the subject item as referenced by
-    * <span class="literal">ItemRef</span>. Corresponds to the Rate column on the QuickBooks Online UI to specify either unit price, a discount, or a tax rate for item.
- If used for unit price, the monetary value of the service or product, as expressed in the home currency.
- If used for a discount or tax rate, express the percentage as a fraction. For example, specify <span class="literal">0.4</span> for 40% tax.
+    * DESCRIPTION: Unit price of the subject item as referenced by **ItemRef**. Corresponds to the Rate column on the QuickBooks Online UI to specify either unit price, a discount, or a tax rate for item.
+    * If used for unit price, the monetary value of the service or product, as expressed in the home currency.
+    * If used for a discount or tax rate, express the percentage as a fraction. For example, specify **0.4** for 40% tax.
     */
    UnitPrice?: number;
 }
@@ -514,14 +477,10 @@ export interface Bill_Line_ItemBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -539,14 +498,13 @@ export interface Bill_Line_ItemBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">ItemBasedExpenseLineDetail</span> for this type of line.
+    * DESCRIPTION: Set to **ItemBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "ItemBasedExpenseLineDetail";
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more transactions linked to this object. The <span class="literal">LinkedTxn.TxnType</span> can be set to <span class="literal">PurchaseOrder</span> or if using Minor Version 55 and above it can also be set to <span class="literal">ReimburseCharge</span>. Use <span class="literal">LinkedTxn.TxnId</span> as the ID of the transaction.  When updating an existing Bill to link to a PurchaseOrder a new Line must be created. This behavior matches the QuickBooks UI as it does not allow the linking of an existing line, but rather a new line must be added to link the PurchaseOrder. Over the API this is achieved by simply updating the Bill <span class="literal">Line.Id</span> to something new. This will ensure old bill line is deleted and the new line is linked to the PurchaseOrder. Please be aware that for this PurchaseOrder-Bill linking to work all LinkedTxn child attributes are required.  See child attributes below.
+    * DESCRIPTION: Zero or more transactions linked to this object. The **LinkedTxn.TxnType** can be set to **PurchaseOrder** or if using Minor Version 55 and above it can also be set to **ReimburseCharge**. Use **LinkedTxn.TxnId** as the ID of the transaction.  When updating an existing Bill to link to a PurchaseOrder a new Line must be created. This behavior matches the QuickBooks UI as it does not allow the linking of an existing line, but rather a new line must be added to link the PurchaseOrder. Over the API this is achieved by simply updating the Bill **Line.Id** to something new. This will ensure old bill line is deleted and the new line is linked to the PurchaseOrder. Please be aware that for this PurchaseOrder-Bill linking to work all LinkedTxn child attributes are required.  See child attributes below.
     */
    LinkedTxn?: any[];
    /**
@@ -569,11 +527,11 @@ export interface AccountBasedExpense {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to the Expense account associated with this item. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType=Expense</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">AccountRef.value</span> and <span class="literal">AccountRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Expense account associated with this item. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType=Expense**. Use **Account.Id** and **Account.Name** from that object for **AccountRef.value** and **AccountRef.name**, respectively.
     * For France locales: The account associated with the referenced Account object is looked up in the account category list.
- <li>If this account has same location as specified in the transaction by the <span class="literal">TransactionLocationType</span> attribute and the same VAT as in the line item <span class="literal">TaxCodeRef</span> attribute, then this account is used.</li>
- <li>If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.</li>
- <li>If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.</li>
+    * If this account has same location as specified in the transaction by the **TransactionLocationType** attribute and the same VAT as in the line item **TaxCodeRef** attribute, then this account is used.,
+    * If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.,
+    * If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.,
     */
    AccountRef: ReferenceType;
    /**
@@ -590,21 +548,19 @@ export interface AccountBasedExpense {
     * ADDON: Decimal
     *
     * DESCRIPTION: The total amount of the line item including tax.
-    * Constraints: Available when endpoint is evoked with the
- <span class="literal">minorversion=1</span>query parameter.
+    * Constraints: Available when endpoint is evoked with the **minorversion=1** query parameter.
     */
    TaxInclusiveAmt?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the expense. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerLine</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the expense. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerLine** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: The
-    * <span class="literal">TaxCode</span>associated with the sales tax for the expense. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: The **TaxCode** associated with the sales tax for the expense. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively.
     */
    TaxCodeRef?: ReferenceType;
    /**
@@ -617,16 +573,13 @@ export interface AccountBasedExpense {
     * META: Optional
     *
     * DESCRIPTION: The billable status of the expense.
-    * Valid values:
- <span class="literal">Billable</span>,
- <span class="literal">NotBillable</span>,
- <span class="literal">HasBeenBilled</span>
+    * Valid values: **Billable**, **NotBillable**, **HasBeenBilled**
     */
    BillableStatus?: "Billable" | "NotBillable" | "HasBeenBilled";
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Customer associated with the expense. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Customer associated with the expense. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef?: ReferenceType;
 }
@@ -636,21 +589,16 @@ export interface Bill_Line_AccountBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">AccountBasedExpenseLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **AccountBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "AccountBasedExpenseLineDetail";
    /**
@@ -664,13 +612,13 @@ export interface Bill_Line_AccountBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>LineDetail</strong>
+    * DESCRIPTION: **LineDetail**
     */
    AccountBasedExpenseLineDetail: AccountBasedExpense;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more PurchaseOrder transactions linked to this Bill object. The <span class="literal">LinkedTxn.TxnType</span> should always be set to <span class="literal">PurchaseOrder</span>. Use <span class="literal">LinkedTxn.TxnId</span> as the ID of the PurchaseOrder.  When updating an existing Bill to link to a PurchaseOrder a new Line must be created. This behavior matches the QuickBooks UI as it does not allow the linking of an existing line, but rather a new line must be added to link the PurchaseOrder. Over the API this is achieved by simply updating the Bill <span class="literal">Line.Id</span> to something new. This will ensure old bill line is deleted and the new line is linked to the PurchaseOrder.
+    * DESCRIPTION: Zero or more PurchaseOrder transactions linked to this Bill object. The **LinkedTxn.TxnType** should always be set to **PurchaseOrder**. Use **LinkedTxn.TxnId** as the ID of the PurchaseOrder.  When updating an existing Bill to link to a PurchaseOrder a new Line must be created. This behavior matches the QuickBooks UI as it does not allow the linking of an existing line, but rather a new line must be added to link the PurchaseOrder. Over the API this is achieved by simply updating the Bill **Line.Id** to something new. This will ensure old bill line is deleted and the new line is linked to the PurchaseOrder.
     */
    LinkedTxn?: any[];
    /**
@@ -693,7 +641,7 @@ export interface CurrencyRefType {
    /**
     * META: * Required
     *
-    * DESCRIPTION: A three letter string representing the ISO 4217 code for the currency. For example, <span class="literal">USD</span>, <span class="literal">AUD</span>, <span class="literal">EUR</span>, and so on.
+    * DESCRIPTION: A three letter string representing the ISO 4217 code for the currency. For example, **USD**, **AUD**, **EUR**, and so on.
     */
    value: string;
    /**
@@ -720,26 +668,15 @@ export interface Bill_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
 
 export interface Date {
    /**
-    * DESCRIPTION: Local timezone: <em>
-    * <span class="literal">YYYY-MM-DD 
- <span style="display: none;"></span>
- </span>
- </em>UTC: <span class="literal">
- <em>YYYY-MM-DD</em>Z <span style="display: none;"></span>
- </span>
- Specific time zone: <em>
- <span class="literal">YYYY-MM-DD+/-HH:MM <span style="display: none;"></span>
- </span>
- </em><br> The date format follows the <a href="https://www.w3.org/TR/xmlschema-2/" target="_blank">XML Schema standard.</a>
+    * DESCRIPTION: Local timezone: **YYYY-MM-DD** UTC: **YYYY-MM-DDZ**
+    * Specific time zone: **YYYY-MM-DD+/-HH:MM** The date format follows the {@link https://www.w3.org/TR/xmlschema-2/ | XML Schema standard.}
     */
    date?: string;
 }
@@ -748,8 +685,8 @@ export interface TaxLineDetail {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to a TaxRate to apply to the entire transaction. Query the TaxRate name list resource to determine the appropriate TaxRage object for this reference. Use <span class="literal">TaxRate.Id</span> and <span class="literal">TaxRate.Name</span> from that object for <span class="literal">TaxRateRef.value</span> and <span class="literal">TaxRateRef.name</span>, respectively.
-    * <br>For non-US versions of QuickBooks, the TaxRate referenced here must also be one of the rates in the referenced tax code's rate list—either the SalesTaxRateList or the PurchaseTaxRateList—as applies to the transaction type. Any given rate may only be listed once.
+    * DESCRIPTION: Reference to a TaxRate to apply to the entire transaction. Query the TaxRate name list resource to determine the appropriate TaxRage object for this reference. Use **TaxRate.Id** and **TaxRate.Name** from that object for **TaxRateRef.value** and **TaxRateRef.name**, respectively.
+    * For non-US versions of QuickBooks, the TaxRate referenced here must also be one of the rates in the referenced tax code's rate list—either the SalesTaxRateList or the PurchaseTaxRateList—as applies to the transaction type. Any given rate may only be listed once.
     */
    TaxRateRef: ReferenceType;
    /**
@@ -757,20 +694,15 @@ export interface TaxLineDetail {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: This is the taxable amount on the total of the applicable tax rates. If TaxRate is applicable on two lines, this attribute represents the total of the two lines for which this rate is applied. This is different from the
-    * <span class="literal">Line.Amount</span> , which represents the final tax amount after the tax has been applied.
- 
- <span style="color:#800080;">Default Value:</span>
- <span class="literal">Null</span>
+    * DESCRIPTION: This is the taxable amount on the total of the applicable tax rates. If TaxRate is applicable on two lines, this attribute represents the total of the two lines for which this rate is applied. This is different from the **Line.Amount** , which represents the final tax amount after the tax has been applied.
+    * 
+    * Default Value: **Null**
     */
    NetAmountTaxable?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <li>
-    * <span class="literal">True</span>—sales tax rate is expressed as a percentage.</li>
- <li>
- <span class="literal">False</span>—sales tax rate is expressed as a number amount.</li>
+    * DESCRIPTION: **True**—sales tax rate is expressed as a percentage., **False**—sales tax rate is expressed as a number amount.,
     */
    PercentBased?: boolean;
    /**
@@ -803,14 +735,13 @@ export interface Bill_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -818,7 +749,7 @@ export interface Bill_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -827,7 +758,7 @@ export interface TxnTaxDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the transaction tax code. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively. If specified and sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>), this element is ignored and not returned. For sales transactions, only: if automated sales tax is enabled (<span class="literal">Preferences.TaxPrefs.PartnerTaxEnabled</span> is set to <span class="literal">true</span>) the supplied transaction tax code is replaced by the automated sales tax engine recommendation.
+    * DESCRIPTION: Reference to the transaction tax code. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively. If specified and sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**), this element is ignored and not returned. For sales transactions, only: if automated sales tax is enabled (**Preferences.TaxPrefs.PartnerTaxEnabled** is set to **true**) the supplied transaction tax code is replaced by the automated sales tax engine recommendation.
     */
    TxnTaxCodeRef?: ReferenceType;
    /**
@@ -855,28 +786,27 @@ export interface Bill {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use <span class="literal">Vendor.Id</span> and <span class="literal">Vendor.Name</span> from that object for <span class="literal">VendorRef.value</span> and <span class="literal">VendorRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use **Vendor.Id** and **Vendor.Name** from that object for **VendorRef.value** and **VendorRef.name**, respectively.
     */
    VendorRef: ReferenceType;
    /**
     * META: * Required
     *
     * DESCRIPTION: Individual line items of a transaction. 
-    * Valid <span class="literal">Line</span> types include:
- <span class="literal">ItemBasedExpenseLine</span> and <span class="literal">AccountBasedExpenseLine</span>
+    * Valid **Line** types include: **ItemBasedExpenseLine** and **AccountBasedExpenseLine**
     */
    Line: (Bill_Line_ItemBasedExpenseLine | Bill_Line_AccountBasedExpenseLine)[];
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company.
     */
    CurrencyRef?: CurrencyRefType;
    /**
@@ -886,35 +816,32 @@ export interface Bill {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">APAccountRef.value</span> and <span class="literal">APAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.Classification</span> set to <span class="literal">Liability</span> and <span class="literal">Account.AccountSubType</span> set to <span class="literal">AccountsPayable</span>.
+    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **APAccountRef.value** and **APAccountRef.name**, respectively. The specified account must have **Account.Classification** set to **Liability** and **Account.AccountSubType** set to **AccountsPayable**.
     * If the company has a single AP account, the account is implied. However, it is recommended that the AP Account be explicitly specified in all cases to prevent unexpected errors when relating transactions to each other.
     */
    APAccountRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use <span class="literal">Term.Id</span> and <span class="literal">Term.Name</span> from that object for <span class="literal">SalesTermRef.value</span> and <span class="literal">SalesTermRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use **Term.Id** and **Term.Name** from that object for **SalesTermRef.value** and **SalesTermRef.name**, respectively.
     */
    SalesTermRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more transactions linked to this Bill object. The <span class="literal">LinkedTxn.TxnType</span> can be set to <span class="literal">PurchaseOrder</span>, <span class="literal">BillPaymentCheck</span> or if using Minor Version 55 and above <span class="literal">ReimburseCharge</span>. Use <span class="literal">LinkedTxn.TxnId</span> as the ID of the transaction.
+    * DESCRIPTION: Zero or more transactions linked to this Bill object. The **LinkedTxn.TxnType** can be set to **PurchaseOrder**, **BillPaymentCheck** or if using Minor Version 55 and above **ReimburseCharge**. Use **LinkedTxn.TxnId** as the ID of the transaction.
     */
    LinkedTxn?: Bill_LinkedTxn[];
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
@@ -928,13 +855,9 @@ export interface Bill {
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -942,8 +865,7 @@ export interface Bill {
     *
     * ADDON: Local timezone: YYYY-MM-DD UTC: YYYY-MM-DDZ Specific time zone: YYYY-MM-DD+/-HH:MM
     *
-    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in
-    * <span class="literal">SalesTermRef</span> added the transaction date will be used.
+    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in **SalesTermRef** added the transaction date will be used.
     */
    DueDate?: string;
    /**
@@ -957,8 +879,8 @@ export interface Bill {
     *
     * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, a custom value can be provided. If no value is supplied, the resulting DocNumber is null.
     * Throws an error when duplicate DocNumber is sent in the request. 
- Recommended best practice: check the setting of <span class="literal">Preferences:OtherPrefs </span> before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI.
- Sort order is ASC by default.
+    * Recommended best practice: check the setting of **Preferences:OtherPrefs** before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI.
+    * Sort order is ASC by default.
     */
    DocNumber?: string;
    /**
@@ -971,7 +893,7 @@ export interface Bill {
     * META: Optional ,
     *
     * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details of all taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
@@ -979,13 +901,13 @@ export interface Bill {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
@@ -999,13 +921,13 @@ export interface Bill {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Convenience field containing the amount in <span class="literal">Balance</span> expressed in terms of the home currency. Calculated by QuickBooks business logic. Value is valid only when <span class="literal">CurrencyRef</span> is specified and available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: Convenience field containing the amount in **Balance** expressed in terms of the home currency. Calculated by QuickBooks business logic. Value is valid only when **CurrencyRef** is specified and available when endpoint is evoked with the **minorversion=3** query parameter. Applicable if multicurrency is enabled for the company.
     */
    readonly HomeBalance?: number;
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">Bill</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **Bill** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
@@ -1013,8 +935,7 @@ export interface Bill {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of
-    * <span class="literal">TotalAmt</span>. A Balance of 0 indicates the bill is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
+    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of **TotalAmt**. A Balance of 0 indicates the bill is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
     */
    readonly Balance?: number;
 }
@@ -1035,9 +956,7 @@ export interface BillPayment_Line_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -1063,18 +982,15 @@ export interface BillPayment_CheckPayment_BillPaymentCheck {
    /**
     * META: * Required
     *
-    * DESCRIPTION: <br>Reference to the bank account. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">APAccountRef.value</span> and <span class="literal">APAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.AccountType</span> set to <span class="literal">Bank</span> and <span class="literal">Account.AccountSubType</span> set to <span class="literal">Checking</span>.
+    * DESCRIPTION: Reference to the bank account. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **APAccountRef.value** and **APAccountRef.name**, respectively. The specified account must have **Account.AccountType** set to **Bank** and **Account.AccountSubType** set to **Checking**.
     */
    BankAccountRef: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span class="literal">NeedToPrint</span>
+    * DESCRIPTION: **NeedToPrint**
     * Printing status of the invoice.
- Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToPrint</span>,
- <span class="literal">PrintComplete</span>.
+    * Valid values: **NotSet**, **NeedToPrint**, **PrintComplete**.
     */
    PrintStatus?: "NeedToPrint" | "NotSet" | "PrintComplete";
 }
@@ -1083,7 +999,7 @@ export interface BillPayment_CreditCardPayment_BillPaymentCreditCard {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to the credit card account. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">CCAccountRef.value</span> and <span class="literal">CCAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.AccountType</span> set to <span class="literal">Credit Card</span> and <span class="literal">Account.AccountSubType</span> set to <span class="literal">CreditCard</span>.
+    * DESCRIPTION: Reference to the credit card account. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **CCAccountRef.value** and **CCAccountRef.name**, respectively. The specified account must have **Account.AccountType** set to **Credit Card** and **Account.AccountSubType** set to **CreditCard**.
     * Inject with data only if the payment was transacted through Intuit Payments API.
     */
    CCAccountRef: ReferenceType;
@@ -1100,15 +1016,15 @@ export interface BillPayment {
    /**
     * META: * Required
     *
-    * DESCRIPTION: <br>Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use <span class="literal">Vendor.Id</span> and <span class="literal">Vendor.Name</span> from that object for <span class="literal">VendorRef.value</span> and <span class="literal">VendorRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use **Vendor.Id** and **Vendor.Name** from that object for **VendorRef.value** and **VendorRef.name**, respectively.
     */
    VendorRef: ReferenceType;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items representing zero or more <span class="literal">Bill</span>, <span class="literal">VendorCredit</span>, and <span class="literal">JournalEntry</span> objects linked to this BillPayment object.
-    * Use <span class="literal">Line.LinkedTxn.TxnId</span> as the ID in a separate Bill, VendorCredit, or JournalEntry read request to retrieve details of the linked object.
- <br> LinkedTxnLine:
+    * DESCRIPTION: Individual line items representing zero or more **Bill**, **VendorCredit**, and **JournalEntry** objects linked to this BillPayment object.
+    * Use **Line.LinkedTxn.TxnId** as the ID in a separate Bill, VendorCredit, or JournalEntry read request to retrieve details of the linked object.
+    *  LinkedTxnLine:
     */
    Line: BillPayment_Line[];
    /**
@@ -1116,26 +1032,26 @@ export interface BillPayment {
     *
     * ADDON: Big Decimal
     *
-    * DESCRIPTION: Indicates the total amount associated with this payment. This includes the total of all the payments from the payment line details. If <span class="literal">TotalAmt</span> is greater than the total on the lines being paid, the overpayment is treated as a credit and exposed as such on the QuickBooks UI. It cannot be negative.
+    * DESCRIPTION: Indicates the total amount associated with this payment. This includes the total of all the payments from the payment line details. If **TotalAmt** is greater than the total on the lines being paid, the overpayment is treated as a credit and exposed as such on the QuickBooks UI. It cannot be negative.
     */
    TotalAmt: number;
    /**
     * META: * Required
     *
-    * DESCRIPTION: The payment type. Valid values include: <span class="literal">Check</span>, <span class="literal">CreditCard</span>
+    * DESCRIPTION: The payment type. Valid values include: **Check**, **CreditCard**
     */
    PayType: "Check" | "CreditCard";
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * <br>Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>.Required if multicurrency is enabled for the company
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}.Required if multicurrency is enabled for the company
     */
    CurrencyRef?: CurrencyRefType;
    /**
@@ -1143,8 +1059,8 @@ export interface BillPayment {
     *
     * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, a custom value can be provided. If no value is supplied, the resulting DocNumber is null.
     * Throws an error when duplicate DocNumber is sent in the request. 
- Recommended best practice: check the setting of <span class="literal">Preferences:OtherPrefs </span> before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI.
- Sort order is ASC by default.
+    * Recommended best practice: check the setting of **Preferences:OtherPrefs** before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI.
+    * Sort order is ASC by default.
     */
    DocNumber?: string;
    /**
@@ -1160,7 +1076,7 @@ export interface BillPayment {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
@@ -1168,32 +1084,28 @@ export interface BillPayment {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">APAccountRef.value</span> and <span class="literal">APAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.Classification</span> set to <span class="literal">Liability</span> and <span class="literal">Account.AccountSubType</span> set to <span class="literal">AccountsPayable</span>.
-    * <br>If the company has a single AP account, the account is implied. However, it is recommended that the AP Account be explicitly specified in all cases to prevent unexpected errors when relating transactions to each other.
+    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **APAccountRef.value** and **APAccountRef.name**, respectively. The specified account must have **Account.Classification** set to **Liability** and **Account.AccountSubType** set to **AccountsPayable**.
+    * If the company has a single AP account, the account is implied. However, it is recommended that the AP Account be explicitly specified in all cases to prevent unexpected errors when relating transactions to each other.
     */
    APAccountRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <br>A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -1205,15 +1117,15 @@ export interface BillPayment {
    /**
     * META: Optional
     *
-    * DESCRIPTION: <br>Descriptive information about the object. The MetaData values are set by Data Services and are read only for all applications.
+    * DESCRIPTION: Descriptive information about the object. The MetaData values are set by Data Services and are read only for all applications.
     */
    MetaData?: ModificationMetaData;
    /**
-    * DESCRIPTION: <br>Information about a check payment for the transaction. Not applicable to Estimate and SalesOrder. Used when PayType is <span class="literal">Check</span>.
+    * DESCRIPTION: Information about a check payment for the transaction. Not applicable to Estimate and SalesOrder. Used when PayType is **Check**.
     */
    CheckPayment?: BillPayment_CheckPayment_BillPaymentCheck;
    /**
-    * DESCRIPTION: <br>Information about a credit card payment for the transaction. Not applicable to Estimate and SalesOrder. Used when PayType is <span class="literal">CreditCard</span>.
+    * DESCRIPTION: Information about a credit card payment for the transaction. Not applicable to Estimate and SalesOrder. Used when PayType is **CreditCard**.
     */
    CreditCardPayment?: BillPayment_CreditCardPayment_BillPaymentCreditCard;
 }
@@ -1222,13 +1134,13 @@ export interface Budget_BudgetDetail {
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerLine</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerLine** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    readonly ClassRef?: ReferenceType;
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    readonly DepartmentRef?: ReferenceType;
    /**
@@ -1250,13 +1162,13 @@ export interface Budget_BudgetDetail {
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: Reference to the Account associated with this BudgetDetail. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType=Expense</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">AccountRef.value</span> and <span class="literal">AccountRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Account associated with this BudgetDetail. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType=Expense**. Use **Account.Id** and **Account.Name** from that object for **AccountRef.value** and **AccountRef.name**, respectively.
     */
    readonly AccountRef?: ReferenceType;
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: Reference to the Customer associated with this BudgetDetail. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Customer associated with this BudgetDetail. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    readonly CustomerRef?: ReferenceType;
 }
@@ -1288,21 +1200,21 @@ export interface Budget {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: Optional ,read only
     *
     * DESCRIPTION: Period that this budget detail covers..
-    *  Valid values include: <span class="literal">Monthly</span>, <span class="literal">Quarterly</span>, <span class="literal">Annually</span>.
+    *  Valid values include: **Monthly**, **Quarterly**, **Annually**.
     */
    readonly BudgetEntryType?: "Monthly" | "Quarterly" | "Annually";
    /**
     * META: Optional ,read only
     *
     * DESCRIPTION: User recognizable name for the Account.
-    * <span class="literal">Account.Name</span> attribute must not contain double quotes (") or colon (:).
+    * **Account.Name** attribute must not contain double quotes (") or colon (:).
     */
    readonly Name?: string;
    /**
@@ -1315,7 +1227,7 @@ export interface Budget {
     * META: Optional ,read only
     *
     * DESCRIPTION: Budget types.
-    *  The only value currently supported is <span class="literal">ProfitAndLoss</span>.
+    *  The only value currently supported is **ProfitAndLoss**.
     */
    readonly BudgetType?: "ProfitAndLoss";
    /**
@@ -1349,7 +1261,7 @@ export interface Class {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -1362,8 +1274,8 @@ export interface Class {
     * META: Optional ,system defined
     *
     * DESCRIPTION: Specifies whether this object is a subclass.
-    * <span class="literal">true</span>--this object represents a subclass.
- <span class="literal">false</span> or null--this object represents a top-level class.
+    * **true**--this object represents a subclass.
+    * **false** or null--this object represents a top-level class.
     */
    SubClass?: boolean;
    /**
@@ -1381,8 +1293,7 @@ export interface Class {
    /**
     * META: read only ,system defined
     *
-    * DESCRIPTION: Fully qualified name of the entity. The fully qualified name prepends the topmost parent, followed by each sub class separated by colons. Takes the form of
-    * <span class="literal">Parent:Class1:SubClass1:SubClass2</span>. Limited to 5 levels.
+    * DESCRIPTION: Fully qualified name of the entity. The fully qualified name prepends the topmost parent, followed by each sub class separated by colons. Takes the form of **Parent:Class1:SubClass1:SubClass2**. Limited to 5 levels.
     */
    readonly FullyQualifiedName?: string;
 }
@@ -1394,7 +1305,7 @@ export interface SalesItemLineDetail {
     * ADDON: Decimal
     *
     * DESCRIPTION: The total amount of the line item including tax.
-    * Constraints: Available when endpoint is evoked with the <span class="literal">minorversion=1</span>query parameter.
+    * Constraints: Available when endpoint is evoked with the **minorversion=1** query parameter.
     */
    TaxInclusiveAmt?: number;
    /**
@@ -1402,35 +1313,35 @@ export interface SalesItemLineDetail {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The discount amount applied to this line. If both <span class="literal">DiscountAmt </span> and <span class="literal">DiscountRate</span> are supplied, <span class="literal">DiscountRate</span> takes precedence and <span class="literal">DiscountAmt </span> is recalculated by QuickBooks services based on amount of <span class="literal">DiscountRate</span>.
+    * DESCRIPTION: The discount amount applied to this line. If both **DiscountAmt** and **DiscountRate** are supplied, **DiscountRate** takes precedence and **DiscountAmt** is recalculated by QuickBooks services based on amount of **DiscountRate**.
     */
    DiscountAmt?: number;
    /**
     * META: Optional
     *
     * DESCRIPTION: Reference to an Item object.
-    * <li>Query the Item name list resource to determine the appropriate Item object for this reference. Use <span class="literal">Item.Id</span> and <span class="literal">Item.Name</span> from that object for <span class="literal">ItemRef.value</span> and <span class="literal">ItemRef.name</span>, respectively.</li>
- <li>Set ItemRef.value to <span class="literal">SHIPPING_ITEM_ID</span> when Line.amount represents transaction-wide shipping charges. Valid when <span class="literal">Preferences.SalesFormsPrefs.AllowShipping</span> is set to <span class="literal">true</span>. </li>
- <li>Set ItemRef.value to <span class="literal">GRATUITY_ITEM_ID</span> when Line.amount represents transaction-wide gratuity amount. Valid when <span class="literal">Preferences.OtherPrefs.Name.SalesFormsPrefs.AllowGratuity</span> is set to <span class="literal">true</span>. </li>
- <li>When a line lacks an ItemRef it is treated as documentation and the <span class="literal">Line.Amount</span>attribute is ignored.</li>
- <li>Applicable to invoice objects, only, and when <span class="literal">linktxn</span> specifies a <span class="literal">ReimburseCharge</span>. When <span class="literal">Item.Id</span> is set to 1, <span class="literal">ItemAccountRef</span> refers to reimburse expense account Id.</li>
- 
- For France locales: The account associated with the referenced Item object is looked up in the account category list.
- <li>If this account has same location as specified in the transaction by the <span class="literal">TransactionLocationType</span> attribute and the same VAT as in the line item <span class="literal">TaxCodeRef</span> attribute, then the item account is used.</li>
- <li>If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.</li>
- <li>If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.</li>
+    * Query the Item name list resource to determine the appropriate Item object for this reference. Use **Item.Id** and **Item.Name** from that object for **ItemRef.value** and **ItemRef.name**, respectively.,
+    * Set ItemRef.value to **SHIPPING_ITEM_ID** when Line.amount represents transaction-wide shipping charges. Valid when **Preferences.SalesFormsPrefs.AllowShipping** is set to **true**.,
+    * Set ItemRef.value to **GRATUITY_ITEM_ID** when Line.amount represents transaction-wide gratuity amount. Valid when **Preferences.OtherPrefs.Name.SalesFormsPrefs.AllowGratuity** is set to **true**.,
+    * When a line lacks an ItemRef it is treated as documentation and the **Line.Amount** attribute is ignored.,
+    * Applicable to invoice objects, only, and when **linktxn** specifies a **ReimburseCharge**. When **Item.Id** is set to 1, **ItemAccountRef** refers to reimburse expense account Id.,
+    * 
+    * For France locales: The account associated with the referenced Item object is looked up in the account category list.
+    * If this account has same location as specified in the transaction by the **TransactionLocationType** attribute and the same VAT as in the line item **TaxCodeRef** attribute, then the item account is used.,
+    * If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.,
+    * If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.,
     */
    ItemRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class for the line item. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerLine</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class for the line item. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerLine** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxCode</span>for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the **TaxCode** for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively.
     */
    TaxCodeRef?: ReferenceType;
    /**
@@ -1442,7 +1353,7 @@ export interface SalesItemLineDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Available with invoice objects, only, and when there is a <span class="literal">linkedtxn</span> of type <span class="literal">ReimburseCharge</span> for this object. When <span class="literal">ItemRef.Id</span> is set to 1, <span class="literal">ItemAccountRef</span> maps to the reimbursable charge account.
+    * DESCRIPTION: Available with invoice objects, only, and when there is a **linkedtxn** of type **ReimburseCharge** for this object. When **ItemRef.Id** is set to 1, **ItemAccountRef** maps to the reimbursable charge account.
     */
    ItemAccountRef?: ReferenceType;
    /**
@@ -1458,7 +1369,7 @@ export interface SalesItemLineDetail {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The discount rate applied to this line. If both <span class="literal">DiscountAmt </span> and <span class="literal">DiscountRate</span> are supplied, <span class="literal">DiscountRate</span> takes precedence and <span class="literal">DiscountAmt </span> is recalculated by QuickBooks services based on amount of <span class="literal">DiscountRate</span>.
+    * DESCRIPTION: The discount rate applied to this line. If both **DiscountAmt** and **DiscountRate** are supplied, **DiscountRate** takes precedence and **DiscountAmt** is recalculated by QuickBooks services based on amount of **DiscountRate**.
     */
    DiscountRate?: number;
    /**
@@ -1474,20 +1385,18 @@ export interface SalesItemLineDetail {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Unit price of the subject item as referenced by
-    * <span class="literal">ItemRef</span>. Corresponds to the Rate column on the QuickBooks Online UI to specify either unit price, a discount, or a tax rate for item.
- If used for unit price, the monetary value of the service or product, as expressed in the home currency. You can override the unit price of the subject item by supplying a new value with create or update operations.
- If used for a discount or tax rate, express the percentage as a fraction. For example, specify <span class="literal">0.4</span> for 40% tax.
+    * DESCRIPTION: Unit price of the subject item as referenced by **ItemRef**. Corresponds to the Rate column on the QuickBooks Online UI to specify either unit price, a discount, or a tax rate for item.
+    * If used for unit price, the monetary value of the service or product, as expressed in the home currency. You can override the unit price of the subject item by supplying a new value with create or update operations.
+    * If used for a discount or tax rate, express the percentage as a fraction. For example, specify **0.4** for 40% tax.
     */
    UnitPrice?: number;
    /**
     * META: Optional ,read only ,minorVersion: 21 ,system defined
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxClassification</span>for this item. Available for companies that have <a href="https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax" title="Automatic Sales Tax">automated sales tax</a> enabled.
-    * <li><span class="literal">TaxClassificationRef.Name</span>: Currently not populated.</li>
- <li><span class="literal">TaxClassificationRef.value</span>: The system-defined Tax Classification code that is applied to this line item.</li>
- 
-  For internal use only.
+    * DESCRIPTION: Reference to the **TaxClassification** for this item. Available for companies that have {@link https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax | automated sales tax} enabled.
+    * **TaxClassificationRef.Name**: Currently not populated., **TaxClassificationRef.value**: The system-defined Tax Classification code that is applied to this line item.,
+    * 
+    *  For internal use only.
     */
    readonly TaxClassificationRef?: ReferenceType;
 }
@@ -1497,20 +1406,16 @@ export interface CreditMemo_Line_SalesItemLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -1523,7 +1428,7 @@ export interface CreditMemo_Line_SalesItemLine {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -1547,20 +1452,16 @@ export interface CreditMemo_Line_GroupLineDetail_Line {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -1573,7 +1474,7 @@ export interface CreditMemo_Line_GroupLineDetail_Line {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -1610,7 +1511,7 @@ export interface GroupLineDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a group item for all the lines that belong to the bundle. Query the Item name list resource to determine the appropriate Item group object (<span class="literal">Item.Type=Group</span>) for this reference. Use <span class="literal">Item.Id</span> and <span class="literal">Item.Name</span> from that object for <span class="literal">GroupItemRef.value</span> and <span class="literal">GroupItemRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a group item for all the lines that belong to the bundle. Query the Item name list resource to determine the appropriate Item group object (**Item.Type=Group**) for this reference. Use **Item.Id** and **Item.Name** from that object for **GroupItemRef.value** and **GroupItemRef.name**, respectively.
     */
    GroupItemRef?: ReferenceType;
 }
@@ -1620,14 +1521,10 @@ export interface CreditMemo_Line_GroupLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -1637,8 +1534,7 @@ export interface CreditMemo_Line_GroupLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">GroupLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **GroupLineDetail** for this type of line.
     */
    DetailType: "GroupLineDetail";
    /**
@@ -1661,7 +1557,7 @@ export interface DescriptionLineDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxCode</span>for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the **TaxCode** for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively.
     */
    TaxCodeRef?: ReferenceType;
    /**
@@ -1679,21 +1575,16 @@ export interface CreditMemo_Line_DescriptionOnlyLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DescriptionOnly</span>for this type of line.
+    * DESCRIPTION: Set to **DescriptionOnly** for this type of line.
     */
    DetailType: "DescriptionOnly";
    /**
@@ -1704,17 +1595,9 @@ export interface CreditMemo_Line_DescriptionOnlyLine {
     * META: Optional ,max character: max 4000 chars
     *
     * DESCRIPTION: A string representing one of the following:
-    * <li>
- Free form text description of the line item that appears in the printed record.
- </li>
- <li>
- A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.
- </li><li>
- In create requests, set to <span class="literal">Subtotal:</span> (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.
- </li>
- <li>
- In read requests, lines with <span class="literal">Subtotal: nn.nn</span> returned in this field denote subtotal lines in the object.
- </li>
+    * Free form text description of the line item that appears in the printed record.,
+    * A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.,In create requests, set to **Subtotal:** (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.,
+    * In read requests, lines with **Subtotal: nn.nn** returned in this field denote subtotal lines in the object.,
     */
    Description?: string;
    /**
@@ -1730,7 +1613,7 @@ export interface CreditMemo_Line_DescriptionOnlyLine {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of the line item. Available when <span class="literal">Amount</span> is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
+    * DESCRIPTION: The amount of the line item. Available when **Amount** is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
     */
    readonly Amount?: number;
 }
@@ -1739,19 +1622,19 @@ export interface DiscountLineDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with this discount. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with this discount. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: The <span class="literal">TaxCode</span>associated with the sales tax for the expense. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: The **TaxCode** associated with the sales tax for the expense. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively.
     */
    TaxCodeRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Income account used to track discounts. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType=Income</span> and <span class="literal">Account.AccountSubType=DiscountsRefundsGiven</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">DiscountAccountRef.value</span> and <span class="literal">DiscountAccountRef.name</span>, respectively.
+    * DESCRIPTION: Income account used to track discounts. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType=Income** and **Account.AccountSubType=DiscountsRefundsGiven**. Use **Account.Id** and **Account.Name** from that object for **DiscountAccountRef.value** and **DiscountAccountRef.name**, respectively.
     */
    DiscountAccountRef?: ReferenceType;
    /**
@@ -1775,30 +1658,23 @@ export interface CreditMemo_Line_DiscountLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
     * DESCRIPTION: Discount detail type for the entire transaction. This is in contrast to a discount applied to a specific line. The company preference
-    * <strong>Sales Form Entry | Discounts</strong> must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
+    * **Sales Form Entry | Discounts** must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
     */
    DiscountLineDetail: DiscountLineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DiscountLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **DiscountLineDetail** for this type of line.
     */
    DetailType: "DiscountLineDetail";
    /**
@@ -1829,12 +1705,11 @@ export interface LineDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Item. Query the Item name list resource to determine the appropriate Item object for this reference. Use <span class="literal">Item.Id</span> and <span class="literal">Item.Name</span> from that object for <span class="literal">ItemRef.value</span> and <span class="literal">ItemRef.name</span>, respectively. When a line lacks an ItemRef it is treated as documentation and the
-    * <span class="literal">Line.Amount</span> attribute is ignored.
- For France locales: The account associated with the referenced Item object is looked up in the account category list.
- <li>If this account has same location as specified in the transaction by the <span class="literal">TransactionLocationType</span> attribute and the same VAT as in the line item <span class="literal">TaxCodeRef</span> attribute, then the item account is used.</li>
- <li>If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.</li>
- <li>If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.</li>
+    * DESCRIPTION: Reference to the Item. Query the Item name list resource to determine the appropriate Item object for this reference. Use **Item.Id** and **Item.Name** from that object for **ItemRef.value** and **ItemRef.name**, respectively. When a line lacks an ItemRef it is treated as documentation and the **Line.Amount** attribute is ignored.
+    * For France locales: The account associated with the referenced Item object is looked up in the account category list.
+    * If this account has same location as specified in the transaction by the **TransactionLocationType** attribute and the same VAT as in the line item **TaxCodeRef** attribute, then the item account is used.,
+    * If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.,
+    * If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.,
     */
    ItemRef?: ReferenceType;
 }
@@ -1844,30 +1719,22 @@ export interface CreditMemo_Line_SubTotalLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>
- If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.
- </li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Subtotal <strong>LineDetail</strong>
+    * DESCRIPTION: Subtotal **LineDetail**
     */
    SubtotalLineDetail: LineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SubtotalLineDetail** for this type of line.
     */
    DetailType: "SubTotalLineDetail";
    /**
@@ -1916,14 +1783,13 @@ export interface CreditMemo_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -1931,7 +1797,7 @@ export interface CreditMemo_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -1995,14 +1861,14 @@ export interface PhysicalAddress {
     * META: Optional ,read only ,system defined
     *
     * DESCRIPTION: Latitude coordinate of Geocode (Geospacial Entity Object Code).
-    * <span class="literal">INVALID</span>is returned for invalid addresses.
+    * **INVALID** is returned for invalid addresses.
     */
    readonly Lat?: string;
    /**
     * META: Optional ,read only ,system defined
     *
     * DESCRIPTION: Longitude coordinate of Geocode (Geospacial Entity Object Code).
-    * <span class="literal">INVALID</span>is returned for invalid addresses.
+    * **INVALID** is returned for invalid addresses.
     */
    readonly Long?: string;
    /**
@@ -2024,34 +1890,32 @@ export interface CreditMemo {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items of a transaction. Valid <span class="literal">Line</span> types include:<span class="literal">SalesItemLine</span>, <span class="literal">GroupLine</span>, <span class="literal">DescriptionOnlyLine</span>, <span class="literal">DiscountLine</span> and <span class="literal">SubTotalLine</span>
+    * DESCRIPTION: Individual line items of a transaction. Valid **Line** types include:**SalesItemLine**, **GroupLine**, **DescriptionOnlyLine**, **DiscountLine** and **SubTotalLine**
     */
    Line: (CreditMemo_Line_SalesItemLine | CreditMemo_Line_GroupLine | CreditMemo_Line_DescriptionOnlyLine | CreditMemo_Line_DiscountLine | CreditMemo_Line_SubTotalLine)[];
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef: ReferenceType;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company.
     */
    CurrencyRef?: CurrencyRefType;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Identifies the e-mail address where the credit-memo is sent. If
-    * <span class="literal">EmailStatus=NeedToSend</span>,
- <span class="literal">BillEmail</span>is a required input.
+    * DESCRIPTION: Identifies the e-mail address where the credit-memo is sent. If **EmailStatus=NeedToSend**, **BillEmail** is a required input.
     */
    BillEmail?: EmailAddress;
    /**
@@ -2061,45 +1925,38 @@ export interface CreditMemo {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerLine</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerLine** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
     * DESCRIPTION: Printing status of the credit-memo.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToPrint</span>,
- <span class="literal">PrintComplete
- </span>.
+    * Valid values: **NotSet**, **NeedToPrint**, **PrintComplete**.
     */
    PrintStatus?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use <span class="literal">Term.Id</span> and <span class="literal">Term.Name</span> from that object for <span class="literal">SalesTermRef.value</span> and <span class="literal">SalesTermRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use **Term.Id** and **Term.Name** from that object for **SalesTermRef.value** and **SalesTermRef.name**, respectively.
     */
    SalesTermRef?: ReferenceType;
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
@@ -2113,19 +1970,15 @@ export interface CreditMemo {
    /**
     * META: Optional ,minorVersion: 37 ,
     *
-    * DESCRIPTION: Reference to the Invoice for which Credit memo is issued. Needed for GST compliance. Use <span class="literal">Invoice.Id</span> and <span class="literal">Invoice.Name</span> from that object for <span class="literal">InvoiceRef.value</span> and <span class="literal">InvoiceRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Invoice for which Credit memo is issued. Needed for GST compliance. Use **Invoice.Id** and **Invoice.Name** from that object for **InvoiceRef.value** and **InvoiceRef.name**, respectively.
     */
    InvoiceRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -2137,11 +1990,12 @@ export interface CreditMemo {
    /**
     * META: Optional ,max character: maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:CustomTxnNumber</span> as follows:
-    * <li>If <span class="literal">Preferences:CustomTxnNumber</span> is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:CustomTxnNumber</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- If <span class="literal">Preferences:CustomTxnNumber</span> is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber. <br><em>Note:</em> DocNumber is an optional field for all locales except France. For France locale if <span class="literal">Preferences:CustomTxnNumber</span> is enabled it will <b>not</b> be automatically generated and is a required field.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:CustomTxnNumber** as follows:
+    * If **Preferences:CustomTxnNumber** is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:CustomTxnNumber** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * If **Preferences:CustomTxnNumber** is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber.
+    * Note: DocNumber is an optional field for all locales except France. For France locale if **Preferences:CustomTxnNumber** is enabled it will **not** be automatically generated and is a required field.
     */
    DocNumber?: string;
    /**
@@ -2159,20 +2013,20 @@ export interface CreditMemo {
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use <span class="literal">PaymentMethod.Id</span> and <span class="literal">PaymentMethod.Name</span> from that object for <span class="literal">PaymentMethodRef.value</span> and <span class="literal">PaymentMethodRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use **PaymentMethod.Id** and **PaymentMethod.Name** from that object for **PaymentMethodRef.value** and **PaymentMethodRef.name**, respectively.
     */
    readonly PaymentMethodRef?: ReferenceType;
    /**
@@ -2180,41 +2034,37 @@ export interface CreditMemo {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Identifies the address where the goods must be shipped. If
-    * <span class="literal">ShipAddr</span>is not specified, and a default
- <span class="literal">Customer:ShippingAddr</span> is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks. <br>For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br>If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods must be shipped. If **ShipAddr** is not specified, and a default **Customer:ShippingAddr** is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks.
+    * For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    * If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
     * META: Optional
     *
     * DESCRIPTION: Email status of the credit-memo.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToSend</span>,
- <span class="literal">EmailSent
- </span>
+    * Valid values: **NotSet**, **NeedToSend**, **EmailSent**
     */
    EmailStatus?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Bill-to address of the credit memo. If
-    * <span class="literal">BillAddr</span>is not specified, and a default
- <span class="literal">Customer:BillingAddr</span> is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks. <br>For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br>If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Bill-to address of the credit memo. If **BillAddr** is not specified, and a default **Customer:BillingAddr** is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks.
+    * For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    * If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    BillAddr?: PhysicalAddress;
    /**
@@ -2228,7 +2078,7 @@ export interface CreditMemo {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Convenience field containing the amount in <span class="literal">Balance</span> expressed in terms of the home currency. Calculated by QuickBooks business logic. Value is valid only when <span class="literal">CurrencyRef</span> is specified and available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: Convenience field containing the amount in **Balance** expressed in terms of the home currency. Calculated by QuickBooks business logic. Value is valid only when **CurrencyRef** is specified and available when endpoint is evoked with the **minorversion=3** query parameter. Applicable if multicurrency is enabled for the company.
     */
    readonly HomeBalance?: number;
    /**
@@ -2242,17 +2092,16 @@ export interface CreditMemo {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">CreditMemo</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **CreditMemo** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
     * META: read only ,minorVersion: 21 ,system defined
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxExepmtion</span> ID associated with this object. Available for companies that have <a href="https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax" title="Automatic Sales Tax">automated sales tax</a> enabled.
-    * <li><span class="literal">TaxExemptionRef.Name</span>: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state.</li>
- <li><span class="literal">TaxExemptionRef.value</span>: The system-generated Id of the exemption type.</li>
- 
-  For internal use only.
+    * DESCRIPTION: Reference to the **TaxExepmtion** ID associated with this object. Available for companies that have {@link https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax | automated sales tax} enabled.
+    * **TaxExemptionRef.Name**: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state., **TaxExemptionRef.value**: The system-generated Id of the exemption type.,
+    * 
+    *  For internal use only.
     */
    readonly TaxExemptionRef?: ReferenceType;
    /**
@@ -2260,8 +2109,7 @@ export interface CreditMemo {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of
-    * <span class="literal">TotalAmt</span>. A Balance of 0 indicates the invoice is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
+    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of **TotalAmt**. A Balance of 0 indicates the invoice is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
     */
    readonly Balance?: number;
    /**
@@ -2270,7 +2118,7 @@ export interface CreditMemo {
     * ADDON: Decimal
     *
     * DESCRIPTION: Total amount of the transaction in the home currency. Includes the total of all the charges, allowances and taxes. Calculated by QuickBooks business logic.
-    * Value is valid only when <span class="literal">CurrencyRef</span> is specified. Applicable if multicurrency is enabled for the company.
+    * Value is valid only when **CurrencyRef** is specified. Applicable if multicurrency is enabled for the company.
     */
    readonly HomeTotalAmt?: number;
 }
@@ -2304,7 +2152,7 @@ export interface CompanyInfo {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -2316,13 +2164,15 @@ export interface CompanyInfo {
    /**
     * META: * Required for update
     *
-    * DESCRIPTION: Company Address as described in preference. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Company Address as described in preference.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    CompanyAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Legal Address given to the government for any government communication. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Legal Address given to the government for any government communication.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    LegalAddr?: PhysicalAddress;
    /**
@@ -2370,7 +2220,7 @@ export interface CompanyInfo {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Address of the company as given to their customer, sometimes the address given to the customer mail address is different from Company address. If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Address of the company as given to their customer, sometimes the address given to the customer mail address is different from Company address. If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    CustomerCommunicationAddr?: PhysicalAddress;
    /**
@@ -2396,8 +2246,7 @@ export interface CompanyInfo {
     *
     * ADDON: Local time zone: YYYY-MM-DDTHH:MM:SS UTC: YYYY-MM-DDT HH :MM: SSZ Specific time zone: YYYY-MM-DDT HH :MM:SS +/- HH :MM
     *
-    * DESCRIPTION: DateTime when company file was created. This field and
-    * <span class="literal">Metadata.CreateTime</span>contain the same value.
+    * DESCRIPTION: DateTime when company file was created. This field and **Metadata.CreateTime** contain the same value.
     */
    readonly CompanyStartDate?: string;
    /**
@@ -2410,7 +2259,7 @@ export interface Customer_CustomerTypeRef_String {
    /**
     * META: * Required
     *
-    * DESCRIPTION: The unique numeric Id of the customer type.  This maps to the CustomerType entity: <span class="literal">CustomerType.Id</span>.
+    * DESCRIPTION: The unique numeric Id of the customer type.  This maps to the CustomerType entity: **CustomerType.Id**.
     */
    value: string;
 }
@@ -2434,7 +2283,7 @@ export interface Customer_CurrencyRef {
    /**
     * META: Optional
     *
-    * DESCRIPTION: An identifying name for the object being referenced by <span class="literal">value</span> and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use <span class="literal">Customer.DisplayName</span> to populate this field. Optionally returned in responses, implementation dependent.
+    * DESCRIPTION: An identifying name for the object being referenced by **value** and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use **Customer.DisplayName** to populate this field. Optionally returned in responses, implementation dependent.
     */
    name?: string;
 }
@@ -2477,44 +2326,44 @@ export interface Customer {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,  ,max character: maximum of 500 chars
     *
     * DESCRIPTION: The name of the person or organization as displayed. Must be unique across all Customer, Vendor, and Employee objects. Cannot be removed with sparse update.
-    * If not supplied, the system generates <span class="literal">DisplayName</span> by concatenating customer name components supplied in the request from the following list: <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, and <span class="literal">Suffix</span>.
+    * If not supplied, the system generates **DisplayName** by concatenating customer name components supplied in the request from the following list: **Title**, **GivenName**, **MiddleName**, **FamilyName**, and **Suffix**.
     */
    DisplayName?: string;
    /**
     * META: * Conditionally required ,  ,max character: maximum of 16 chars
     *
-    * DESCRIPTION: Title of the person. This tag supports i18n, all locales. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required.
+    * DESCRIPTION: Title of the person. This tag supports i18n, all locales. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required.
     */
    Title?: string;
    /**
     * META: * Conditionally required ,  ,max character: maximum of 100 chars
     *
-    * DESCRIPTION: Given name or first name of a person. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required.
+    * DESCRIPTION: Given name or first name of a person. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required.
     */
    GivenName?: string;
    /**
     * META: * Conditionally required ,  ,max character: maximum of 100 chars
     *
-    * DESCRIPTION: Middle name of the person. The person can have zero or more middle names. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required.
+    * DESCRIPTION: Middle name of the person. The person can have zero or more middle names. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required.
     */
    MiddleName?: string;
    /**
     * META: * Conditionally required ,  ,max character: maximum of 16 chars
     *
-    * DESCRIPTION: Suffix of the name. For example, <span class="literal">Jr</span>. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required.
+    * DESCRIPTION: Suffix of the name. For example, **Jr**. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required.
     */
    Suffix?: string;
    /**
     * META: * Conditionally required ,  ,max character: maximum of 100 chars
     *
-    * DESCRIPTION: Family name or the last name of the person. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required.
+    * DESCRIPTION: Family name or the last name of the person. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required.
     */
    FamilyName?: string;
    /**
@@ -2532,22 +2381,22 @@ export interface Customer {
    /**
     * META: Optional ,minorVersion: 3 ,
     *
-    * DESCRIPTION: Also called UTR No. in ( UK ) , CST Reg No. ( IN ) also represents the tax registration number of the Person or Organization. This value is masked in responses, exposing only last five characters. For example, the ID of <span class="literal">123-45-6789</span> is returned as <span class="literal">XXXXXX56789</span>.
+    * DESCRIPTION: Also called UTR No. in ( UK ) , CST Reg No. ( IN ) also represents the tax registration number of the Person or Organization. This value is masked in responses, exposing only last five characters. For example, the ID of **123-45-6789** is returned as **XXXXXX56789**.
     */
    SecondaryTaxIdentifier?: string;
    /**
     * META: Optional ,minorVersion: 3 ,
     *
-    * DESCRIPTION: Identifies the accounts receivable account to be used for this customer. Each customer must have his own AR account. Applicable for France companies, only. Available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter.
-    * Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType=Accounts Receivable</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">ARAccountRef.value</span> and <span class="literal">ARAccountRef.name</span>, respectively.
+    * DESCRIPTION: Identifies the accounts receivable account to be used for this customer. Each customer must have his own AR account. Applicable for France companies, only. Available when endpoint is evoked with the **minorversion=3** query parameter.
+    * Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType=Accounts Receivable**. Use **Account.Id** and **Account.Name** from that object for **ARAccountRef.value** and **ARAccountRef.name**, respectively.
     */
    ARAccountRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a default tax code associated with this Customer object. Reference is valid if <span class="literal">Customer.Taxable</span> is set to true; otherwise, it is ignored.
-    * If automated sales tax is enabled (<span class="literal">Preferences.TaxPrefs.PartnerTaxEnabled</span> is set to <span class="literal">true</span>) the default tax code is set by the system and can not be overridden.
- Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">DefaultTaxCodeRef.value</span> and <span class="literal">DefaultTaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a default tax code associated with this Customer object. Reference is valid if **Customer.Taxable** is set to true; otherwise, it is ignored.
+    * If automated sales tax is enabled (**Preferences.TaxPrefs.PartnerTaxEnabled** is set to **true**) the default tax code is set by the system and can not be overridden.
+    * Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **DefaultTaxCodeRef.value** and **DefaultTaxCodeRef.name**, respectively.
     */
    DefaultTaxCodeRef?: ReferenceType;
    /**
@@ -2565,7 +2414,7 @@ export interface Customer {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a SalesTerm associated with this Customer object. Query the Term name list resource to determine the appropriate Term object for this reference. Use <span class="literal">Term.Id</span> and <span class="literal">Term.Name</span> from that object for <span class="literal">SalesTermRef.value</span> and <span class="literal">SalesTermRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a SalesTerm associated with this Customer object. Query the Term name list resource to determine the appropriate Term object for this reference. Use **Term.Id** and **Term.Name** from that object for **SalesTermRef.value** and **SalesTermRef.name**, respectively.
     */
    SalesTermRef?: ReferenceType;
    /**
@@ -2597,14 +2446,14 @@ export interface Customer {
     *
     * DESCRIPTION: Reference to the currency in which all amounts associated with this customer are expressed. Once set, it cannot be changed.
     * If specified currency is not currently in the company's currency list, it is added.
- If not specified, currency for this customer is the home currency of the company, as defined by <span class="literal">Preferences.CurrencyPrefs.HomeCurrency</span>. [[
- <strong>String</strong>
- Preferred delivery method. Values are Print, Email, or None.
- <strong>String</strong>, 16 chars
- Resale number or some additional info about the customer.
- <strong>ReferenceType</strong>
- Identifies the accounts receivable account to be used for this customer. Each customer must have his own AR account. Applicable for France companies, only. Available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter.
- Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType=Accounts Receivable</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">ARAccountRef.value</span> and <span class="literal">ARAccountRef.name</span>, respectively. Read-only after object is created
+    * If not specified, currency for this customer is the home currency of the company, as defined by **Preferences.CurrencyPrefs.HomeCurrency**. [[
+    * **String**
+    * Preferred delivery method. Values are Print, Email, or None.
+    * **String**, 16 chars
+    * Resale number or some additional info about the customer.
+    * **ReferenceType**
+    * Identifies the accounts receivable account to be used for this customer. Each customer must have his own AR account. Applicable for France companies, only. Available when endpoint is evoked with the **minorversion=3** query parameter.
+    * Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType=Accounts Receivable**. Use **Account.Id** and **Account.Name** from that object for **ARAccountRef.value** and **ARAccountRef.name**, respectively. Read-only after object is created
     */
    readonly CurrencyRef?: Customer_CurrencyRef;
    /**
@@ -2645,7 +2494,7 @@ export interface Customer {
     * META: Optional
     *
     * DESCRIPTION: If true, transactions for this customer are taxable.
-    * Default behavior with minor version 10 and above: true, if <span class="literal">DefaultTaxCodeRef</span> is defined or false if <span class="literal">TaxExemptionReasonId</span> is set.
+    * Default behavior with minor version 10 and above: true, if **DefaultTaxCodeRef** is defined or false if **TaxExemptionReasonId** is set.
     */
    Taxable?: boolean;
    /**
@@ -2664,7 +2513,7 @@ export interface Customer {
     * META: Optional
     *
     * DESCRIPTION: A reference to a Customer object that is the immediate parent of the Sub-Customer/Job in the hierarchical Customer:Job list.
-    * Required for the create operation if this object is a sub-customer or Job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">ParentRef.value</span> and <span class="literal">ParentRef.name</span>, respectively.
+    * Required for the create operation if this object is a sub-customer or Job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **ParentRef.value** and **ParentRef.name**, respectively.
     */
    ParentRef?: ReferenceType;
    /**
@@ -2683,7 +2532,7 @@ export interface Customer {
     * META: Optional
     *
     * DESCRIPTION: If true, this entity is currently enabled for use by QuickBooks. 
-    * If there is an amount in <span class="literal">Customer.Balance</span> when setting this Customer object to inactive through the QuickBooks UI, a CreditMemo balancing transaction is created for the amount.
+    * If there is an amount in **Customer.Balance** when setting this Customer object to inactive through the QuickBooks UI, a CreditMemo balancing transaction is created for the amount.
     */
    Active?: boolean;
    /**
@@ -2703,13 +2552,13 @@ export interface Customer {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Default shipping address. If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Default shipping address. If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a PaymentMethod associated with this Customer object. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use <span class="literal">PaymentMethod.Id</span> and <span class="literal">PaymentMethod.Name</span> from that object for <span class="literal">PaymentMethodRef.value</span> and <span class="literal">PaymentMethodRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a PaymentMethod associated with this Customer object. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use **PaymentMethod.Id** and **PaymentMethod.Name** from that object for **PaymentMethodRef.value** and **PaymentMethodRef.name**, respectively.
     */
    PaymentMethodRef?: ReferenceType;
    /**
@@ -2721,26 +2570,19 @@ export interface Customer {
    /**
     * META: Optional ,minorVersion: 59
     *
-    * DESCRIPTION: The Source type of the transactions created by QuickBooks Commerce. Valid values include: <span class="literal">QBCommerce</span>
+    * DESCRIPTION: The Source type of the transactions created by QuickBooks Commerce. Valid values include: **QBCommerce**
     */
    Source?: string;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: Also called Tax Reg. No in ( UK ) , ( CA ) , ( IN ) , ( AU ) represents the tax ID of the Person or Organization. This value is masked in responses, exposing only last five characters. For example, the ID of <span class="literal">123-45-6789</span> is returned as <span class="literal">XXXXXX56789</span>.
+    * DESCRIPTION: Also called Tax Reg. No in ( UK ) , ( CA ) , ( IN ) , ( AU ) represents the tax ID of the Person or Organization. This value is masked in responses, exposing only last five characters. For example, the ID of **123-45-6789** is returned as **XXXXXX56789**.
     */
    PrimaryTaxIdentifier?: string;
    /**
     * META: Optional ,max character: maximum of 15 chars ,minorVersion: 33 ,
     *
-    * DESCRIPTION: For the filing of GSTR, transactions need to be classified depending on the type of customer to whom the sale is done. To facilitate this, we have introduced a new field as 'GST registration type'. Possible values are listed below:
-    * <li><span class="literal">GST_REG_REG</span> GST registered- Regular. Customer who has a business which is registered under GST and has a GSTIN (doesn’t include customers registered under composition scheme, as an SEZ or as EOU's, STP's EHTP's etc.).</li>
- <li><span class="literal">GST_REG_COMP</span> GST registered-Composition. Customer who has a business which is registered under the composition scheme of GST and has a GSTIN.</li>
- <li><span class="literal">GST_UNREG</span> GST unregistered. Customer who has a business which is not registered under GST and does not have a GSTIN.</li>
- <li><span class="literal">CONSUMER</span> Consumer. Customer who is not registered under GST and is the final consumer of the service or product sold.</li>
- <li><span class="literal">OVERSEAS</span> Overseas. Customer who has a business which is located out of India.</li>
- <li><span class="literal">SEZ</span> SEZ. Customer who has a business which is registered under GST, has a GSTIN and is located in a SEZ or is a SEZ Developer.</li>
- <li><span class="literal">DEEMED</span> Deemed exports- EOU's, STP's EHTP's etc. Customer who has a business which is registered under GST and falls in the category of companies (EOU's, STP's EHTP's etc.), to which supplies are made they are termed as deemed exports.</li>
+    * DESCRIPTION: For the filing of GSTR, transactions need to be classified depending on the type of customer to whom the sale is done. To facilitate this, we have introduced a new field as 'GST registration type'. Possible values are listed below: **GST_REG_REG** GST registered- Regular. Customer who has a business which is registered under GST and has a GSTIN (doesn’t include customers registered under composition scheme, as an SEZ or as EOU's, STP's EHTP's etc.)., **GST_REG_COMP** GST registered-Composition. Customer who has a business which is registered under the composition scheme of GST and has a GSTIN., **GST_UNREG** GST unregistered. Customer who has a business which is not registered under GST and does not have a GSTIN., **CONSUMER** Consumer. Customer who is not registered under GST and is the final consumer of the service or product sold., **OVERSEAS** Overseas. Customer who has a business which is located out of India., **SEZ** SEZ. Customer who has a business which is registered under GST, has a GSTIN and is located in a SEZ or is a SEZ Developer., **DEEMED** Deemed exports- EOU's, STP's EHTP's etc. Customer who has a business which is registered under GST and falls in the category of companies (EOU's, STP's EHTP's etc.), to which supplies are made they are termed as deemed exports.,
     */
    GSTRegistrationType?: string;
    /**
@@ -2748,20 +2590,19 @@ export interface Customer {
     *
     * DESCRIPTION: Name of the person or organization as printed on a check. If not provided, this is populated from DisplayName.
     * 
- <span style="color:#800080;">Constraints:</span> Cannot be removed with sparse update.
+    * Constraints: Cannot be removed with sparse update.
     */
    PrintOnCheckName?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Default billing address. If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Default billing address. If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    BillAddr?: PhysicalAddress;
    /**
     * META: read only ,system defined
     *
-    * DESCRIPTION: Fully qualified name of the object. The fully qualified name prepends the topmost parent, followed by each sub element separated by colons. Takes the form of
-    * <span class="literal">Customer:Job:Sub-job</span>. System generated. Limited to 5 levels.
+    * DESCRIPTION: Fully qualified name of the object. The fully qualified name prepends the topmost parent, followed by each sub element separated by colons. Takes the form of **Customer:Job:Sub-job**. System generated. Limited to 5 levels.
     */
    readonly FullyQualifiedName?: string;
    /**
@@ -2771,7 +2612,7 @@ export interface Customer {
     *
     * DESCRIPTION: Specifies the level of the hierarchy in which the entity is located. Zero specifies the top level of the hierarchy; anything above will be level with respect to the parent.
     * 
- <span style="color:#800080;">Constraints:</span>up to 5 levels
+    * Constraints:up to 5 levels
     */
    readonly Level?: number;
    /**
@@ -2779,77 +2620,7 @@ export interface Customer {
     *
     * ADDON: Numeric Id
     *
-    * DESCRIPTION: The tax exemption reason associated with this customer object. Applicable if automated sales tax is enabled (<span class="literal">Preferences.TaxPrefs.PartnerTaxEnabled</span> is set to <span class="literal">true</span>) for the company. Set  <span class="literal">TaxExemptionReasonId:</span> to one of the following:
-    * <table>
- <thead>
- <tr>
- <th>Id</th>
- <th>Reason</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>1</td>
- <td>Federal government</td>
- </tr>
- <tr>
- <td>2</td>
- <td>State government</td>
- </tr>
- <tr>
- <td>3</td>
- <td>Local government</td>
- </tr>
- <tr>
- <td>4</td>
- <td>Tribal government</td>
- </tr>
- <tr>
- <td>5</td>
- <td>Charitable organization</td>
- </tr>
- <tr>
- <td>6</td>
- <td>Religious organization</td>
- </tr>
- <tr>
- <td>7</td>
- <td>Educational organization</td>
- </tr>
- <tr>
- <td>8</td>
- <td>Hospital</td>
- </tr>
- <tr>
- <td>9</td>
- <td>Resale</td>
- </tr>
- <tr>
- <td>10</td>
- <td>Direct pay permit</td>
- </tr>
- <tr>
- <td>11</td>
- <td>Multiple points of use</td>
- </tr>
- <tr>
- <td>12</td>
- <td>Direct mail</td>
- </tr>
- <tr>
- <td>13</td>
- <td>Agricultural production</td>
- </tr>
- <tr>
- <td>14</td>
- <td>Industrial production / manufacturing</td>
- </tr>
- <tr>
- <td>15</td>
- <td>Foreign diplomat</td>
- </tr>
- </tbody>
- </table>
+    * DESCRIPTION: The tax exemption reason associated with this customer object. Applicable if automated sales tax is enabled (**Preferences.TaxPrefs.PartnerTaxEnabled** is set to **true**) for the company. Set  **TaxExemptionReasonId:** to one of the following:
     */
    TaxExemptionReasonId?: number;
    /**
@@ -2875,7 +2646,7 @@ export interface Department {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -2900,15 +2671,15 @@ export interface Department {
    /**
     * META: read only ,system defined
     *
-    * DESCRIPTION: Fully qualified name of the entity. The fully qualified name prepends the topmost parent, followed by each sub element separated by colons. Takes the form of <span class="literal">Parent:Department1:SubDepartment1:SubDepartment2</span>. Limited to 5 levels.
+    * DESCRIPTION: Fully qualified name of the entity. The fully qualified name prepends the topmost parent, followed by each sub element separated by colons. Takes the form of **Parent:Department1:SubDepartment1:SubDepartment2**. Limited to 5 levels.
     */
    readonly FullyQualifiedName?: string;
    /**
     * META: read only ,system defined
     *
     * DESCRIPTION: Specifies whether this Department object is a SubDepartment.
-    * <span class="literal">true</span>--SubDepartment.
- <span class="literal">false</span> or null--top-level Department.
+    * **true**--SubDepartment.
+    * **false** or null--top-level Department.
     */
    readonly SubDepartment?: boolean;
 }
@@ -2929,9 +2700,7 @@ export interface Deposit_Line_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -2957,23 +2726,23 @@ export interface Deposit_Line_DepositLineDetail {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Account where the funds are deposited. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType</span> equals one of the following: <span class="literal">Income</span>, <span class="literal">Other Income</span>, <span class="literal">Expense</span>, <span class="literal">Other Expense</span>, <span class="literal">Other Current Assets</span>, <span class="literal">Equity</span> or <span class="literal">COGS</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">AccountRef.value</span> and <span class="literal">AccountRef.name</span>, respectively.
+    * DESCRIPTION: Account where the funds are deposited. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType** equals one of the following: **Income**, **Other Income**, **Expense**, **Other Expense**, **Other Current Assets**, **Equity** or **COGS**. Use **Account.Id** and **Account.Name** from that object for **AccountRef.value** and **AccountRef.name**, respectively.
     * For France locales: The account associated with the referenced Account object is looked up in the account category list.
- <li>If this account has same location as specified in the transaction by the <span class="literal">TransactionLocationType</span> attribute and the same VAT as in the line item <span class="literal">TaxCodeRef</span> attribute, then this account is used.</li>
- <li>If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.</li>
- <li>If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.</li>
+    * If this account has same location as specified in the transaction by the **TransactionLocationType** attribute and the same VAT as in the line item **TaxCodeRef** attribute, then this account is used.,
+    * If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.,
+    * If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.,
     */
    AccountRef: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use <span class="literal">PaymentMethod.Id</span> and <span class="literal">PaymentMethod.Name</span> from that object for <span class="literal">PaymentMethodRef.value</span> and <span class="literal">PaymentMethodRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use **PaymentMethod.Id** and **PaymentMethod.Name** from that object for **PaymentMethodRef.value** and **PaymentMethodRef.name**, respectively.
     */
    PaymentMethodRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerLine</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerLine** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
@@ -2985,16 +2754,14 @@ export interface Deposit_Line_DepositLineDetail {
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: Sales/Purchase tax code associated with the Line. For Non US Companies. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Sales/Purchase tax code associated with the Line. For Non US Companies. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively.
     */
    TaxCodeRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
     * DESCRIPTION: Indicates whether the tax applicable on the line is sales or purchase. For Non US Companies.
-    * Valid value:
- <span class="literal">Sales</span>,
- <span class="literal">Purchase</span> Required if TaxCodeRef is specified.
+    * Valid value: **Sales**, **Purchase** Required if TaxCodeRef is specified.
     */
    TaxApplicableOn?: "Sales" | "Purchase";
    /**
@@ -3010,7 +2777,7 @@ export interface Deposit_Line_DepositLineDetail {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a customer from which deposit was received. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">Entity.value</span> and <span class="literal">Entity.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer from which deposit was received. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **Entity.value** and **Entity.name**, respectively.
     */
    Entity?: ReferenceType;
 }
@@ -3020,16 +2787,15 @@ export interface Deposit_Line_DepositLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no <span class="literal">Id</span>is provided, the <span class="literal">Id</span>provided is less than or equal to zero, or the <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.
- </li>
-  Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    *  Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">DepositLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **DepositLineDetail** for this type of line.
     */
    DetailType: "DepositLineDetail";
    /**
@@ -3053,7 +2819,7 @@ export interface Deposit_Line_DepositLine {
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
@@ -3067,7 +2833,7 @@ export interface Deposit_Line_DepositLine {
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
 }
@@ -3076,7 +2842,7 @@ export interface Deposit_CashBack_CashBackInfo {
    /**
     * META: * Required
     *
-    * DESCRIPTION: The bank acount into which the cashback amount is transferred. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">AccountRef.value</span> and <span class="literal">\AccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.Classification</span> set to <span class="literal">Asset</span>.
+    * DESCRIPTION: The bank acount into which the cashback amount is transferred. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **AccountRef.value** and **\AccountRef.name**, respectively. The specified account must have **Account.Classification** set to **Asset**.
     */
    AccountRef: ReferenceType;
    /**
@@ -3097,14 +2863,13 @@ export interface Deposit_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -3112,7 +2877,7 @@ export interface Deposit_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -3128,39 +2893,30 @@ export interface Deposit {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Identifies the account to be used for this deposit. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType</span> is <span class="literal">Other Current Asset</span> or <span class="literal">Bank</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">DepositToAccountRef.value</span> and <span class="literal">DepostiToAccountRef.name</span>, respectively.
+    * DESCRIPTION: Identifies the account to be used for this deposit. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType** is **Other Current Asset** or **Bank**. Use **Account.Id** and **Account.Name** from that object for **DepositToAccountRef.value** and **DepostiToAccountRef.name**, respectively.
     */
    DepositToAccountRef: ReferenceType;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items comprising the deposit. Specify a <span class="literal">Line.LinkedTxn</span> element along with DepositLine detail type if this line is to record a deposit for an existing transaction. Select <span class="literal">UndepositedFunds</span> account on the existing transaction to make it available for the Deposit.
-    * <li>
- Possible types of transactions that can be linked to a Deposit include:
- <span class="literal">Transfer</span>,
- <span class="literal">Payment</span> (for Cash, CreditCard, and Check payment method types),
- <span class="literal">SalesReceipt</span>,
- <span class="literal">RefundReceipt</span>,
- <span class="literal">JournalEntry</span>.
- </li>
- <li>
- In addition, any expense object whose line item has <span class="literal">AccountReceivable</span> can be linked to a Payment and then that Payment can be linked to a Deposit object.
- </li>
- 
- Use <span class="literal">Line.LinkedTxn.TxnId</span> as the ID in a separate read request for the specific resource to retrieve details of the linked object. Valid <span class="literal">Line</span> types include: <span class="literal">LinkedTxn</span> and <span class="literal">DepositLine</span>
+    * DESCRIPTION: Individual line items comprising the deposit. Specify a **Line.LinkedTxn** element along with DepositLine detail type if this line is to record a deposit for an existing transaction. Select **UndepositedFunds** account on the existing transaction to make it available for the Deposit.
+    * Possible types of transactions that can be linked to a Deposit include: **Transfer**, **Payment** (for Cash, CreditCard, and Check payment method types), **SalesReceipt**, **RefundReceipt**, **JournalEntry**.,
+    * In addition, any expense object whose line item has **AccountReceivable** can be linked to a Payment and then that Payment can be linked to a Deposit object.,
+    * 
+    * Use **Line.LinkedTxn.TxnId** as the ID in a separate read request for the specific resource to retrieve details of the linked object. Valid **Line** types include: **LinkedTxn** and **DepositLine**
     */
    Line: (Deposit_Line_LineLinkedTxn | Deposit_Line_DepositLine)[];
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * <br>Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>.  The CurrencyRef can be overwritten by the <span class="literal">Line.DepositLineDetail</span> Entity. If the customer that you are referring to has a default currency of USD then the currency for this Deposit will always be set as USD.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}.  The CurrencyRef can be overwritten by the **Line.DepositLineDetail** Entity. If the customer that you are referring to has a default currency of USD then the currency for this Deposit will always be set as USD.
     */
    CurrencyRef?: CurrencyRefType;
    /**
@@ -3172,10 +2928,7 @@ export interface Deposit {
    /**
     * META: Optional ,minorVersion: 3 ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
@@ -3183,14 +2936,14 @@ export interface Deposit {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * Query the Department name list resource to determine the appropriate Department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction, as defined using location tracking in QuickBooks Online. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate Department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
@@ -3206,7 +2959,7 @@ export interface Deposit {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
@@ -3216,21 +2969,17 @@ export interface Deposit {
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
     * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. For non-US companies.
-    * See <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-sales-tax-for-non-us-locales/non-us_sales_tax_integrations" title="Global Tax Model">Global tax model</a> for more information about this element.
- If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * See {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-sales-tax-for-non-us-locales/non-us_sales_tax_integrations | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
@@ -3242,7 +2991,7 @@ export interface Deposit {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">Deposit</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **Deposit** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
@@ -3259,7 +3008,7 @@ export interface Deposit {
     * ADDON: Decimal
     *
     * DESCRIPTION: Total amount of the transaction in the home currency. Includes the total of all the charges, allowances and taxes. Calculated by QuickBooks business logic.
-    * Value is valid only when <span class="literal">CurrencyRef</span> is specified. Applicable if multicurrency is enabled for the company.
+    * Value is valid only when **CurrencyRef** is specified. Applicable if multicurrency is enabled for the company.
     */
    readonly HomeTotalAmt?: number;
    /**
@@ -3297,30 +3046,28 @@ export interface Employee {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,  ,max character: maximum 30 characters
     *
-    * DESCRIPTION: Represents the physical street address for this employee. If QuickBooks Payroll is enabled for the company, the following PhysicalAddress fields are required:
-    * <li><span class="literal">City</span>, maximum of 255 chars</li>
- <li><span class="literal">CountrySubDivisionCode</span>, maximum of 255 chars</li>
- <li><span class="literal">PostalCode</span></li>
-  Required when QuickBooks Payroll is enabled.<br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Represents the physical street address for this employee. If QuickBooks Payroll is enabled for the company, the following PhysicalAddress fields are required: **City**, maximum of 255 chars, **CountrySubDivisionCode**, maximum of 255 chars, **PostalCode**,
+    *  Required when QuickBooks Payroll is enabled.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    PrimaryAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span class="literal">Primary email address.</span>
+    * DESCRIPTION: **Primary email address.**
     */
    PrimaryEmailAddr?: EmailAddress;
    /**
     * META: Optional ,max character: maximum of 500 chars
     *
-    * DESCRIPTION: The name of the person or organization as displayed. Default Value: If not supplied, the system generates <span class="literal">DisplayName</span> by concatenating employee name components supplied in the request from the following list: <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, and <span class="literal">Suffix</span>.
-    * When QuickBooks Payroll is enabled, this attribute is read-only and a concatenation of <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, and <span class="literal">FamilyName</span>.
+    * DESCRIPTION: The name of the person or organization as displayed. Default Value: If not supplied, the system generates **DisplayName** by concatenating employee name components supplied in the request from the following list: **Title**, **GivenName**, **MiddleName**, **FamilyName**, and **Suffix**.
+    * When QuickBooks Payroll is enabled, this attribute is read-only and a concatenation of **GivenName**, **MiddleName**, and **FamilyName**.
     */
    DisplayName?: string;
    /**
@@ -3328,7 +3075,7 @@ export interface Employee {
     *
     * DESCRIPTION: Title of the person.
     * This tag supports i18n, all locale.
- Not supported when QuickBooks Payroll is enabled.
+    * Not supported when QuickBooks Payroll is enabled.
     */
    Title?: string;
    /**
@@ -3340,8 +3087,7 @@ export interface Employee {
    /**
     * META: Optional ,max character: maximum of 100 chars
     *
-    * DESCRIPTION: Given name or family name of a person. At least one of
-    * <span class="literal">GivenName</span> or <span class="literal">FamilyName</span> attributes is required.
+    * DESCRIPTION: Given name or family name of a person. At least one of **GivenName** or **FamilyName** attributes is required.
     */
    GivenName?: string;
    /**
@@ -3368,7 +3114,7 @@ export interface Employee {
    /**
     * META: Optional ,max character: maximum of 20 chars
     *
-    * DESCRIPTION: <span class="literal">Primary phone number.</span>
+    * DESCRIPTION: **Primary phone number.**
     */
    PrimaryPhone?: Employee_PrimaryPhone_TelephoneNumber;
    /**
@@ -3408,7 +3154,7 @@ export interface Employee {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Gender of the employee. To clear the gender value, set to Null in a full update request. Supported values include: <span class="literal">Male</span> or <span class="literal">Female</span>.
+    * DESCRIPTION: Gender of the employee. To clear the gender value, set to Null in a full update request. Supported values include: **Male** or **Female**.
     */
    Gender?: string;
    /**
@@ -3424,37 +3170,36 @@ export interface Employee {
     *
     * ADDON: Big Decimal
     *
-    * DESCRIPTION: This attribute can only be set if <span class="literal">BillableTime</span> is true.
+    * DESCRIPTION: This attribute can only be set if **BillableTime** is true.
     * Not supported when QuickBooks Payroll is enabled.
     */
    BillRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span class="literal">true</span>--the object represents an organization.
-    * <span class="literal">false</span>--the object represents a person.
+    * DESCRIPTION: **true**--the object represents an organization.
+    * **false**--the object represents a person.
     */
    Organization?: boolean;
    /**
     * META: Optional ,max character: maximum of 16 chars
     *
-    * DESCRIPTION: Suffix of the name. For example, <span class="literal">Jr</span>.
+    * DESCRIPTION: Suffix of the name. For example, **Jr**.
     * Not supported when QuickBooks Payroll is enabled.
     */
    Suffix?: string;
    /**
     * META: Optional ,max character: maximum of 100 chars
     *
-    * DESCRIPTION: Family name or the last name of the person. At least one of
-    * <span class="literal">GivenName</span> or <span class="literal">FamilyName</span> attributes is required.
+    * DESCRIPTION: Family name or the last name of the person. At least one of **GivenName** or **FamilyName** attributes is required.
     */
    FamilyName?: string;
    /**
     * META: Optional ,max character: maximum of 100 chars
     *
-    * DESCRIPTION: <span>Name of the person or organization as printed on a check. If not provided, this is populated from <span class="literal">DisplayName</span>.</span>
+    * DESCRIPTION: Name of the person or organization as printed on a check. If not provided, this is populated from **DisplayName**.
     * Cannot be removed with sparse update.
- Not supported when QuickBooks Payroll is enabled.
+    * Not supported when QuickBooks Payroll is enabled.
     */
    PrintOnCheckName?: string;
    /**
@@ -3487,9 +3232,7 @@ export interface Estimate_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -3499,20 +3242,16 @@ export interface Estimate_Line_SalesItemLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -3525,7 +3264,7 @@ export interface Estimate_Line_SalesItemLine {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -3549,20 +3288,16 @@ export interface Estimate_Line_GroupLineDetail_Line {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -3575,7 +3310,7 @@ export interface Estimate_Line_GroupLineDetail_Line {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -3599,14 +3334,10 @@ export interface Estimate_Line_GroupLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -3616,8 +3347,7 @@ export interface Estimate_Line_GroupLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">GroupLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **GroupLineDetail** for this type of line.
     */
    DetailType: "GroupLineDetail";
    /**
@@ -3641,21 +3371,16 @@ export interface Estimate_Line_DescriptionOnlyLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DescriptionOnly</span>for this type of line.
+    * DESCRIPTION: Set to **DescriptionOnly** for this type of line.
     */
    DetailType: "DescriptionOnly";
    /**
@@ -3666,17 +3391,9 @@ export interface Estimate_Line_DescriptionOnlyLine {
     * META: Optional ,max character: max 4000 chars
     *
     * DESCRIPTION: A string representing one of the following:
-    * <li>
- Free form text description of the line item that appears in the printed record.
- </li>
- <li>
- A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.
- </li><li>
- In create requests, set to <span class="literal">Subtotal:</span> (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.
- </li>
- <li>
- In read requests, lines with <span class="literal">Subtotal: nn.nn</span> returned in this field denote subtotal lines in the object.
- </li>
+    * Free form text description of the line item that appears in the printed record.,
+    * A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.,In create requests, set to **Subtotal:** (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.,
+    * In read requests, lines with **Subtotal: nn.nn** returned in this field denote subtotal lines in the object.,
     */
    Description?: string;
    /**
@@ -3692,7 +3409,7 @@ export interface Estimate_Line_DescriptionOnlyLine {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of the line item. Available when <span class="literal">Amount</span> is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
+    * DESCRIPTION: The amount of the line item. Available when **Amount** is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
     */
    readonly Amount?: number;
 }
@@ -3702,30 +3419,23 @@ export interface Estimate_Line_DiscountLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
     * DESCRIPTION: Discount detail type for the entire transaction. This is in contrast to a discount applied to a specific line. The company preference
-    * <strong>Sales Form Entry | Discounts</strong> must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
+    * **Sales Form Entry | Discounts** must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
     */
    DiscountLineDetail: DiscountLineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DiscountLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **DiscountLineDetail** for this type of line.
     */
    DetailType: "DiscountLineDetail";
    /**
@@ -3757,30 +3467,22 @@ export interface Estimate_Line_SubTotalLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>
- If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.
- </li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Subtotal <strong>LineDetail</strong>
+    * DESCRIPTION: Subtotal **LineDetail**
     */
    SubtotalLineDetail: LineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SubtotalLineDetail** for this type of line.
     */
    DetailType: "SubTotalLineDetail";
    /**
@@ -3811,14 +3513,13 @@ export interface Estimate_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -3826,7 +3527,7 @@ export interface Estimate_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -3842,28 +3543,26 @@ export interface Estimate {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef: ReferenceType;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company.
     */
    CurrencyRef?: CurrencyRefType;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Identifies the e-mail address where the estimate is sent. If
-    * <span class="literal">EmailStatus=NeedToSend</span>,
- <span class="literal">BillEmail</span>is a required input.
+    * DESCRIPTION: Identifies the e-mail address where the estimate is sent. If **EmailStatus=NeedToSend**, **BillEmail** is a required input.
     */
    BillEmail?: EmailAddress;
    /**
@@ -3873,13 +3572,15 @@ export interface Estimate {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional ,minorVersion: 35
     *
-    * DESCRIPTION: Identifies the address where the goods are shipped from. For transactions without shipping, it represents the address where the sale took place.<br>For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br>If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods are shipped from. For transactions without shipping, it represents the address where the sale took place.
+    * For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    * If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipFromAddr?: PhysicalAddress;
    /**
@@ -3893,53 +3594,46 @@ export interface Estimate {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerTxn</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerTxn** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
     * DESCRIPTION: Printing status of the invoice.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToPrint</span>,
- <span class="literal">PrintComplete
- </span>.
+    * Valid values: **NotSet**, **NeedToPrint**, **PrintComplete**.
     */
    PrintStatus?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use <span class="literal">Term.Id</span> and <span class="literal">Term.Name</span> from that object for <span class="literal">SalesTermRef.value</span> and <span class="literal">SalesTermRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use **Term.Id** and **Term.Name** from that object for **SalesTermRef.value** and **SalesTermRef.name**, respectively.
     */
    SalesTermRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of the following status settings: <span class="literal">Accepted, Closed, Pending, Rejected, Converted</span>
+    * DESCRIPTION: One of the following status settings: **Accepted, Closed, Pending, Rejected, Converted**
     */
    TxnStatus?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more <span class="literal">Invoice</span> objects related to this transaction.
-    * Use <span class="literal">LinkedTxn.TxnId</span> as the ID in a separate Invoice read request to retrieve details of the linked object.
+    * DESCRIPTION: Zero or more **Invoice** objects related to this transaction.
+    * Use **LinkedTxn.TxnId** as the ID in a separate Invoice read request to retrieve details of the linked object.
     */
    LinkedTxn?: Estimate_LinkedTxn[];
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: <span class="literal">TaxExcluded</span>
-    * Method in which tax is applied. Allowed values are:
- <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: **TaxExcluded**
+    * Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
@@ -3961,13 +3655,9 @@ export interface Estimate {
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -3975,8 +3665,7 @@ export interface Estimate {
     *
     * ADDON: Local timezone: YYYY-MM-DD UTC: YYYY-MM-DDZ Specific time zone: YYYY-MM-DD+/-HH:MM
     *
-    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in
-    * <span class="literal">SalesTermRef</span> added the transaction date will be used.
+    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in **SalesTermRef** added the transaction date will be used.
     */
    DueDate?: string;
    /**
@@ -3988,11 +3677,12 @@ export interface Estimate {
    /**
     * META: Optional ,max character: maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:CustomTxnNumber</span> as follows:
-    * <li>If <span class="literal">Preferences:CustomTxnNumber</span> is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:CustomTxnNumber</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- If <span class="literal">Preferences:CustomTxnNumber</span> is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber. <br><em>Note:</em> DocNumber is an optional field for all locales except France. For France locale if <span class="literal">Preferences:CustomTxnNumber</span> is enabled it will <b>not</b> be automatically generated and is a required field.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:CustomTxnNumber** as follows:
+    * If **Preferences:CustomTxnNumber** is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:CustomTxnNumber** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * If **Preferences:CustomTxnNumber** is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber.
+    * Note: DocNumber is an optional field for all locales except France. For France locale if **Preferences:CustomTxnNumber** is enabled it will **not** be automatically generated and is a required field.
     */
    DocNumber?: string;
    /**
@@ -4004,8 +3694,7 @@ export interface Estimate {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Individual line items of a transaction. Valid <span class="literal">Line</span> types include:
-    * <span class="literal">SalesItemLine</span>, <span class="literal">GroupLine</span>, <span class="literal">DescriptionOnlyLine</span> (also used for inline Subtotal lines), <span class="literal">DiscountLine</span> and <span class="literal">SubTotalLine</span> (used for the overall transaction)
+    * DESCRIPTION: Individual line items of a transaction. Valid **Line** types include: **SalesItemLine**, **GroupLine**, **DescriptionOnlyLine** (also used for inline Subtotal lines), **DiscountLine** and **SubTotalLine** (used for the overall transaction)
     */
    Line?: (Estimate_Line_SalesItemLine | Estimate_Line_GroupLine | Estimate_Line_DescriptionOnlyLine | Estimate_Line_DiscountLine | Estimate_Line_SubTotalLine)[];
    /**
@@ -4018,24 +3707,20 @@ export interface Estimate {
     * META: Optional
     *
     * DESCRIPTION: Email status of the invoice.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToSend</span>,
- <span class="literal">EmailSent
- </span>
+    * Valid values: **NotSet**, **NeedToSend**, **EmailSent**
     */
    EmailStatus?: string;
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
@@ -4049,22 +3734,22 @@ export interface Estimate {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Identifies the address where the goods must be shipped. If
-    * <span class="literal">ShipAddr</span>is not specified, and a default
- <span class="literal">Customer:ShippingAddr</span> is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks. <br>For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br>If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods must be shipped. If **ShipAddr** is not specified, and a default **Customer:ShippingAddr** is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks.
+    * For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    * If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
@@ -4076,9 +3761,9 @@ export interface Estimate {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Bill-to address of the Invoice. If
-    * <span class="literal">BillAddr</span>is not specified, and a default
- <span class="literal">Customer:BillingAddr</span> is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks. <br>For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br>If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Bill-to address of the Invoice. If **BillAddr** is not specified, and a default **Customer:BillingAddr** is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks.
+    * For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    * If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    BillAddr?: PhysicalAddress;
    /**
@@ -4098,17 +3783,16 @@ export interface Estimate {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">Estimate</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **Estimate** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
     * META: read only ,minorVersion: 21 ,system defined
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxExepmtion</span> ID associated with this object. Available for companies that have <a href="https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax" title="Automatic Sales Tax">automated sales tax</a> enabled.
-    * <li><span class="literal">TaxExemptionRef.Name</span>: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state.</li>
- <li><span class="literal">TaxExemptionRef.value</span>: The system-generated Id of the exemption type.</li>
- 
-  For internal use only.
+    * DESCRIPTION: Reference to the **TaxExepmtion** ID associated with this object. Available for companies that have {@link https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax | automated sales tax} enabled.
+    * **TaxExemptionRef.Name**: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state., **TaxExemptionRef.value**: The system-generated Id of the exemption type.,
+    * 
+    *  For internal use only.
     */
    readonly TaxExemptionRef?: ReferenceType;
    /**
@@ -4117,13 +3801,13 @@ export interface Estimate {
     * ADDON: Decimal
     *
     * DESCRIPTION: Total amount of the transaction in the home currency. Includes the total of all the charges, allowances and taxes. Calculated by QuickBooks business logic.
-    * Value is valid only when <span class="literal">CurrencyRef</span> is specified. Applicable if multicurrency is enabled for the company.
+    * Value is valid only when **CurrencyRef** is specified. Applicable if multicurrency is enabled for the company.
     */
    readonly HomeTotalAmt?: number;
    /**
     * META: system defined
     *
-    * DESCRIPTION: Denotes how <span class="literal">ShipAddr</span> is stored:&nbsp;formatted or unformatted. The value of this flag is system defined based on format of shipping address at object create time.<ul><li>If set to <span class="literal">false</span>, shipping address is returned in a formatted style using City, Country,&nbsp;CountrySubDivisionCode, Postal code.</li><li>If set to <span class="literal">true</span>, shipping address is returned in an unformatted style using Line1 through Line5 attributes.</li></ul>
+    * DESCRIPTION: Denotes how **ShipAddr** is stored:&nbsp;formatted or unformatted. The value of this flag is system defined based on format of shipping address at object create time. If set to **false**, shipping address is returned in a formatted style using City, Country,&nbsp;CountrySubDivisionCode, Postal code.,If set to **true**, shipping address is returned in an unformatted style using Line1 through Line5 attributes.,
     */
    FreeFormAddress?: boolean;
    /**
@@ -4136,7 +3820,7 @@ export interface Exchangerate {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -4148,8 +3832,8 @@ export interface Exchangerate {
    /**
     * META: * Required for update ,max character: Exactly 3 chars
     *
-    * DESCRIPTION: The source currency from which the exchange rate is specified, and usually. Specify as a three letter string representing the ISO 4217 code for the currency. For example, <span class="literal">USD</span>, <span class="literal">AUD</span>, <span class="literal">EUR</span>, and so on.
-    * For example, in the equation <span class="literal">65 INR = 1 USD</span>, <span class="literal">INR</span> is the source currency.
+    * DESCRIPTION: The source currency from which the exchange rate is specified, and usually. Specify as a three letter string representing the ISO 4217 code for the currency. For example, **USD**, **AUD**, **EUR**, and so on.
+    * For example, in the equation **65 INR = 1 USD**, **INR** is the source currency.
     */
    SourceCurrencyCode?: string;
    /**
@@ -4157,20 +3841,20 @@ export interface Exchangerate {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The exchange rate between <span class="literal">SourceCurrencyCode</span> and <span class="literal">TargetCurrencyCode</span> on the <span class="literal">AsOfDate</span> date.
+    * DESCRIPTION: The exchange rate between **SourceCurrencyCode** and **TargetCurrencyCode** on the **AsOfDate** date.
     */
    Rate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
     * META: Optional ,max character: Exactly 3 chars
     *
-    * DESCRIPTION: The target currency against which the exchange rate is specified. Specify as a three letter string representing the ISO 4217 code for the currency. For example, <span class="literal">USD</span>, <span class="literal">AUD</span>, <span class="literal">EUR</span>, and so on.
-    * For example, in the equation <span class="literal">65 INR = 1 USD</span>, <span class="literal">USA</span> is the target currency.
+    * DESCRIPTION: The target currency against which the exchange rate is specified. Specify as a three letter string representing the ISO 4217 code for the currency. For example, **USD**, **AUD**, **EUR**, and so on.
+    * For example, in the equation **65 INR = 1 USD**, **USA** is the target currency.
     */
    TargetCurrencyCode?: string;
    /**
@@ -4186,20 +3870,16 @@ export interface Invoice_Line_SalesItemLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -4212,7 +3892,7 @@ export interface Invoice_Line_SalesItemLine {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -4236,20 +3916,16 @@ export interface Invoice_Line_GroupLineDetail_Line {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -4262,7 +3938,7 @@ export interface Invoice_Line_GroupLineDetail_Line {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -4286,14 +3962,10 @@ export interface Invoice_Line_GroupLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -4303,8 +3975,7 @@ export interface Invoice_Line_GroupLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">GroupLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **GroupLineDetail** for this type of line.
     */
    DetailType: "GroupLineDetail";
    /**
@@ -4328,21 +3999,16 @@ export interface Invoice_Line_DescriptionOnlyLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DescriptionOnly</span>for this type of line.
+    * DESCRIPTION: Set to **DescriptionOnly** for this type of line.
     */
    DetailType: "DescriptionOnly";
    /**
@@ -4353,17 +4019,9 @@ export interface Invoice_Line_DescriptionOnlyLine {
     * META: Optional ,max character: max 4000 chars
     *
     * DESCRIPTION: A string representing one of the following:
-    * <li>
- Free form text description of the line item that appears in the printed record.
- </li>
- <li>
- A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.
- </li><li>
- In create requests, set to <span class="literal">Subtotal:</span> (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.
- </li>
- <li>
- In read requests, lines with <span class="literal">Subtotal: nn.nn</span> returned in this field denote subtotal lines in the object.
- </li>
+    * Free form text description of the line item that appears in the printed record.,
+    * A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.,In create requests, set to **Subtotal:** (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.,
+    * In read requests, lines with **Subtotal: nn.nn** returned in this field denote subtotal lines in the object.,
     */
    Description?: string;
    /**
@@ -4379,7 +4037,7 @@ export interface Invoice_Line_DescriptionOnlyLine {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of the line item. Available when <span class="literal">Amount</span> is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
+    * DESCRIPTION: The amount of the line item. Available when **Amount** is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
     */
    readonly Amount?: number;
 }
@@ -4389,30 +4047,23 @@ export interface Invoice_Line_DiscountLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
     * DESCRIPTION: Discount detail type for the entire transaction. This is in contrast to a discount applied to a specific line. The company preference
-    * <strong>Sales Form Entry | Discounts</strong> must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
+    * **Sales Form Entry | Discounts** must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
     */
    DiscountLineDetail: DiscountLineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DiscountLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **DiscountLineDetail** for this type of line.
     */
    DetailType: "DiscountLineDetail";
    /**
@@ -4444,30 +4095,22 @@ export interface Invoice_Line_SubTotalLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>
- If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.
- </li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Subtotal <strong>LineDetail</strong>
+    * DESCRIPTION: Subtotal **LineDetail**
     */
    SubTotalLineDetail: LineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SubtotalLineDetail** for this type of line.
     */
    DetailType: "SubTotalLineDetail";
    /**
@@ -4510,9 +4153,7 @@ export interface Invoice_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -4521,14 +4162,13 @@ export interface Invoice_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -4536,7 +4176,7 @@ export interface Invoice_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -4546,7 +4186,7 @@ export interface DeliveryInfo {
     * META: read only
     *
     * DESCRIPTION: Type of the delivery. Used to confirm that email has been sent via the send operation.
-    *  Valid values currently include: <span class="literal">Email</span>.
+    *  Valid values currently include: **Email**.
     */
    readonly DeliveryType?: "Email";
    /**
@@ -4570,49 +4210,43 @@ export interface Invoice {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items of a transaction. Valid <span class="literal">Line</span> types include 
-    * <span class="literal">SalesItemLine</span>,
- <span class="literal">GroupLine</span>,
- <span class="literal">DescriptionOnlyLine</span> (also used for inline Subtotal lines),
- <span class="literal">DiscountLine</span> and 
- <span class="literal">SubTotalLine</span> (used for the overall transaction)
+    * DESCRIPTION: Individual line items of a transaction. Valid **Line** types include  **SalesItemLine**, **GroupLine**, **DescriptionOnlyLine** (also used for inline Subtotal lines), **DiscountLine** and  **SubTotalLine** (used for the overall transaction)
     */
    Line: (Invoice_Line_SalesItemLine | Invoice_Line_GroupLine | Invoice_Line_DescriptionOnlyLine | Invoice_Line_DiscountLine | Invoice_Line_SubTotalLine)[];
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef: ReferenceType;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Applicable if multicurrency is enabled for the company.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Applicable if multicurrency is enabled for the company.
     */
    CurrencyRef?: CurrencyRefType;
    /**
     * META: * Conditionally required ,  ,max character: maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:CustomTxnNumber</span> as follows:
-    * <li>If <span class="literal">Preferences:CustomTxnNumber</span> is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:CustomTxnNumber</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- If <span class="literal">Preferences:CustomTxnNumber</span> is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber. <br><em>Note:</em> DocNumber is an optional field for all locales except France. For France locale if <span class="literal">Preferences:CustomTxnNumber</span> is enabled it will <b>not</b> be automatically generated and is a required field. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:CustomTxnNumber** as follows:
+    * If **Preferences:CustomTxnNumber** is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:CustomTxnNumber** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * If **Preferences:CustomTxnNumber** is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber.
+    * Note: DocNumber is an optional field for all locales except France. For France locale if **Preferences:CustomTxnNumber** is enabled it will **not** be automatically generated and is a required field. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI.
     */
    DocNumber?: string;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Identifies the e-mail address where the invoice is sent. If
-    * <span class="literal">EmailStatus=NeedToSend</span>,
- <span class="literal">BillEmail</span>is a required input.
+    * DESCRIPTION: Identifies the e-mail address where the invoice is sent. If **EmailStatus=NeedToSend**, **BillEmail** is a required input.
     */
    BillEmail?: EmailAddress;
    /**
@@ -4620,13 +4254,15 @@ export interface Invoice {
     *
     * ADDON: Local timezone: YYYY-MM-DD UTC: YYYY-MM-DDZ Specific time zone: YYYY-MM-DD+/-HH:MM
     *
-    * DESCRIPTION: The date entered by the user when this transaction occurred. <ul><li><em>yyyy/MM/dd</em> is the valid date format.</li><li>For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.</li><li>Sort order is ASC by default.</li></ul>
+    * DESCRIPTION: The date entered by the user when this transaction occurred.  yyyy/MM/dd is the valid date format.,For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.,Sort order is ASC by default.,
     */
    TxnDate?: string;
    /**
     * META: Optional ,minorVersion: 35
     *
-    * DESCRIPTION: Identifies the address where the goods are shipped from. For transactions without shipping, it represents the address where the sale took place.<br> For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods are shipped from. For transactions without shipping, it represents the address where the sale took place.
+    *  For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipFromAddr?: PhysicalAddress;
    /**
@@ -4646,24 +4282,20 @@ export interface Invoice {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerTxn</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerTxn** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
     * DESCRIPTION: Printing status of the invoice.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToPrint</span>,
- <span class="literal">PrintComplete
- </span>.
+    * Valid values: **NotSet**, **NeedToPrint**, **PrintComplete**.
     */
    PrintStatus?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use <span class="literal">Term.Id</span> and <span class="literal">Term.Name</span> from that object for <span class="literal">SalesTermRef.value</span> and <span class="literal">SalesTermRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use **Term.Id** and **Term.Name** from that object for **SalesTermRef.value** and **SalesTermRef.name**, respectively.
     */
    SalesTermRef?: ReferenceType;
    /**
@@ -4675,61 +4307,40 @@ export interface Invoice {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more related transactions to this Invoice object. The following linked relationships are supported:<ul><li>
-    * Links to <span class="literal">Estimate</span> and <span class="literal">TimeActivity</span> objects can be established directly to this Invoice object with UI or with the API. Create, Read, Update, and Query operations are avaialble at the API level for these types of links.
- </li>
- <li>Only one link can be made to an <span class="literal">Estimate</span>. Progress Invoicing is not supported via the API. </li><li>
- Links to expenses incurred on behalf of the customer are returned in the response with <span class="literal">LinkedTxn.TxnType</span> set to <span class="literal">ReimburseCharge</span>, <span class="literal">ChargeCredit</span> or <span class="literal">StatementCharge</span> corresponding to billable customer expenses of type <span class="literal">Cash</span>, <span class="literal">Delayed Credit</span>, and <span class="literal">Delayed Charge</span>, respectively. Links to these types of transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.
- </li>
- <li>
- Links to payments applied to an Invoice object are returned in the response with <span class="literal">LinkedTxn.TxnType</span> set to <span class="literal">Payment</span>. Links to Payment transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.
- </li>
- </ul>
- Use <span class="literal">LinkedTxn.TxnId</span> as the ID in a separate read request for the specific resource to retrieve details of the linked object.
+    * DESCRIPTION: Zero or more related transactions to this Invoice object. The following linked relationships are supported: Links to **Estimate** and **TimeActivity** objects can be established directly to this Invoice object with UI or with the API. Create, Read, Update, and Query operations are avaialble at the API level for these types of links.,
+    * Only one link can be made to an **Estimate**. Progress Invoicing is not supported via the API.,Links to expenses incurred on behalf of the customer are returned in the response with **LinkedTxn.TxnType** set to **ReimburseCharge**, **ChargeCredit** or **StatementCharge** corresponding to billable customer expenses of type **Cash**, **Delayed Credit**, and **Delayed Charge**, respectively. Links to these types of transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.,
+    * Links to payments applied to an Invoice object are returned in the response with **LinkedTxn.TxnType** set to **Payment**. Links to Payment transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.,
+    * Use **LinkedTxn.TxnId** as the ID in a separate read request for the specific resource to retrieve details of the linked object.
     */
    LinkedTxn?: Invoice_LinkedTxn[];
    /**
     * META: Optional
     *
-    * DESCRIPTION: Account to which money is deposited. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType</span> is <span class="literal">Other Current Asset</span> or <span class="literal">Bank</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">DepositToAccountRef.value</span> and <span class="literal">DepositToAccountRef.name</span>, respectively.
-    * <br>Before you can use this field ensure that the company allows deposits in their invoices first. This can be found by querying the <a href="https://developer.intuit.com/app/developer/qbo/docs/api/accounting/all-entities/preferences">Preferences endpoint</a>.  <span class="literal">SalesFormsPrefs.AllowDeposit</span> must be equal to true. If you do not specify this account the payment is applied to the Undeposited Funds account.
+    * DESCRIPTION: Account to which money is deposited. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType** is **Other Current Asset** or **Bank**. Use **Account.Id** and **Account.Name** from that object for **DepositToAccountRef.value** and **DepositToAccountRef.name**, respectively.
+    * Before you can use this field ensure that the company allows deposits in their invoices first. This can be found by querying the {@link https://developer.intuit.com/app/developer/qbo/docs/api/accounting/all-entities/preferences | Preferences endpoint}.  **SalesFormsPrefs.AllowDeposit** must be equal to true. If you do not specify this account the payment is applied to the Undeposited Funds account.
     */
    DepositToAccountRef?: ReferenceType;
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Specifies if this invoice can be paid with online bank transfers and corresponds to the <b>Free bank transfer</b> online payment check box on the QuickBooks UI. Active when <span class="literal">Preferences.SalesFormsPrefs.ETransactionPaymentEnabled</span> is set to <span class="literal">true</span>.
-    * <li>If set to <span class="literal">true</span>, allow invoice to be paid with online bank transfers. The <b>Free bank transfer</b> online payment check box is checked on the QuickBooks UI for this invoice.</li>
- <li>If set to <span class="literal">false</span>, online bank transfers are not allowed. The <b>Free bank transfer</b> online payment check box is not checked on the QuickBooks UI for this invoice.</li>
+    * DESCRIPTION: Specifies if this invoice can be paid with online bank transfers and corresponds to the **Free bank transfer** online payment check box on the QuickBooks UI. Active when **Preferences.SalesFormsPrefs.ETransactionPaymentEnabled** is set to **true**.
+    * If set to **true**, allow invoice to be paid with online bank transfers. The **Free bank transfer** online payment check box is checked on the QuickBooks UI for this invoice.,
+    * If set to **false**, online bank transfers are not allowed. The **Free bank transfer** online payment check box is not checked on the QuickBooks UI for this invoice.,
     */
    AllowOnlineACHPayment?: boolean;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
     * DESCRIPTION: The account location. For France locale valid values include:
-    * <ul><li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li></ul>
- For UAE, valid values include <ul><li><span class="literal">ABUDHABI</span></li>
- <li><span class="literal">AJMAN</span></li>
- <li><span class="literal">SHARJAH</span></li>
- <li><span class="literal">DUBAI</span></li>
- <li><span class="literal">FUJAIRAH</span></li>
- <li><span class="literal">RAS_AL_KHAIMAH</span></li>
- <li><span class="literal">UMM_AL_QUWAIN</span></li>
- <li><span class="literal">OTHER_GCC</span></li>
- </ul>
- For India locale, use state code values from the list below:
+    *  **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * For UAE, valid values include  **ABUDHABI**, **AJMAN**, **SHARJAH**, **DUBAI**, **FUJAIRAH**, **RAS_AL_KHAIMAH**, **UMM_AL_QUWAIN**, **OTHER_GCC**,
+    * For India locale, use state code values from the list below:
     */
    TransactionLocationType?: string;
    /**
@@ -4737,8 +4348,7 @@ export interface Invoice {
     *
     * ADDON: Local timezone: YYYY-MM-DD UTC: YYYY-MM-DDZ Specific time zone: YYYY-MM-DD+/-HH:MM
     *
-    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in
-    * <span class="literal">SalesTermRef</span> added the transaction date will be used.
+    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in **SalesTermRef** added the transaction date will be used.
     */
    DueDate?: string;
    /**
@@ -4756,7 +4366,7 @@ export interface Invoice {
    /**
     * META: Optional ,minorVersion: 8
     *
-    * DESCRIPTION: Identifies the carbon copy e-mail address where the invoice is sent. If not specified, this field is populated from that defined in <span class="literal">Preferences.SalesFormsPrefs.SalesEmailCc</span>. If this email address is invalid, carbon copy email is not sent.
+    * DESCRIPTION: Identifies the carbon copy e-mail address where the invoice is sent. If not specified, this field is populated from that defined in **Preferences.SalesFormsPrefs.SalesEmailCc**. If this email address is invalid, carbon copy email is not sent.
     */
    BillEmailCc?: EmailAddress;
    /**
@@ -4769,17 +4379,13 @@ export interface Invoice {
     * META: Optional
     *
     * DESCRIPTION: Email status of the invoice.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToSend</span>,
- <span class="literal">EmailSent
- </span>
+    * Valid values: **NotSet**, **NeedToSend**, **EmailSent**
     */
    EmailStatus?: string;
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
@@ -4787,7 +4393,7 @@ export interface Invoice {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
@@ -4801,43 +4407,43 @@ export interface Invoice {
    /**
     * META: Optional
     *
-    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * <br>If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Specifies if online credit card payments are allowed for this invoice and corresponds to the <b>Cards</b> online payment check box on the QuickBooks UI. Active when <span class="literal">Preferences.SalesFormsPrefs.ETransactionPaymentEnabled</span> is set to <span class="literal">true</span>.
-    * <li>If set to <span class="literal">true</span>, allow invoice to be paid with online credit card payments. The <b>Cards</b> online payment check box is checked on the QuickBooks UI.</li>
- <li>If set to <span class="literal">false</span>, online credit card payments are not allowed. The <b>Cards</b> online payment check box is not checked on the QuickBooks UI.</li>
+    * DESCRIPTION: Specifies if online credit card payments are allowed for this invoice and corresponds to the **Cards** online payment check box on the QuickBooks UI. Active when **Preferences.SalesFormsPrefs.ETransactionPaymentEnabled** is set to **true**.
+    * If set to **true**, allow invoice to be paid with online credit card payments. The **Cards** online payment check box is checked on the QuickBooks UI.,
+    * If set to **false**, online credit card payments are not allowed. The **Cards** online payment check box is not checked on the QuickBooks UI.,
     */
    AllowOnlineCreditCardPayment?: boolean;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
     * META: Optional
     *
-    * DESCRIPTION: Identifies the address where the goods must be shipped. If
-    * <span class="literal">ShipAddr</span>is not specified, and a default
- <span class="literal">Customer:ShippingAddr</span> is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks. <br> For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods must be shipped. If **ShipAddr** is not specified, and a default **Customer:ShippingAddr** is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks.
+    *  For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * <br>Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 8
     *
-    * DESCRIPTION: Identifies the blind carbon copy e-mail address where the invoice is sent. If not specified, this field is populated from that defined in <span class="literal">Preferences.SalesFormsPrefs.SalesEmailBcc</span>. If this email address is invalid, blind carbon copy email is not sent.
+    * DESCRIPTION: Identifies the blind carbon copy e-mail address where the invoice is sent. If not specified, this field is populated from that defined in **Preferences.SalesFormsPrefs.SalesEmailBcc**. If this email address is invalid, blind carbon copy email is not sent.
     */
    BillEmailBcc?: EmailAddress;
    /**
@@ -4849,11 +4455,11 @@ export interface Invoice {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Bill-to address of the Invoice. If
-    * <span class="literal">BillAddr</span>is not specified, and a default
- <span class="literal">Customer:BillingAddr</span> is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks. <br> For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
- 
- Starting <span class="literal">minorversion=54</span> if you update the <span class="literal">CustomerRef</span>, the address passed using <span class="literal">BillAddr</span> will be honored.
+    * DESCRIPTION: Bill-to address of the Invoice. If **BillAddr** is not specified, and a default **Customer:BillingAddr** is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks.
+    *  For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
+    * 
+    * Starting **minorversion=54** if you update the **CustomerRef**, the address passed using **BillAddr** will be honored.
     */
    BillAddr?: PhysicalAddress;
    /**
@@ -4867,8 +4473,8 @@ export interface Invoice {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Convenience field containing the amount in <span class="literal">Balance</span> expressed in terms of the home currency. Calculated by QuickBooks business logic.
-    * Value is valid only when <span class="literal">CurrencyRef</span> is specified and available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter. Applicable if multicurrency is enabled for the company
+    * DESCRIPTION: Convenience field containing the amount in **Balance** expressed in terms of the home currency. Calculated by QuickBooks business logic.
+    * Value is valid only when **CurrencyRef** is specified and available when endpoint is evoked with the **minorversion=3** query parameter. Applicable if multicurrency is enabled for the company
     */
    readonly HomeBalance?: number;
    /**
@@ -4894,17 +4500,16 @@ export interface Invoice {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">Invoice</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **Invoice** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
     * META: read only ,minorVersion: 21 ,system defined
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxExepmtion</span> ID associated with this object. Available for companies that have <a href="https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax" title="Automatic Sales Tax">automated sales tax</a> enabled.
-    * <li><span class="literal">TaxExemptionRef.Name</span>: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state.</li>
- <li><span class="literal">TaxExemptionRef.value</span>: The system-generated Id of the exemption type.</li>
- 
-  For internal use only
+    * DESCRIPTION: Reference to the **TaxExepmtion** ID associated with this object. Available for companies that have {@link https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax | automated sales tax} enabled.
+    * **TaxExemptionRef.Name**: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state., **TaxExemptionRef.value**: The system-generated Id of the exemption type.,
+    * 
+    *  For internal use only
     */
    readonly TaxExemptionRef?: ReferenceType;
    /**
@@ -4912,9 +4517,7 @@ export interface Invoice {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of
-    * <span class="literal">TotalAmt</span>. A Balance of 0 indicates the invoice is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks. If you process a linked transaction against a specific transaction, the 
- <span class="literal">balance</span> value won't change. It will remain the same.
+    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of **TotalAmt**. A Balance of 0 indicates the invoice is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks. If you process a linked transaction against a specific transaction, the  **balance** value won't change. It will remain the same.
     */
    readonly Balance?: number;
    /**
@@ -4923,28 +4526,28 @@ export interface Invoice {
     * ADDON: Decimal
     *
     * DESCRIPTION: Total amount of the transaction in the home currency. Includes the total of all the charges, allowances and taxes. Calculated by QuickBooks business logic.
-    * Value is valid only when <span class="literal">CurrencyRef</span> is specified. Applicable if multicurrency is enabled for the company.
+    * Value is valid only when **CurrencyRef** is specified. Applicable if multicurrency is enabled for the company.
     */
    readonly HomeTotalAmt?: number;
    /**
     * META: system defined
     *
-    * DESCRIPTION: Denotes how <span class="literal">ShipAddr</span> is stored:&nbsp;formatted or unformatted. The value of this flag is system defined based on format of shipping address at object create time.<ul><li>If set to <span class="literal">false</span>, shipping address is returned in a formatted style using City, Country,&nbsp;CountrySubDivisionCode, Postal code.</li><li>If set to <span class="literal">true</span>, shipping address is returned in an unformatted style using Line1 through Line5 attributes.</li></ul>
+    * DESCRIPTION: Denotes how **ShipAddr** is stored:&nbsp;formatted or unformatted. The value of this flag is system defined based on format of shipping address at object create time. If set to **false**, shipping address is returned in a formatted style using City, Country,&nbsp;CountrySubDivisionCode, Postal code.,If set to **true**, shipping address is returned in an unformatted style using Line1 through Line5 attributes.,
     */
    FreeFormAddress?: boolean;
    /**
     * META: deprecated
     *
-    * DESCRIPTION: Deprecated flag to allow online payments. In use before <span class="literal">AllowOnlineCreditCardPayment</span> and <span class="literal">AllowOnlineACHPayment</span> flags existed and provided to maintain backward compatibility.
-    * <li>If set to <span class="literal">true</span>, this invoice was created before <span class="literal">AllowOnlinePayment</span> was deprecated and denotes both CC and ACH payments are allowed. In addition, the <span class="literal">AllowOnlineCreditCardPayment</span> and <span class="literal">AllowOnlineACHPayment</span> flags must be set to <span class="literal">true</span>.</li>
- <li>If set to <span class="literal">false</span>, this invoice was created after the <span class="literal">AllowOnlinePayment</span> flag was deprecated and is not used.</li>
-  Do not modify.
+    * DESCRIPTION: Deprecated flag to allow online payments. In use before **AllowOnlineCreditCardPayment** and **AllowOnlineACHPayment** flags existed and provided to maintain backward compatibility.
+    * If set to **true**, this invoice was created before **AllowOnlinePayment** was deprecated and denotes both CC and ACH payments are allowed. In addition, the **AllowOnlineCreditCardPayment** and **AllowOnlineACHPayment** flags must be set to **true**.,
+    * If set to **false**, this invoice was created after the **AllowOnlinePayment** flag was deprecated and is not used.,
+    *  Do not modify.
     */
    AllowOnlinePayment?: boolean;
    /**
     * META: deprecated
     *
-    * DESCRIPTION: Flag to allow payments from legacy Intuit Payment Network (IPN). Provided to maintain backward compatibility and must always be set to <span class="literal">false</span>. Do not modify
+    * DESCRIPTION: Flag to allow payments from legacy Intuit Payment Network (IPN). Provided to maintain backward compatibility and must always be set to **false**. Do not modify
     */
    AllowIPNPayment?: boolean;
    /**
@@ -4966,10 +4569,9 @@ export interface Item {
    /**
     * META: * Required ,minorVersion: 3 ,
     *
-    * DESCRIPTION: Classification that specifies the use of this item. Applicable for France companies, only. Available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter.
+    * DESCRIPTION: Classification that specifies the use of this item. Applicable for France companies, only. Available when endpoint is evoked with the **minorversion=3** query parameter.
     * Read-only after object is created.
- Valid values include:
- <span class="literal">Product</span> and <span class="literal">Service</span>.
+    * Valid values include: **Product** and **Service**.
     */
    ItemCategoryType: string;
    /**
@@ -4992,24 +4594,19 @@ export interface Item {
     *
     * DESCRIPTION: Date of opening balance for the inventory transaction.
     * For read operations, the date returned in this field is always the originally provided inventory start date.
- For update operations, the date supplied is interpreted as the inventory adjust date, is stored as such in the underlying data model, and is reflected in the QuickBooks Online UI for the object. The inventory adjust date is not exposed for read operations through the API. Required for <span class="literal">Inventory</span> type items.
+    * For update operations, the date supplied is interpreted as the inventory adjust date, is stored as such in the underlying data model, and is reflected in the QuickBooks Online UI for the object. The inventory adjust date is not exposed for read operations through the API. Required for **Inventory** type items.
     */
    InvStartDate?: string;
    /**
     * META: * Conditionally required ,  ,minorVersion: specified.
     *
     * DESCRIPTION: Classification that specifies the use of this item. See the description at the top of the Item entity page for details about supported item types.
-    * For requests with minor versions earlier than 4 specified, this field is read-only and system-defined as follows:
- <li><span class="literal">Inventory</span>--Default setting when <span class="literal">TrackQtyOnHand</span>, <span class="literal">InvStartDate</span>, and <span class="literal">AssetAccountRef</span> are specified. Used for goods the company sells and buys that are tracked as inventory. </li>
- <li><span class="literal">Service</span>--Default setting when <span class="literal">TrackQtyOnHand</span>, <span class="literal">InvStartDate</span>, and <span class="literal">AssetAccountRef</span> are not specified. Used for non-tangible goods the company sells and buys that are not tracked as inventory. For example, specialized labor, consulting hours, and professional fees.</li>
- 
- For requests with minor version=4 query parameter, this field is required to be explicitly set with one of the following:
- <li><span class="literal">Inventory</span>--Used for goods the company sells and buys that are tracked as inventory. </li>
- <li><span class="literal">Service</span>--Used for non-tangible goods the company sells and buys that are not tracked as inventory. For example, specialized labor, consulting hours, and professional fees.</li>
- <li><span class="literal">NonInventory</span>--Use for goods the company sells and buys that are not tracked as inventory. For example, office supplies or goods bought on behalf of the customer.</li>
- 
- When querying Item objects with minor versions earlier than 4 specified, <span class="literal">NonInventory</span> types are returned as type <span class="literal">Service</span>.
- For French locales, <span class="literal">Type</span> is tied with <span class="literal">ItemCategoryType</span>: if <span class="literal">ItemCategoryType</span> is set to <span class="literal">Service</span>, then <span class="literal">Type</span> is set to <span class="literal">Service</span>, if <span class="literal">ItemCategoryType</span> is <span class="literal">Product</span>, then <span class="literal">Type</span> is set to <span class="literal">NonInventory</span>. &gt;Required when minor version 4 is specified.
+    * For requests with minor versions earlier than 4 specified, this field is read-only and system-defined as follows: **Inventory**--Default setting when **TrackQtyOnHand**, **InvStartDate**, and **AssetAccountRef** are specified. Used for goods the company sells and buys that are tracked as inventory., **Service**--Default setting when **TrackQtyOnHand**, **InvStartDate**, and **AssetAccountRef** are not specified. Used for non-tangible goods the company sells and buys that are not tracked as inventory. For example, specialized labor, consulting hours, and professional fees.,
+    * 
+    * For requests with minor version=4 query parameter, this field is required to be explicitly set with one of the following: **Inventory**--Used for goods the company sells and buys that are tracked as inventory., **Service**--Used for non-tangible goods the company sells and buys that are not tracked as inventory. For example, specialized labor, consulting hours, and professional fees., **NonInventory**--Use for goods the company sells and buys that are not tracked as inventory. For example, office supplies or goods bought on behalf of the customer.,
+    * 
+    * When querying Item objects with minor versions earlier than 4 specified, **NonInventory** types are returned as type **Service**.
+    * For French locales, **Type** is tied with **ItemCategoryType**: if **ItemCategoryType** is set to **Service**, then **Type** is set to **Service**, if **ItemCategoryType** is **Product**, then **Type** is set to **NonInventory**. &gt;Required when minor version 4 is specified.
     */
    Type?: string;
    /**
@@ -5017,13 +4614,13 @@ export interface Item {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Current quantity of the <span class="literal">Inventory</span> items available for sale. Not used for <span class="literal">Service</span> or <span class="literal">NonInventory</span> type items.Required for <span class="literal">Inventory</span> type items.
+    * DESCRIPTION: Current quantity of the **Inventory** items available for sale. Not used for **Service** or **NonInventory** type items.Required for **Inventory** type items.
     */
    QtyOnHand?: number;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Reference to the Inventory Asset account that tracks the current value of the inventory. If the same account is used for all inventory items, the current balance of this account will represent the current total value of the inventory. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">AssetAccountRef.value</span> and <span class="literal">AssetAccountRef.name</span>, respectively. Required for <span class="literal">Inventory</span> item types.
+    * DESCRIPTION: Reference to the Inventory Asset account that tracks the current value of the inventory. If the same account is used for all inventory items, the current balance of this account will represent the current total value of the inventory. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **AssetAccountRef.value** and **AssetAccountRef.name**, respectively. Required for **Inventory** item types.
     */
    AssetAccountRef?: ReferenceType;
    /**
@@ -5041,26 +4638,26 @@ export interface Item {
    /**
     * META: Optional
     *
-    * DESCRIPTION: True if there is quantity on hand to be tracked. Once this value is true, it cannot be updated to false. Applicable for items of type <span class="literal">Inventory</span>.
-    *  Not applicable for <span class="literal">Service</span> or <span class="literal">NonInventory</span> item types.
+    * DESCRIPTION: True if there is quantity on hand to be tracked. Once this value is true, it cannot be updated to false. Applicable for items of type **Inventory**.
+    *  Not applicable for **Service** or **NonInventory** item types.
     */
    TrackQtyOnHand?: boolean;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the sales tax code for the Sales item. Applicable to Service and Sales item types only. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">SalesTaxCodeRef.value</span> and <span class="literal">SalesTaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the sales tax code for the Sales item. Applicable to Service and Sales item types only. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **SalesTaxCodeRef.value** and **SalesTaxCodeRef.name**, respectively.
     */
    SalesTaxCodeRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 41
     *
-    * DESCRIPTION: Reference to the Class for the item. Query the Class name list resource to determine the appropriate object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class for the item. Query the Class name list resource to determine the appropriate object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 59
     *
-    * DESCRIPTION: The Source type of the transactions created by QuickBooks Commerce. Valid values include: <span class="literal">QBCommerce</span>
+    * DESCRIPTION: The Source type of the transactions created by QuickBooks Commerce. Valid values include: **QBCommerce**
     */
    Source?: string;
    /**
@@ -5125,7 +4722,7 @@ export interface Item {
    /**
     * META: Optional ,minorVersion: 31
     *
-    * DESCRIPTION: Reference to the preferred vendor of this item. Query the Vendor name list resource to determine the appropriate object for this reference. Use <span class="literal">Vendor.Id</span> and <span class="literal">Vendor.Name</span> from that object for <span class="literal">ParentRef.value</span> and <span class="literal">ParentRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the preferred vendor of this item. Query the Vendor name list resource to determine the appropriate object for this reference. Use **Vendor.Id** and **Vendor.Name** from that object for **ParentRef.value** and **ParentRef.name**, respectively.
     */
    PrefVendorRef?: ReferenceType;
    /**
@@ -5151,7 +4748,7 @@ export interface Item {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the purchase tax code for the item. Applicable to Service, Other Charge, and Product (Non-Inventory) item types. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">PurchaseTaxCodeRef.value</span> and <span class="literal">PurchaseTaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the purchase tax code for the item. Applicable to Service, Other Charge, and Product (Non-Inventory) item types. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **PurchaseTaxCodeRef.value** and **PurchaseTaxCodeRef.name**, respectively.
     */
    PurchaseTaxCodeRef?: ReferenceType;
    /**
@@ -5171,7 +4768,7 @@ export interface Item {
    /**
     * META: Optional
     *
-    * DESCRIPTION: The immediate parent of the sub item in the hierarchical Item:SubItem list. If SubItem is true, then ParenRef is required. If SubItem is true, then ParenRef is required. Query the Item name list resource to determine the appropriate object for this reference. Use <span class="literal">Item.Id</span> and <span class="literal">Item.Name</span> from that object for <span class="literal">ParentRef.value</span> and <span class="literal">ParentRef.name</span>, respectively.
+    * DESCRIPTION: The immediate parent of the sub item in the hierarchical Item:SubItem list. If SubItem is true, then ParenRef is required. If SubItem is true, then ParenRef is required. Query the Item name list resource to determine the appropriate object for this reference. Use **Item.Id** and **Item.Name** from that object for **ParentRef.value** and **ParentRef.name**, respectively.
     */
    ParentRef?: ReferenceType;
    /**
@@ -5181,23 +4778,22 @@ export interface Item {
     *
     * DESCRIPTION: Corresponds to the Price/Rate column on the QuickBooks Online UI to specify either unit price, a discount, or a tax rate for item.
     * If used for unit price, the monetary value of the service or product, as expressed in the home currency.
- If used for a discount or tax rate, express the percentage as a fraction. For example, specify <span class="literal">0.4</span> for 40% tax.
+    * If used for a discount or tax rate, express the percentage as a fraction. For example, specify **0.4** for 40% tax.
     */
    UnitPrice?: number;
    /**
     * META: read only ,system defined
     *
-    * DESCRIPTION: Fully qualified name of the entity. The fully qualified name prepends the topmost parent, followed by each sub element separated by colons. Takes the form of
-    * <span class="literal">Item:SubItem</span>. Returned from an existing object and not input on a new object.Limited to 5 levels.
+    * DESCRIPTION: Fully qualified name of the entity. The fully qualified name prepends the topmost parent, followed by each sub element separated by colons. Takes the form of **Item:SubItem**. Returned from an existing object and not input on a new object.Limited to 5 levels.
     */
    readonly FullyQualifiedName?: string;
    /**
-    * DESCRIPTION: Reference to the expense account used to pay the vendor for this item. Must be an account with account type of <span class="literal">Cost of Goods Sold</span>. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">ExpenseAccountRef.value</span> and <span class="literal">ExpenseAccountRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the expense account used to pay the vendor for this item. Must be an account with account type of **Cost of Goods Sold**. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **ExpenseAccountRef.value** and **ExpenseAccountRef.name**, respectively.
     * For France locales:
- <li>This is an optional field.</li>
- <li>This is the purchase account id, If not provided it defaults to the default purchase account: 605100 and 601100 are the default expense accounts used for <span class="literal">Service</span> and <span class="literal">Product</span> type of item, respectively.</li>
- 
-  Required for <span class="literal">Inventory</span>, <span class="literal">NonInventory</span>, and <span class="literal">Service</span> item types
+    * This is an optional field.,
+    * This is the purchase account id, If not provided it defaults to the default purchase account: 605100 and 601100 are the default expense accounts used for **Service** and **Product** type of item, respectively.,
+    * 
+    *  Required for **Inventory**, **NonInventory**, and **Service** item types
     */
    ExpenseAccountRef?: ReferenceType;
    /**
@@ -5211,10 +4807,10 @@ export interface Item {
    /**
     * META: * Conditionally Required
     *
-    * DESCRIPTION: Reference to the posting account, that is, the account that records the proceeds from the sale of this item. Must be an account with account type of <span class="literal">Sales of Product Income</span>. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">IncomeAccountRef.value</span> and <span class="literal">IncomeAccountRef.name</span>, respectively.For France locales: <li>This is an optional field.</li>
-    * <li>This is the sales account id, If not provided it defaults to the default sales account: 706100 and 707100 are the default expense accounts used for <span class="literal">Service</span> and <span class="literal">Product</span> type of item, respectively.</li>
- 
-  required for <span class="literal">Inventory</span> and <span class="literal">Service</span> item types
+    * DESCRIPTION: Reference to the posting account, that is, the account that records the proceeds from the sale of this item. Must be an account with account type of **Sales of Product Income**. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **IncomeAccountRef.value** and **IncomeAccountRef.name**, respectively.For France locales: This is an optional field.,
+    * This is the sales account id, If not provided it defaults to the default sales account: 706100 and 707100 are the default expense accounts used for **Service** and **Product** type of item, respectively.,
+    * 
+    *  required for **Inventory** and **Service** item types
     */
    IncomeAccountRef?: ReferenceType;
    /**
@@ -5257,20 +4853,13 @@ export interface JournalCode {
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
     * META: Optional
     *
-    * DESCRIPTION: The type of this journal code. The value cannot be changed once the object is created. Valid types include:
-    * <span class="literal">Expenses</span>
- <span class="literal">Sales</span>
- <span class="literal">Bank</span>
- <span class="literal">Nouveaux</span>
- <span class="literal">Wages</span>
- <span class="literal">Cash</span>
- <span class="literal">Others</span>
+    * DESCRIPTION: The type of this journal code. The value cannot be changed once the object is created. Valid types include: **Expenses** **Sales** **Bank** **Nouveaux** **Wages** **Cash** **Others**
     */
    Type?: string;
    /**
@@ -5285,12 +4874,11 @@ export interface JournalEntry_Line_JournalEntryLineDetail_Entity {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Query the corresponding name list resource as specified by <span class="literal">Entity</span> to determine the appropriate object for this reference. Use the <span class="literal">Id</span> and <span class="literal">DisplayName
-    * </span> values from that object for <span class="literal">EntityRef.value</span> and <span class="literal">EntityRef.name</span>, respectively.
+    * DESCRIPTION: Query the corresponding name list resource as specified by **Entity** to determine the appropriate object for this reference. Use the **Id** and **DisplayName** values from that object for **EntityRef.value** and **EntityRef.name**, respectively.
     */
    EntityRef: ReferenceType;
    /**
-    * DESCRIPTION: Object type. Output only. Valid values are <span class="literal">Vendor</span>, <span class="literal">Employee</span>, or <span class="literal">Customer</span>.
+    * DESCRIPTION: Object type. Output only. Valid values are **Vendor**, **Employee**, or **Customer**.
     */
    Type?: "Vendor" | "Employee" | "Customer";
 }
@@ -5299,39 +4887,37 @@ export interface JournalEntry_Line_JournalEntryLineDetail {
    /**
     * META: * Required ,minorVersion: 5 ,
     *
-    * DESCRIPTION: For France locales, only. Reference to a JournalCode object. This must be present for both <span class="literal">Credit</span> and <span class="literal">Debit</span> posting sides of the JournalEntry object. Query the JournalCode name list resource to determine the appropriate JournalCode object for this reference. Use <span class="literal">JournalCode.Id</span> and <span class="literal">JournalCode.Name</span> from that object for <span class="literal">JournalCodeRef.value</span> and <span class="literal">JournalCodeRef.name</span>, respectively.
+    * DESCRIPTION: For France locales, only. Reference to a JournalCode object. This must be present for both **Credit** and **Debit** posting sides of the JournalEntry object. Query the JournalCode name list resource to determine the appropriate JournalCode object for this reference. Use **JournalCode.Id** and **JournalCode.Name** from that object for **JournalCodeRef.value** and **JournalCodeRef.name**, respectively.
     */
    JournalCodeRef: ReferenceType;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Indicates whether this JournalEntry line is a debit or credit. Valid values: <span class="literal">Credit</span>, <span class="literal">Debit</span>
+    * DESCRIPTION: Indicates whether this JournalEntry line is a debit or credit. Valid values: **Credit**, **Debit**
     */
    PostingType: "Credit" | "Debit";
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to the account associated with this line. Query the Account name list resource to determine the appropriate Account object for this reference, based on the side of the journal entry represented by this line. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">AccountRef.value</span> and <span class="literal">AccountRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the account associated with this line. Query the Account name list resource to determine the appropriate Account object for this reference, based on the side of the journal entry represented by this line. Use **Account.Id** and **Account.Name** from that object for **AccountRef.value** and **AccountRef.name**, respectively.
     * For France locales: The account associated with the referenced Account object is looked up in the account category list.
- <li>If this account has same location as specified in the transaction by the <span class="literal">TransactionLocationType</span> attribute and the same VAT as in the line item <span class="literal">TaxCodeRef</span> attribute, then this account is used.</li>
- <li>If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.</li>
- <li>If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.</li>
+    * If this account has same location as specified in the transaction by the **TransactionLocationType** attribute and the same VAT as in the line item **TaxCodeRef** attribute, then this account is used.,
+    * If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.,
+    * If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.,
     */
    AccountRef: ReferenceType;
    /**
     * META: * Conditionally required ,  ,
     *
     * DESCRIPTION: Indicates whether the tax applicable on the line is sales or purchase.
-    * Valid value:
- <span class="literal">Sales</span>,
- <span class="literal">Purchase</span>. Required if <span class="literal">TaxCodeRef</span> is specified
+    * Valid value: **Sales**, **Purchase**. Required if **TaxCodeRef** is specified
     */
    TaxApplicableOn?: "Sales" | "Purchase" | "TaxCodeRef";
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: When you use <span class="literal">Accounts Receivable</span>, you must choose a <span class="literal">customer</span> in the Name field.
-    * When you use <span class="literal">Accounts Payable</span>, you must choose a <span class="literal">supplier/vendor</span> in the Name field.
+    * DESCRIPTION: When you use **Accounts Receivable**, you must choose a **customer** in the Name field.
+    * When you use **Accounts Payable**, you must choose a **supplier/vendor** in the Name field.
     */
    Entity?: JournalEntry_Line_JournalEntryLineDetail_Entity;
    /**
@@ -5340,36 +4926,33 @@ export interface JournalEntry_Line_JournalEntryLineDetail {
     * ADDON: Decimal
     *
     * DESCRIPTION: The total amount of the line items including tax.
-    * Constraints: Available when endpoint is evoked with the <span class="literal">minorversion=1</span>query parameter.
+    * Constraints: Available when endpoint is evoked with the **minorversion=1** query parameter.
     */
    TaxInclusiveAmt?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerTxn</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerTxn** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * <br>Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxCode</span>for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use <span class="literal">TaxCode.Id</span> and <span class="literal">TaxCode.Name</span> from that object for <span class="literal">TaxCodeRef.value</span> and <span class="literal">TaxCodeRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the **TaxCode** for this item. Query the TaxCode name list resource to determine the appropriate TaxCode object for this reference. Use **TaxCode.Id** and **TaxCode.Name** from that object for **TaxCodeRef.value** and **TaxCodeRef.name**, respectively.
     */
    TaxCodeRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: The billable status of the journal entry line. The line is to be billed to a customer if the account is an expense account and <span class="literal">EntityRef</span> specifies a Customer object.
-    * Valid values:
- <span class="literal">Billable</span>,
- <span class="literal">NotBillable</span>,
- <span class="literal">HasBeenBilled</span>
+    * DESCRIPTION: The billable status of the journal entry line. The line is to be billed to a customer if the account is an expense account and **EntityRef** specifies a Customer object.
+    * Valid values: **Billable**, **NotBillable**, **HasBeenBilled**
     */
    BillableStatus?: "EntityRef" | "Billable" | "NotBillable" | "HasBeenBilled";
    /**
@@ -5387,7 +4970,7 @@ export interface JournalEntry_Line_JournalEntryLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item.
-    * In requests, if <span class="literal">Id</span> matches that for an existing line in the transaction the line is updated. Otherwise, a new line is created. Integer as string.
+    * In requests, if **Id** matches that for an existing line in the transaction the line is updated. Otherwise, a new line is created. Integer as string.
     */
    readonly Id?: string;
    /**
@@ -5397,8 +4980,7 @@ export interface JournalEntry_Line_JournalEntryLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">JournalEntryLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **JournalEntryLineDetail** for this type of line.
     */
    DetailType: "JournalEntryLineDetail";
    /**
@@ -5418,7 +5000,7 @@ export interface JournalEntry_Line_JournalEntryLine {
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
@@ -5436,21 +5018,16 @@ export interface JournalEntry_Line_DescriptionOnlyLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DescriptionOnly</span>for this type of line.
+    * DESCRIPTION: Set to **DescriptionOnly** for this type of line.
     */
    DetailType: "DescriptionOnly";
    /**
@@ -5461,17 +5038,9 @@ export interface JournalEntry_Line_DescriptionOnlyLine {
     * META: Optional ,max character: max 4000 chars
     *
     * DESCRIPTION: A string representing one of the following:
-    * <li>
- Free form text description of the line item that appears in the printed record.
- </li>
- <li>
- A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.
- </li><li>
- In create requests, set to <span class="literal">Subtotal:</span> (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.
- </li>
- <li>
- In read requests, lines with <span class="literal">Subtotal: nn.nn</span> returned in this field denote subtotal lines in the object.
- </li>
+    * Free form text description of the line item that appears in the printed record.,
+    * A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.,In create requests, set to **Subtotal:** (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.,
+    * In read requests, lines with **Subtotal: nn.nn** returned in this field denote subtotal lines in the object.,
     */
    Description?: string;
    /**
@@ -5487,7 +5056,7 @@ export interface JournalEntry_Line_DescriptionOnlyLine {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of the line item. Available when <span class="literal">Amount</span> is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
+    * DESCRIPTION: The amount of the line item. Available when **Amount** is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
     */
    readonly Amount?: number;
 }
@@ -5496,14 +5065,13 @@ export interface JournalEntry_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -5511,7 +5079,7 @@ export interface JournalEntry_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -5527,33 +5095,31 @@ export interface JournalEntry {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items of a transaction. There must be at least one pair of Journal Entry Line elements, representing a debit and a credit, called distribution lines. Valid <span class="literal">Line</span> types include:
-    * <span class="literal">JournalEntryLine</span> and 
- <span class="literal">DescriptionOnlyLine</span>
+    * DESCRIPTION: Individual line items of a transaction. There must be at least one pair of Journal Entry Line elements, representing a debit and a credit, called distribution lines. Valid **Line** types include: **JournalEntryLine** and  **DescriptionOnlyLine**
     */
    Line: (JournalEntry_Line_JournalEntryLine | JournalEntry_Line_DescriptionOnlyLine)[];
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * <br>Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company
     */
    CurrencyRef?: CurrencyRefType;
    /**
     * META: Optional ,max character: Maximum of 21 chars
     *
     * DESCRIPTION: Reference number for the transaction.
-    * Throws an error when duplicate DocNumber is sent in the request and if <span class="literal">Preferences:OtherPrefs:NameValue.Name = WarnDuplicateJournalNumber</span> is true. Recommended best practice: check the setting of <span class="literal">Preferences:OtherPrefs:NameValue.Name = WarnDuplicateJournalNumber</span> before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI.
- Sort order is ASC by default.
- With this change V3 JournalEntry API will be supporting autoassign docNumber when null in the request only till <span class="literal">minorversion=53</span>.
- Starting <span class="literal">minorversion=54</span> if null value is sent in the request null will be saved.
- With <span class="literal">minorversion=54</span> if there is a need to support assigning a <span class="literal">docNumber</span> when null, it can be achieved through include param, <span class="literal">include=allowautodocnum</span>
+    * Throws an error when duplicate DocNumber is sent in the request and if **Preferences:OtherPrefs:NameValue.Name = WarnDuplicateJournalNumber** is true. Recommended best practice: check the setting of **Preferences:OtherPrefs:NameValue.Name = WarnDuplicateJournalNumber** before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI.
+    * Sort order is ASC by default.
+    * With this change V3 JournalEntry API will be supporting autoassign docNumber when null in the request only till **minorversion=53**.
+    * Starting **minorversion=54** if null value is sent in the request null will be saved.
+    * With **minorversion=54** if there is a need to support assigning a **docNumber** when null, it can be achieved through include param, **include=allowautodocnum**
     */
    DocNumber?: string;
    /**
@@ -5569,7 +5135,7 @@ export interface JournalEntry {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
@@ -5577,40 +5143,34 @@ export interface JournalEntry {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional ,minorVersion: 49
     *
-    * DESCRIPTION: Reference to the Tax Adjustment Rate Ids for this item. Query the TaxRate list resource to determine the appropriate TaxRate object for this reference. Use <span class="literal">TaxRate.Id</span> and <span class="literal">TaxRate.Name</span> from that object for TaxRateRef.value and TaxRateRef.name, respectively.
+    * DESCRIPTION: Reference to the Tax Adjustment Rate Ids for this item. Query the TaxRate list resource to determine the appropriate TaxRate object for this reference. Use **TaxRate.Id** and **TaxRate.Name** from that object for TaxRateRef.value and TaxRateRef.name, respectively.
     */
    TaxRateRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
     * META: Optional ,minorVersion: 53 ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive";
    /**
@@ -5628,7 +5188,7 @@ export interface JournalEntry {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">JournalEntry</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **JournalEntry** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
@@ -5669,9 +5229,7 @@ export interface Payment_Line_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -5697,7 +5255,7 @@ export interface CreditChargeResponse {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Indicates the status of the payment transaction. Possible values include <span class="literal">Completed</span>, <span class="literal">Unknown</span>.
+    * DESCRIPTION: Indicates the status of the payment transaction. Possible values include **Completed**, **Unknown**.
     */
    Status?: "Completed" | "Unknown";
    /**
@@ -5728,16 +5286,14 @@ export interface CreditChargeInfo {
     *
     * ADDON: Integer
     *
-    * DESCRIPTION: Expiration Month on card, expressed as a number:
-    * <span class="literal">1</span>=January,
- <span class="literal">2</span>=February, etc.
+    * DESCRIPTION: Expiration Month on card, expressed as a number: **1**=January, **2**=February, etc.
     */
    CcExpiryMonth?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: -<span class="literal">false</span> or no value-Store credit card information only. Do not store QuickBooks Payment transaction information in CreditChargeResponse.
-    * -<span class="literal">true</span>-Store credit card payment transaction information in CreditChargeResponse below. Use this setting when QuickBooks Payments is configured to process credit card charges.
+    * DESCRIPTION: -**false** or no value-Store credit card information only. Do not store QuickBooks Payment transaction information in CreditChargeResponse.
+    * -**true**-Store credit card payment transaction information in CreditChargeResponse below. Use this setting when QuickBooks Payments is configured to process credit card charges.
     */
    ProcessPayment?: boolean;
    /**
@@ -5765,8 +5321,7 @@ export interface CreditChargeInfo {
     *
     * ADDON: Integer
     *
-    * DESCRIPTION: Expiration Year on card, expressed as a 4 digit number
-    * <span class="literal">1999</span>, <span class="literal">2003</span>, etc.
+    * DESCRIPTION: Expiration Year on card, expressed as a 4 digit number **1999**, **2003**, etc.
     */
    CcExpiryYear?: number;
    /**
@@ -5811,28 +5366,26 @@ export interface Payment {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Indicates the total amount of the transaction. This includes the total of all the charges, allowances, and taxes. If you process a linked refund transaction against a specific transaction, the 
-    * <span class="literal">totalAmt</span> value won't change. It will remain the same. However, voiding the linked refund will change the 
- <span class="literal">totalAmt</span> value to O.
+    * DESCRIPTION: Indicates the total amount of the transaction. This includes the total of all the charges, allowances, and taxes. If you process a linked refund transaction against a specific transaction, the  **totalAmt** value won't change. It will remain the same. However, voiding the linked refund will change the  **totalAmt** value to O.
     */
    TotalAmt: number;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef: ReferenceType;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * <br>Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company.
     */
    CurrencyRef?: CurrencyRefType;
    /**
@@ -5844,7 +5397,7 @@ export interface Payment {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use <span class="literal">PaymentMethod.Id</span> and <span class="literal">PaymentMethod.Name</span> from that object for <span class="literal">PaymentMethodRef.value</span> and <span class="literal">PaymentMethodRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use **PaymentMethod.Id** and **PaymentMethod.Name** from that object for **PaymentMethodRef.value** and **PaymentMethodRef.name**, respectively.
     */
    PaymentMethodRef?: ReferenceType;
    /**
@@ -5858,8 +5411,8 @@ export interface Payment {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Identifies the account to be used for this payment. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType</span> is <span class="literal">Other Current Asset</span> or <span class="literal">Bank</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">DepositToAccountRef.value</span> and <span class="literal">DepostiToAccountRef.name</span>, respectively.
-    * <br>If you do not specify this account, payment is applied to the Undeposited Funds account.
+    * DESCRIPTION: Identifies the account to be used for this payment. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType** is **Other Current Asset** or **Bank**. Use **Account.Id** and **Account.Name** from that object for **DepositToAccountRef.value** and **DepostiToAccountRef.name**, respectively.
+    * If you do not specify this account, payment is applied to the Undeposited Funds account.
     */
    DepositToAccountRef?: ReferenceType;
    /**
@@ -5867,40 +5420,21 @@ export interface Payment {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more transactions accounting for this payment. Values for
-    * <span class="literal">Line.LinkedTxn.TxnType</span>can be one of the following:
- <li>
- <span class="literal">Expense</span>--Payment is reimbursement for expense paid by cash made on behalf of the customer
- </li>
- <li>
- <span class="literal">Check</span>--Payment is reimbursement for expense paid by check made on behalf of the customer
- </li>
- <li>
- <span class="literal">CreditCardCredit</span>--Payment is reimbursement for a credit card credit made on behalf of the customer
- </li>
- <li>
- <span class="literal">JournalEntry</span>--Payment is linked to the representative journal entry
- </li>
- <li>
- <span class="literal">CreditMemo</span>--Payment is linked to the credit memo the customer has with the business
- </li>
- <li>
- <span class="literal">Invoice</span>--The invoice to which payment is applied
- </li>
- 
- Use <span class="literal">Line.LinkedTxn.TxnId</span> as the ID in a separate read request for the specific resource to retrieve details of the linked object.
+    * DESCRIPTION: Zero or more transactions accounting for this payment. Values for **Line.LinkedTxn.TxnType** can be one of the following: **Expense**--Payment is reimbursement for expense paid by cash made on behalf of the customer, **Check**--Payment is reimbursement for expense paid by check made on behalf of the customer, **CreditCardCredit**--Payment is reimbursement for a credit card credit made on behalf of the customer, **JournalEntry**--Payment is linked to the representative journal entry, **CreditMemo**--Payment is linked to the credit memo the customer has with the business, **Invoice**--The invoice to which payment is applied,
+    * 
+    * Use **Line.LinkedTxn.TxnId** as the ID in a separate read request for the specific resource to retrieve details of the linked object.
     */
    Line?: Payment_Line[];
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
@@ -5912,7 +5446,7 @@ export interface Payment {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Specifies the accounts receivable account associated with this payment. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">ARAccountRef.value</span> and <span class="literal">ARAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.AccountType</span> set to <span class="literal">Accounts Receivable</span>.
+    * DESCRIPTION: Specifies the accounts receivable account associated with this payment. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **ARAccountRef.value** and **ARAccountRef.name**, respectively. The specified account must have **Account.AccountType** set to **Accounts Receivable**.
     */
    ARAccountRef?: ReferenceType;
    /**
@@ -5922,7 +5456,7 @@ export interface Payment {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
@@ -5934,13 +5468,9 @@ export interface Payment {
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -5958,11 +5488,10 @@ export interface Payment {
    /**
     * META: read only ,minorVersion: 21 ,system defined
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxExepmtion</span> ID associated with this object. Available for companies that have <a href="https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax" title="Automatic Sales Tax">automated sales tax</a> enabled.
-    * <li><span class="literal">TaxExemptionRef.Name</span>: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state.</li>
- <li><span class="literal">TaxExemptionRef.value</span>: The system-generated Id of the exemption type.</li>
- 
- For internal use only
+    * DESCRIPTION: Reference to the **TaxExepmtion** ID associated with this object. Available for companies that have {@link https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax | automated sales tax} enabled.
+    * **TaxExemptionRef.Name**: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state., **TaxExemptionRef.value**: The system-generated Id of the exemption type.,
+    * 
+    * For internal use only
     */
    readonly TaxExemptionRef?: ReferenceType;
    /**
@@ -5988,7 +5517,7 @@ export interface PaymentMethod {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -6000,7 +5529,7 @@ export interface PaymentMethod {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Defines the type of payment. Valid values include <span class="literal">CREDIT_CARD</span> or <span class="literal">NON_CREDIT_CARD</span>.
+    * DESCRIPTION: Defines the type of payment. Valid values include **CREDIT_CARD** or **NON_CREDIT_CARD**.
     */
    Type?: string;
    /**
@@ -6074,7 +5603,7 @@ export interface Preferences_ProductAndServicesPrefs {
 
 export interface Preferences_ReportPrefs {
    /**
-    * DESCRIPTION: Accounting method for summary. Possible values include <span class="literal">Cash</span> and <span class="literal">Accrual</span>.
+    * DESCRIPTION: Accounting method for summary. Possible values include **Cash** and **Accrual**.
     */
    ReportBasis?: "Cash" | "Accrual";
    /**
@@ -6089,37 +5618,37 @@ export interface Preferences_AccountingInfoPrefs {
    /**
     * META: read only ,minorVersion: 21
     *
-    * DESCRIPTION: This setting corresponds to the <strong>First month of fiscal year</strong> preference in the QuickBooks Online Company Settings to specify the beginning of the company's fiscal year. Specify months as fulling spelled out: <span class="literal">January</span>, <span class="literal">February</span>, and so on.
+    * DESCRIPTION: This setting corresponds to the **First month of fiscal year** preference in the QuickBooks Online Company Settings to specify the beginning of the company's fiscal year. Specify months as fulling spelled out: **January**, **February**, and so on.
     */
    readonly FirstMonthOfFiscalYear?: "January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December";
    /**
     * META: read only ,minorVersion: 21
     *
-    * DESCRIPTION: This setting corresponds to <strong>Enable account numbers</strong> in QuickBooks Online Company Settings.<ul><li>If set to <span class="literal">On</span>, account names are displayed with their corresponding account numbers in chart of accounts.</li><li>If set to <span class="literal">off</span>, account numbers are not displayed with account names in chart of accounts.</li></ul>
+    * DESCRIPTION: This setting corresponds to **Enable account numbers** in QuickBooks Online Company Settings. If set to **On**, account names are displayed with their corresponding account numbers in chart of accounts.,If set to **off**, account numbers are not displayed with account names in chart of accounts.,
     */
    readonly UseAccountNumbers?: boolean;
    /**
     * META: read only ,minorVersion: 21
     *
-    * DESCRIPTION: This setting corresponds to the <strong>First month of income tax year</strong> preference in the QuickBooks Online Company Settings to specify the beginning of the company's fiscal year. Specify months as fulling spelled out: <span class="literal">January</span>, <span class="literal">February</span>, and so on.
+    * DESCRIPTION: This setting corresponds to the **First month of income tax year** preference in the QuickBooks Online Company Settings to specify the beginning of the company's fiscal year. Specify months as fulling spelled out: **January**, **February**, and so on.
     */
    readonly TaxYearMonth?: string;
    /**
-    * DESCRIPTION: This setting correspond to how classes are assigned when <strong>Track classes</strong> in QuickBooks Online Company Settings under Categories is set to <strong>On</strong>. If set to <span class="literal">true</span>, assign classes at the transaction level. Only one of <span class="literal">ClassTrackingPerTxnLine</span> or <span class="literal">ClassTrackingPerTxn</span> can be set to <span class="literal">true</span> at a given time. If <strong>Track classes</strong> is set to <strong>Off</strong> in company settings, both are set to <span class="literal">false</span>.
+    * DESCRIPTION: This setting correspond to how classes are assigned when **Track classes** in QuickBooks Online Company Settings under Categories is set to **On**. If set to **true**, assign classes at the transaction level. Only one of **ClassTrackingPerTxnLine** or **ClassTrackingPerTxn** can be set to **true** at a given time. If **Track classes** is set to **Off** in company settings, both are set to **false**.
     */
    ClassTrackingPerTxn?: boolean;
    /**
-    * DESCRIPTION: This setting corresponds to the <strong>Track locations</strong> preference in QuickBooks Online Company Settings under Categories. If <strong>Track locations</strong> is set to <strong>On</strong>, this attribute is returned as <span class="literal">true</span> in the response. Otherwise, <span class="literal">false</span> is returned.
+    * DESCRIPTION: This setting corresponds to the **Track locations** preference in QuickBooks Online Company Settings under Categories. If **Track locations** is set to **On**, this attribute is returned as **true** in the response. Otherwise, **false** is returned.
     */
    TrackDepartments?: boolean;
    /**
     * META: read only ,minorVersion: 21
     *
-    * DESCRIPTION: This setting corresponds to the <strong>Tax form</strong> preference in the QuickBooks Online Company Settings to specify the tax form your company files.
+    * DESCRIPTION: This setting corresponds to the **Tax form** preference in the QuickBooks Online Company Settings to specify the tax form your company files.
     */
    readonly TaxForm?: string;
    /**
-    * DESCRIPTION: This setting corresponds to the <strong>Customer label</strong> preference in QuickBooks Online Company Settings and specifies the term used by the company for customers. This string is used in many places throughout the QuickBooks UI having to do with sales-side activities. Possible values include: <span class="literal">Clients</span>, <span class="literal">Customers</span>, <span class="literal">Donors</span>, <span class="literal">Guests</span>, <span class="literal">Members</span>, <span class="literal">Patients</span>, <span class="literal">Tenants</span>.
+    * DESCRIPTION: This setting corresponds to the **Customer label** preference in QuickBooks Online Company Settings and specifies the term used by the company for customers. This string is used in many places throughout the QuickBooks UI having to do with sales-side activities. Possible values include: **Clients**, **Customers**, **Donors**, **Guests**, **Members**, **Patients**, **Tenants**.
     */
    CustomerTerminology?: string;
    /**
@@ -6127,34 +5656,34 @@ export interface Preferences_AccountingInfoPrefs {
     *
     * ADDON: Local timezone: YYYY-MM-DD UTC: YYYY-MM-DDZ Specific time zone: YYYY-MM-DD+/-HH:MM
     *
-    * DESCRIPTION: This setting corresponds to the <strong>Closing date</strong> preference in the QuickBooks Online Company Settings and specifies the date the books are closed: income and expense accounts are closed and net profit or loss is rolled up into the retained earnings account. Transactions before this date are protected from changes.
+    * DESCRIPTION: This setting corresponds to the **Closing date** preference in the QuickBooks Online Company Settings and specifies the date the books are closed: income and expense accounts are closed and net profit or loss is rolled up into the retained earnings account. Transactions before this date are protected from changes.
     */
    readonly BookCloseDate?: string;
    /**
-    * DESCRIPTION: Specifies the term used by the company for department. This string is used as a label on transaction forms. Possible values include: <span class="literal">Business</span>, <span class="literal">Department</span>, <span class="literal">Division</span>, <span class="literal">Location</span>, <span class="literal">Property</span>, <span class="literal">Store</span>, <span class="literal">Territory</span>. This is returned only if the company's <strong>Track location</strong> preference is enabled. See TrackDepartments for more details.
+    * DESCRIPTION: Specifies the term used by the company for department. This string is used as a label on transaction forms. Possible values include: **Business**, **Department**, **Division**, **Location**, **Property**, **Store**, **Territory**. This is returned only if the company's **Track location** preference is enabled. See TrackDepartments for more details.
     */
    DepartmentTerminology?: string;
    /**
-    * DESCRIPTION: This setting correspond to how classes are assigned when <strong>Track classes</strong> in QuickBooks Online Company Settings under Categories is set to <strong>On</strong>. If set to <span class="literal">true</span>, assign classes at the line level. Only one of <span class="literal">ClassTrackingPerTxnLine</span> or <span class="literal">ClassTrackingPerTxn</span> can be set to <span class="literal">true</span> at a given time. If <strong>Track classes</strong> is set to <strong>Off</strong> in company settings, both are set to <span class="literal">false</span>.
+    * DESCRIPTION: This setting correspond to how classes are assigned when **Track classes** in QuickBooks Online Company Settings under Categories is set to **On**. If set to **true**, assign classes at the line level. Only one of **ClassTrackingPerTxnLine** or **ClassTrackingPerTxn** can be set to **true** at a given time. If **Track classes** is set to **Off** in company settings, both are set to **false**.
     */
    ClassTrackingPerTxnLine?: boolean;
 }
 
 export interface Preferences_SalesFormsPrefs_CustomField_CustomFieldDefinition_CustomField {
    /**
-    * DESCRIPTION: Used to enable the custom field. Set to <span class="literal">True</span> to enable the field. Once enabled, it is available on sales forms in the QuickBOoks UI and available for QuickBooks services.
+    * DESCRIPTION: Used to enable the custom field. Set to **True** to enable the field. Once enabled, it is available on sales forms in the QuickBOoks UI and available for QuickBooks services.
     */
    BooleanValue?: boolean;
    /**
     * META: system defined
     *
-    * DESCRIPTION: Value is <span class="literal">BooleanType</span>. Denotes this is a custom field enabling object.
+    * DESCRIPTION: Value is **BooleanType**. Denotes this is a custom field enabling object.
     */
    Type?: "BooleanType";
    /**
     * META: read only
     *
-    * DESCRIPTION: The internal name of an enabled custom field. <span class="literal">Name</span> takes the form <span class="literal">SalesFormsPrefs.SalesCustomNameN</span>, where N is <span class="literal">1</span>, <span class="literal">2</span>, or <span class="literal">3</span> for up to three available custom fields.
+    * DESCRIPTION: The internal name of an enabled custom field. **Name** takes the form **SalesFormsPrefs.SalesCustomNameN**, where N is **1**, **2**, or **3** for up to three available custom fields.
     */
    readonly Name?: string;
 }
@@ -6167,13 +5696,13 @@ export interface Preferences_SalesFormsPrefs_CustomField_CustomFieldDefinition_C
    /**
     * META: system defined
     *
-    * DESCRIPTION: Denotes that this is a custom field definition. Value is <span class="literal">StringType</span>. This type of custom field is available once the field has been enabled with a corresponding <span class="literal">CustomField</span> object of type <span class="literal">BooleanType</span>.
+    * DESCRIPTION: Denotes that this is a custom field definition. Value is **StringType**. This type of custom field is available once the field has been enabled with a corresponding **CustomField** object of type **BooleanType**.
     */
    Type?: "StringType" | "CustomField" | "BooleanType";
    /**
     * META: read only
     *
-    * DESCRIPTION: The internal name of an enabled custom field, <span class="literal">Name</span> takes the form <span class="literal">SalesFormsPrefs.SalesCustomNameN</span>, where N is <span class="literal">1</span>, <span class="literal">2</span>, or <span class="literal">3</span> for up to three available custom fields that have been enabled. Use the numeric part, represented by N here, as the <span class="literal">CustomField.DefinitionId</span> when configuring custom fields in transactions.
+    * DESCRIPTION: The internal name of an enabled custom field, **Name** takes the form **SalesFormsPrefs.SalesCustomNameN**, where N is **1**, **2**, or **3** for up to three available custom fields that have been enabled. Use the numeric part, represented by N here, as the **CustomField.DefinitionId** when configuring custom fields in transactions.
     */
    readonly Name?: string;
 }
@@ -6182,13 +5711,13 @@ export interface Preferences_SalesFormsPrefs {
    /**
     * META: Optional ,minorVersion: 8
     *
-    * DESCRIPTION: Default blind carbon copy email address where invoices are sent. Override this setting with the  <span class="literal"> Invoice.BillEmailBcc </span>  attribute. Max 200 characters. Ignored if address is invalid. Available with minor version 8.
+    * DESCRIPTION: Default blind carbon copy email address where invoices are sent. Override this setting with the  **Invoice.BillEmailBcc**  attribute. Max 200 characters. Ignored if address is invalid. Available with minor version 8.
     */
    SalesEmailBcc?: EmailAddress;
    /**
     * META: Optional ,minorVersion: 8
     *
-    * DESCRIPTION: Default carbon copy email address where invoices are sent. Override this setting with the <span class="literal"> Invoice.BillEmailCc </span> attribute. Max 200 characters. Ignored if address is invalid. Available with minor version 8.
+    * DESCRIPTION: Default carbon copy email address where invoices are sent. Override this setting with the **Invoice.BillEmailCc** attribute. Max 200 characters. Ignored if address is invalid. Available with minor version 8.
     */
    SalesEmailCc?: EmailAddress;
    /**
@@ -6214,7 +5743,7 @@ export interface Preferences_SalesFormsPrefs {
     */
    readonly EstimateMessage?: string;
    /**
-    * DESCRIPTION: If set to true, the QuickBooks company is cc'ed on all email sent to customers for sales transactions. Email used is that defined with <span class="literal"> CompanyInfo.Email.Address </span>. Available with minor verion 8.
+    * DESCRIPTION: If set to true, the QuickBooks company is cc'ed on all email sent to customers for sales transactions. Email used is that defined with **CompanyInfo.Email.Address**. Available with minor verion 8.
     */
    EmailCopyToCompany?: boolean;
    /**
@@ -6293,19 +5822,19 @@ export interface Preferences_SalesFormsPrefs {
 
 export interface Preferences_VendorAndPurchasesPrefs_POCustomField_CustomFieldDefinition_CustomField {
    /**
-    * DESCRIPTION: Used to enable the custom field. Set to <span class="literal">True</span> to enable the field. Once enabled, it is available on purchase order forms in the QuickBOoks UI and available for QuickBooks services.
+    * DESCRIPTION: Used to enable the custom field. Set to **True** to enable the field. Once enabled, it is available on purchase order forms in the QuickBOoks UI and available for QuickBooks services.
     */
    BooleanValue?: boolean;
    /**
     * META: system defined
     *
-    * DESCRIPTION: Value is <span class="literal">BooleanType</span>. Denotes this is a custom field enabling object.
+    * DESCRIPTION: Value is **BooleanType**. Denotes this is a custom field enabling object.
     */
    Type?: "BooleanType";
    /**
     * META: read only
     *
-    * DESCRIPTION: The internal name of the custom field. <span class="literal">Name</span> takes the form <span class="literal">PurchasePrefs.UsePurchaseNameN</span>, where N is <span class="literal">1</span>, <span class="literal">2</span>, or <span class="literal">3</span> for up to three available custom fields.
+    * DESCRIPTION: The internal name of the custom field. **Name** takes the form **PurchasePrefs.UsePurchaseNameN**, where N is **1**, **2**, or **3** for up to three available custom fields.
     */
    readonly Name?: string;
 }
@@ -6318,13 +5847,13 @@ export interface Preferences_VendorAndPurchasesPrefs_POCustomField_CustomFieldDe
    /**
     * META: system defined
     *
-    * DESCRIPTION: Denotes that this is a custom field definition. Value is <span class="literal">StringType</span>. This type of custom field is available once the field has been enabled with a corresponding <span class="literal">CustomField</span> object of type <span class="literal">BooleanType</span>.
+    * DESCRIPTION: Denotes that this is a custom field definition. Value is **StringType**. This type of custom field is available once the field has been enabled with a corresponding **CustomField** object of type **BooleanType**.
     */
    Type?: "StringType" | "CustomField" | "BooleanType";
    /**
     * META: read only
     *
-    * DESCRIPTION: The internal name of an enabled custom field, <span class="literal">Name</span> takes the form <span class="literal">PurchasePrefs.PurchaseCustomNameN</span>, where N is <span class="literal">1</span>, <span class="literal">2</span>, or <span class="literal">3</span> for up to three available custom fields that have been enabled.
+    * DESCRIPTION: The internal name of an enabled custom field, **Name** takes the form **PurchasePrefs.PurchaseCustomNameN**, where N is **1**, **2**, or **3** for up to three available custom fields that have been enabled.
     */
    readonly Name?: string;
 }
@@ -6370,7 +5899,7 @@ export interface Preferences_TaxPrefs {
    /**
     * META: read only
     *
-    * DESCRIPTION: Partner tax refers to the automated sales tax engine that provides sales tax compliance. All QuickBooks Online companies created after November 10, 2017 are enabled by default.<ul><li>If <span class="literal">true</span>, automated sales tax is enabled for the company and sales tax is set up (<span class="literal">UsingSalesTax</span> is set to <span class="literal">true</span>).</li><li>If <span class="literal">false</span>, automated sales tax is enabled for the company but the company doesn't have sales tax set up (<span class="literal">UsingSalesTax</span> is set to <span class="literal">false</span>).</li><li>If not present in response payload, the company is not enabled for automated sales tax.</li></ul>
+    * DESCRIPTION: Partner tax refers to the automated sales tax engine that provides sales tax compliance. All QuickBooks Online companies created after November 10, 2017 are enabled by default. If **true**, automated sales tax is enabled for the company and sales tax is set up (**UsingSalesTax** is set to **true**).,If **false**, automated sales tax is enabled for the company but the company doesn't have sales tax set up (**UsingSalesTax** is set to **false**).,If not present in response payload, the company is not enabled for automated sales tax.,
     */
    readonly PartnerTaxEnabled?: boolean;
    /**
@@ -6442,7 +5971,7 @@ export interface Preferences {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -6455,7 +5984,7 @@ export interface Preferences {
    ProductAndServicesPrefs?: Preferences_ProductAndServicesPrefs;
    ReportPrefs?: Preferences_ReportPrefs;
    /**
-    * DESCRIPTION: The following settings are available for QuickBooks Online Plus editions, only. To determine this edition type, query the value of the <span class="literal">OfferingSku</span> CustomerInfo.Name name/value pair for <span class="literal">QuickBooks Online Plus</span>.
+    * DESCRIPTION: The following settings are available for QuickBooks Online Plus editions, only. To determine this edition type, query the value of the **OfferingSku** CustomerInfo.Name name/value pair for **QuickBooks Online Plus**.
     */
    AccountingInfoPrefs?: Preferences_AccountingInfoPrefs;
    SalesFormsPrefs?: Preferences_SalesFormsPrefs;
@@ -6490,9 +6019,7 @@ export interface Purchase_Line_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -6502,14 +6029,10 @@ export interface Purchase_Line_ItemBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -6527,14 +6050,13 @@ export interface Purchase_Line_ItemBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">ItemBasedExpenseLineDetail</span> for this type of line.
+    * DESCRIPTION: Set to **ItemBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "ItemBasedExpenseLineDetail";
    /**
     * META: Optional ,minorVersion: 55
     *
-    * DESCRIPTION: Zero or more transactions linked to this object. The <span class="literal">LinkedTxn.TxnType</span> can be set to <span class="literal">ReimburseCharge</span>. The <span class="literal">LinkedTxn.TxnId</span> can be set as the ID of the transaction.
+    * DESCRIPTION: Zero or more transactions linked to this object. The **LinkedTxn.TxnType** can be set to **ReimburseCharge**. The **LinkedTxn.TxnId** can be set as the ID of the transaction.
     */
    LinkedTxn?: Purchase_Line_LinkedTxn[];
    /**
@@ -6558,21 +6080,16 @@ export interface Purchase_Line_AccountBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">AccountBasedExpenseLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **AccountBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "AccountBasedExpenseLineDetail";
    /**
@@ -6586,7 +6103,7 @@ export interface Purchase_Line_AccountBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>LineDetail</strong>
+    * DESCRIPTION: **LineDetail**
     */
    AccountBasedExpenseLineDetail: AccountBasedExpense;
    /**
@@ -6621,9 +6138,7 @@ export interface Purchase_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -6632,14 +6147,13 @@ export interface Purchase_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -6647,7 +6161,7 @@ export interface Purchase_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -6663,38 +6177,32 @@ export interface Purchase {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items of a transaction. Valid 
-    * <span class="literal">Line</span> types include <span class="literal">ItemBasedExpenseLine</span> (Available if
- <span class="literal">Preferences.ProductAndServicesPrefs.ForPurchase</span> is set to 
- <span class="literal">true</span>) and <span class="literal">AccountBasedExpenseLine</span>
+    * DESCRIPTION: Individual line items of a transaction. Valid  **Line** types include **ItemBasedExpenseLine** (Available if **Preferences.ProductAndServicesPrefs.ForPurchase** is set to  **true**) and **AccountBasedExpenseLine**
     */
    Line: (Purchase_Line_ItemBasedExpenseLine | Purchase_Line_AccountBasedExpenseLine)[];
    /**
     * META: * Required
     *
-    * DESCRIPTION: Type can be
-    * <span class="literal">Cash</span>,
- <span class="literal">Check</span>, or
- <span class="literal">CreditCard</span>.
+    * DESCRIPTION: Type can be **Cash**, **Check**, or **CreditCard**.
     */
    PaymentType: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Specifies the account reference to which this purchase is applied based on the <span class="literal">PaymentType</span>. A type of <span class="literal">Check</span> should have bank account, <span class="literal">CreditCard</span> should specify credit card account, etc. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">AccountRef.value</span> and <span class="literal">AccountRef.name</span>, respectively.
+    * DESCRIPTION: Specifies the account reference to which this purchase is applied based on the **PaymentType**. A type of **Check** should have bank account, **CreditCard** should specify credit card account, etc. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **AccountRef.value** and **AccountRef.name**, respectively.
     */
    AccountRef: ReferenceType;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * <br>Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company.
     */
    CurrencyRef?: CurrencyRefType;
    /**
@@ -6704,27 +6212,21 @@ export interface Purchase {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: PrintStatus is applicable only for
-    * <span class="literal">Check</span>.&nbsp; Ignored for
- <span class="literal">CreditCard</span>charge or refund.
- Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToPrint</span>,
- <span class="literal">PrintComplete.</span>
+    * DESCRIPTION: PrintStatus is applicable only for **Check**.&nbsp; Ignored for **CreditCard** charge or refund.
+    * Valid values: **NotSet**, **NeedToPrint**, **PrintComplete.**
     */
    PrintStatus?: string;
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: Address to which the payment should be sent. This attribute is applicable only for
-    * <span class="literal">Check</span>. Ignored for
- <span class="literal">CreditCard</span>&nbsp;charge or refund. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Address to which the payment should be sent. This attribute is applicable only for **Check**. Ignored for **CreditCard**&nbsp;charge or refund.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    readonly RemitToAddr?: PhysicalAddress;
    /**
@@ -6736,28 +6238,21 @@ export interface Purchase {
    /**
     * META: Optional ,minorVersion: 55
     *
-    * DESCRIPTION: Zero or more transactions linked to this object. The <span class="literal">LinkedTxn.TxnType</span> can be set to <span class="literal">ReimburseCharge</span>. The <span class="literal">LinkedTxn.TxnId</span> can be set as the ID of the transaction.
+    * DESCRIPTION: Zero or more transactions linked to this object. The **LinkedTxn.TxnType** can be set to **ReimburseCharge**. The **LinkedTxn.TxnId** can be set as the ID of the transaction.
     */
    LinkedTxn?: Purchase_LinkedTxn[];
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -6769,12 +6264,12 @@ export interface Purchase {
    /**
     * META: Optional ,max character: Maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> as follows:
-    * <li>If <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> is true a custom value can be provided; duplicate values are not accepted. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- For Cash/CreditCard transactions, throws an error when duplicate DocNumber is sent in the request. For Check transactions, error is thrown when duplicate DocNumber is sent in the request and <span class="literal">Preferences:OtherPrefs:NameValue.Name = WarnDuplicateCheckNumber</span> is true. Recommended best practice: check the setting of <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI. 
- Sort order is ASC by default.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** as follows:
+    * If **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** is true a custom value can be provided; duplicate values are not accepted. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * For Cash/CreditCard transactions, throws an error when duplicate DocNumber is sent in the request. For Check transactions, error is thrown when duplicate DocNumber is sent in the request and **Preferences:OtherPrefs:NameValue.Name = WarnDuplicateCheckNumber** is true. Recommended best practice: check the setting of **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI. 
+    * Sort order is ASC by default.
     */
    DocNumber?: string;
    /**
@@ -6786,27 +6281,25 @@ export interface Purchase {
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span class="literal">False</span>—it represents a charge.
+    * DESCRIPTION: **False**—it represents a charge.
     * 
- <span class="literal">True</span>—it represents a refund.
- Valid only for
- <span class="literal">CreditCard</span>payment type.
- 
- Validation Rules: Valid only for
- <span class="literal">CreditCard</span>transactions.
+    * **True**—it represents a refund.
+    * Valid only for **CreditCard** payment type.
+    * 
+    * Validation Rules: Valid only for **CreditCard** transactions.
     */
    Credit?: boolean;
    /**
     * META: Optional
     *
-    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use <span class="literal">PaymentMethod.Id</span> and <span class="literal">PaymentMethod.Name</span> from that object for <span class="literal">PaymentMethodRef.value</span> and <span class="literal">PaymentMethodRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use **PaymentMethod.Id** and **PaymentMethod.Name** from that object for **PaymentMethodRef.value** and **PaymentMethodRef.name**, respectively.
     */
    PaymentMethodRef?: ReferenceType;
    /**
@@ -6822,23 +6315,21 @@ export interface Purchase {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * <br>Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Specifies the party with whom an expense is associated. Can be
-    * <span class="literal">Customer</span>,
- <span class="literal">Vendor, or Employee.</span>
- <br>Query the corresponding name list resource of the associated type to determine the appropriate object for this reference. Use the <span class="literal">Id</span> and <span class="literal">DisplayName</span> values from that object for <span class="literal">EntityRef.value</span> and <span class="literal">EntityRef.name</span>, respectively. Set <span class="literal">EntityRef.type</span> to the type of object associated with this expense. For example, if this object represents a purchase from a vendor, then set <span class="literal">EntityRef.type</span> to <span class="literal">Vendor</span> and query the Vendor resource for the appropriate object to reference.
+    * DESCRIPTION: Specifies the party with whom an expense is associated. Can be **Customer**, **Vendor, or Employee.**
+    * Query the corresponding name list resource of the associated type to determine the appropriate object for this reference. Use the **Id** and **DisplayName** values from that object for **EntityRef.value** and **EntityRef.name**, respectively. Set **EntityRef.type** to the type of object associated with this expense. For example, if this object represents a purchase from a vendor, then set **EntityRef.type** to **Vendor** and query the Vendor resource for the appropriate object to reference.
     */
    EntityRef?: ReferenceType;
    /**
@@ -6859,7 +6350,7 @@ export interface Purchase {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">Purchase</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **Purchase** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
 }
@@ -6880,9 +6371,7 @@ export interface PurchaseOrder_Line_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -6892,14 +6381,10 @@ export interface PurchaseOrder_Line_ItemBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -6917,14 +6402,13 @@ export interface PurchaseOrder_Line_ItemBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">ItemBasedExpenseLineDetail</span> for this type of line.
+    * DESCRIPTION: Set to **ItemBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "ItemBasedExpenseLineDetail";
    /**
     * META: Optional ,minorVersion: 55
     *
-    * DESCRIPTION: Zero or more transactions linked to this object. The <span class="literal">LinkedTxn.TxnType</span> can be set to <span class="literal">ReimburseCharge</span>. The <span class="literal">LinkedTxn.TxnId</span> can be set as the ID of the transaction.
+    * DESCRIPTION: Zero or more transactions linked to this object. The **LinkedTxn.TxnType** can be set to **ReimburseCharge**. The **LinkedTxn.TxnId** can be set as the ID of the transaction.
     */
    LinkedTxn?: PurchaseOrder_Line_LinkedTxn[];
    /**
@@ -6948,21 +6432,16 @@ export interface PurchaseOrder_Line_AccountBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">AccountBasedExpenseLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **AccountBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "AccountBasedExpenseLineDetail";
    /**
@@ -6976,7 +6455,7 @@ export interface PurchaseOrder_Line_AccountBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>LineDetail</strong>
+    * DESCRIPTION: **LineDetail**
     */
    AccountBasedExpenseLineDetail: AccountBasedExpense;
    /**
@@ -7011,9 +6490,7 @@ export interface PurchaseOrder_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -7022,14 +6499,13 @@ export interface PurchaseOrder_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -7037,7 +6513,7 @@ export interface PurchaseOrder_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -7053,35 +6529,33 @@ export interface PurchaseOrder {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">APAccountRef.value</span> and <span class="literal">APAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.Classification</span> set to <span class="literal">Liability</span> and <span class="literal">Account.AccountSubType</span> set to <span class="literal">AccountsPayable</span>.
-    * <br>If the company has a single AP account, the account is implied. However, it is recommended that the AP Account be explicitly specified in all cases to prevent unexpected errors when relating transactions to each other.
+    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **APAccountRef.value** and **APAccountRef.name**, respectively. The specified account must have **Account.Classification** set to **Liability** and **Account.AccountSubType** set to **AccountsPayable**.
+    * If the company has a single AP account, the account is implied. However, it is recommended that the AP Account be explicitly specified in all cases to prevent unexpected errors when relating transactions to each other.
     */
    APAccountRef: ReferenceType;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use <span class="literal">Vendor.Id</span> and <span class="literal">Vendor.Name</span> from that object for <span class="literal">VendorRef.value</span> and <span class="literal">VendorRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use **Vendor.Id** and **Vendor.Name** from that object for **VendorRef.value** and **VendorRef.name**, respectively.
     */
    VendorRef: ReferenceType;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items of a transaction. Valid <span class="literal">Line</span> types include:
-    * <span class="literal">ItemBasedExpenseLine</span> and 
- <span class="literal">AccountBasedExpenseLine</span>
+    * DESCRIPTION: Individual line items of a transaction. Valid **Line** types include: **ItemBasedExpenseLine** and  **AccountBasedExpenseLine**
     */
    Line: (PurchaseOrder_Line_ItemBasedExpenseLine | PurchaseOrder_Line_AccountBasedExpenseLine)[];
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * <br>Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company
     */
    CurrencyRef?: CurrencyRefType;
    /**
@@ -7091,13 +6565,13 @@ export interface PurchaseOrder {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
@@ -7109,28 +6583,25 @@ export interface PurchaseOrder {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerTxn</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerTxn** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use <span class="literal">Term.Id</span> and <span class="literal">Term.Name</span> from that object for <span class="literal">SalesTermRef.value</span> and <span class="literal">SalesTermRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the sales term associated with the transaction. Query the Term name list resource to determine the appropriate Term object for this reference. Use **Term.Id** and **Term.Name** from that object for **SalesTermRef.value** and **SalesTermRef.name**, respectively.
     */
    SalesTermRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more Bill objects linked to this purchase order; <span class="literal">LinkedTxn.TxnType</span> is set to <span class="literal">Bill</span>. To retrieve details of a linked Bill transaction, issue a separate request to read the Bill whose ID is <span class="literal">linkedTxn.TxnId</span>.
+    * DESCRIPTION: Zero or more Bill objects linked to this purchase order; **LinkedTxn.TxnType** is set to **Bill**. To retrieve details of a linked Bill transaction, issue a separate request to read the Bill whose ID is **linkedTxn.TxnId**.
     */
    LinkedTxn?: PurchaseOrder_LinkedTxn[];
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
@@ -7142,19 +6613,15 @@ export interface PurchaseOrder {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Purchase order status. Valid values are: <span class="literal">Open</span> and <span class="literal">Closed</span>.
+    * DESCRIPTION: Purchase order status. Valid values are: **Open** and **Closed**.
     */
    POStatus?: string;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -7162,8 +6629,7 @@ export interface PurchaseOrder {
     *
     * ADDON: Local timezone: YYYY-MM-DD UTC: YYYY-MM-DDZ Specific time zone: YYYY-MM-DD+/-HH:MM
     *
-    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in
-    * <span class="literal">SalesTermRef</span> added the transaction date will be used.
+    * DESCRIPTION: Date when the payment of the transaction is due. If date is not provided, the number of days specified in **SalesTermRef** added the transaction date will be used.
     */
    DueDate?: string;
    /**
@@ -7175,12 +6641,12 @@ export interface PurchaseOrder {
    /**
     * META: Optional ,max character: Maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> as follows:
-    * <li>If <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- Throws an error when duplicate DocNumber is sent in the request. Recommended best practice: check the setting of <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI.
- Sort order is ASC by default.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** as follows:
+    * If **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * Throws an error when duplicate DocNumber is sent in the request. Recommended best practice: check the setting of **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI.
+    * Sort order is ASC by default.
     */
    DocNumber?: string;
    /**
@@ -7192,14 +6658,14 @@ export interface PurchaseOrder {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the user-defined ShipMethod associated with the transaction. Store shipping method string in both <span class="literal">ShipMethodRef.value</span> and <span class="literal">ShipMethodRef.name</span>.
+    * DESCRIPTION: Reference to the user-defined ShipMethod associated with the transaction. Store shipping method string in both **ShipMethodRef.value** and **ShipMethodRef.name**.
     */
    ShipMethodRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
@@ -7213,30 +6679,28 @@ export interface PurchaseOrder {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Address to which the vendor shipped or will ship any goods associated with the purchase. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Address to which the vendor shipped or will ship any goods associated with the purchase.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Address to which the payment should be sent. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Address to which the payment should be sent.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    VendorAddr?: PhysicalAddress;
    /**
     * META: Optional ,minorVersion: 45
     *
     * DESCRIPTION: Email status of the purchase order.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToSend</span>,
- <span class="literal">EmailSent
- </span>
+    * Valid values: **NotSet**, **NeedToSend**, **EmailSent**
     */
    EmailStatus?: string;
    /**
@@ -7250,7 +6714,7 @@ export interface PurchaseOrder {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">PurchaseOrder</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **PurchaseOrder** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
 }
@@ -7260,20 +6724,16 @@ export interface RefundReceipt_Line_SalesItemLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -7286,7 +6746,7 @@ export interface RefundReceipt_Line_SalesItemLine {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -7310,20 +6770,16 @@ export interface RefundReceipt_Line_GroupLineDetail_Line {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -7336,7 +6792,7 @@ export interface RefundReceipt_Line_GroupLineDetail_Line {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -7360,14 +6816,10 @@ export interface RefundReceipt_Line_GroupLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -7377,8 +6829,7 @@ export interface RefundReceipt_Line_GroupLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">GroupLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **GroupLineDetail** for this type of line.
     */
    DetailType: "GroupLineDetail";
    /**
@@ -7402,21 +6853,16 @@ export interface RefundReceipt_Line_DescriptionOnlyLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DescriptionOnly</span>for this type of line.
+    * DESCRIPTION: Set to **DescriptionOnly** for this type of line.
     */
    DetailType: "DescriptionOnly";
    /**
@@ -7427,17 +6873,9 @@ export interface RefundReceipt_Line_DescriptionOnlyLine {
     * META: Optional ,max character: max 4000 chars
     *
     * DESCRIPTION: A string representing one of the following:
-    * <li>
- Free form text description of the line item that appears in the printed record.
- </li>
- <li>
- A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.
- </li><li>
- In create requests, set to <span class="literal">Subtotal:</span> (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.
- </li>
- <li>
- In read requests, lines with <span class="literal">Subtotal: nn.nn</span> returned in this field denote subtotal lines in the object.
- </li>
+    * Free form text description of the line item that appears in the printed record.,
+    * A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.,In create requests, set to **Subtotal:** (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.,
+    * In read requests, lines with **Subtotal: nn.nn** returned in this field denote subtotal lines in the object.,
     */
    Description?: string;
    /**
@@ -7453,7 +6891,7 @@ export interface RefundReceipt_Line_DescriptionOnlyLine {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of the line item. Available when <span class="literal">Amount</span> is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
+    * DESCRIPTION: The amount of the line item. Available when **Amount** is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
     */
    readonly Amount?: number;
 }
@@ -7463,30 +6901,23 @@ export interface RefundReceipt_Line_DiscountLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
     * DESCRIPTION: Discount detail type for the entire transaction. This is in contrast to a discount applied to a specific line. The company preference
-    * <strong>Sales Form Entry | Discounts</strong> must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
+    * **Sales Form Entry | Discounts** must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
     */
    DiscountLineDetail: DiscountLineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DiscountLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **DiscountLineDetail** for this type of line.
     */
    DetailType: "DiscountLineDetail";
    /**
@@ -7518,30 +6949,22 @@ export interface RefundReceipt_Line_SubTotalLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>
- If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.
- </li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Subtotal <strong>LineDetail</strong>
+    * DESCRIPTION: Subtotal **LineDetail**
     */
    SubtotalLineDetail: LineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SubtotalLineDetail** for this type of line.
     */
    DetailType: "SubTotalLineDetail";
    /**
@@ -7605,14 +7028,13 @@ export interface RefundReceipt_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -7620,7 +7042,7 @@ export interface RefundReceipt_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -7636,49 +7058,42 @@ export interface RefundReceipt {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Account from which payment money is refunded. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType</span> is <span class="literal">Other Current Asset</span> or <span class="literal">Bank</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">DepositToAccountRef.value</span> and <span class="literal">DepositToAccountRef.name</span>, respectively.
+    * DESCRIPTION: Account from which payment money is refunded. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType** is **Other Current Asset** or **Bank**. Use **Account.Id** and **Account.Name** from that object for **DepositToAccountRef.value** and **DepositToAccountRef.name**, respectively.
     */
    DepositToAccountRef: ReferenceType;
    /**
     * META: * Required
     *
     * DESCRIPTION: Individual line items of a transaction. 
-    * Valid <span class="literal">Line</span> types include:
- <span class="literal">SalesItemLine</span>,
- <span class="literal">GroupLine</span>,
- <span class="literal">DescriptionOnlyLine</span>,
- <span class="literal">DiscountLine</span> and 
- <span class="literal">SubTotalLine</span>(read-only)
+    * Valid **Line** types include: **SalesItemLine**, **GroupLine**, **DescriptionOnlyLine**, **DiscountLine** and  **SubTotalLine**(read-only)
     */
    Line: (RefundReceipt_Line_SalesItemLine | RefundReceipt_Line_GroupLine | RefundReceipt_Line_DescriptionOnlyLine | RefundReceipt_Line_DiscountLine | RefundReceipt_Line_SubTotalLine)[];
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company.
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company.
     */
    CurrencyRef?: CurrencyRefType;
    /**
     * META: * Conditionally required ,  ,max character: Maximum 100 chars
     *
     * DESCRIPTION: The reference number for the payment received. For example, check # for a check, envelope # for a cash donation.
-    * <li>Provide when <span class="literal">DepositToAccountRef</span> references an Account object where <span class="literal">Account.AccountType=Bank</span>.</li>
- <li>Required when <span class="literal">PrintStatus</span> is set to <span class="literal">PrintComplete</span>. </li>
- <li>If <span class="literal">PrintStatus</span> is set to <span class="literal">NeedToPrint</span>, the system sets <span class="literal">PaymentRefNum</span> to <span class="literal">To Print</span>.</li>
+    * Provide when **DepositToAccountRef** references an Account object where **Account.AccountType=Bank**.,
+    * Required when **PrintStatus** is set to **PrintComplete**.,
+    * If **PrintStatus** is set to **NeedToPrint**, the system sets **PaymentRefNum** to **To Print**.,
     */
    PaymentRefNum?: string;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Identifies the e-mail address where the invoice is sent. If
-    * <span class="literal">EmailStatus=NeedToSend</span>,
- <span class="literal">BillEmail</span>is a required input.
+    * DESCRIPTION: Identifies the e-mail address where the invoice is sent. If **EmailStatus=NeedToSend**, **BillEmail** is a required input.
     */
    BillEmail?: EmailAddress;
    /**
@@ -7688,63 +7103,52 @@ export interface RefundReceipt {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerTxn</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerTxn** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
     * DESCRIPTION: Printing status of the invoice.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToPrint</span>,
- <span class="literal">PrintComplete
- </span>.
+    * Valid values: **NotSet**, **NeedToPrint**, **PrintComplete**.
     */
    PrintStatus?: string;
    /**
     * META: Optional ,max character: max 21 characters
     *
-    * DESCRIPTION: Information about a check payment for the transaction. Used when PaymentType is <span class="literal">Check</span>.
+    * DESCRIPTION: Information about a check payment for the transaction. Used when PaymentType is **Check**.
     */
    CheckPayment?: RefundReceipt_CheckPayment;
    /**
     * META: Optional
     *
-    * DESCRIPTION: The originating source of the credit card transaction. Used in eCommerce apps where credit card transactions are processed by a merchant account. When set to <span class="literal">IntuitPayment</span>, this transaction is inserted into a list of pending deposits to be automatically matched and reconciled with the merchant's account when the transactions made via QuickBooks Payments settle. Currently, the only supported value is <span class="literal">IntuitPayment</span>.
+    * DESCRIPTION: The originating source of the credit card transaction. Used in eCommerce apps where credit card transactions are processed by a merchant account. When set to **IntuitPayment**, this transaction is inserted into a list of pending deposits to be automatically matched and reconciled with the merchant's account when the transactions made via QuickBooks Payments settle. Currently, the only supported value is **IntuitPayment**.
     */
    TxnSource?: string;
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -7756,11 +7160,13 @@ export interface RefundReceipt {
    /**
     * META: Optional ,max character: Maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:CustomTxnNumber</span> as follows:
-    * <li>If <span class="literal">Preferences:CustomTxnNumber</span> is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:CustomTxnNumber</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- Recommended best practice: check the setting of <span class="literal">Preferences:CustomTxnNumber</span> before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI. <br><em>Note:</em> DocNumber is an optional field for all locales except France. For France locale if <span class="literal">Preferences:CustomTxnNumber</span> is enabled it will <b>not</b> be automatically generated and is a required field. <br>Sort order is ASC by default.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:CustomTxnNumber** as follows:
+    * If **Preferences:CustomTxnNumber** is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:CustomTxnNumber** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * Recommended best practice: check the setting of **Preferences:CustomTxnNumber** before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI.
+    * Note: DocNumber is an optional field for all locales except France. For France locale if **Preferences:CustomTxnNumber** is enabled it will **not** be automatically generated and is a required field.
+    * Sort order is ASC by default.
     */
    DocNumber?: string;
    /**
@@ -7778,32 +7184,32 @@ export interface RefundReceipt {
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
     * META: Optional ,max character: Max 21 characters
     *
-    * DESCRIPTION: Information about a credit card payment for the transaction. Used when PaymentType is <span class="literal">CreditCard</span>. Inject with data only if the payment was transacted through Intuit Payments API.
+    * DESCRIPTION: Information about a credit card payment for the transaction. Used when PaymentType is **CreditCard**. Inject with data only if the payment was transacted through Intuit Payments API.
     */
    CreditCardPayment?: CreditCardPayment;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This data type provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use <span class="literal">PaymentMethod.Id</span> and <span class="literal">PaymentMethod.Name</span> from that object for <span class="literal">PaymentMethodRef.value</span> and <span class="literal">PaymentMethodRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use **PaymentMethod.Id** and **PaymentMethod.Name** from that object for **PaymentMethodRef.value** and **PaymentMethodRef.name**, respectively.
     */
    PaymentMethodRef?: ReferenceType;
    /**
@@ -7811,43 +7217,43 @@ export interface RefundReceipt {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Identifies the address where the goods must be shipped. If
-    * <span class="literal">ShipAddr</span>is not specified, and a default
- <span class="literal">Customer:ShippingAddr</span> is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks. <br> For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br>If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods must be shipped. If **ShipAddr** is not specified, and a default **Customer:ShippingAddr** is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks.
+    *  For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    * If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * <br>Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
     * META: Optional ,max character: Max 21 characters
     *
-    * DESCRIPTION: Valid values are <span class="literal">Cash</span>, <span class="literal">Check</span>, <span class="literal">CreditCard</span>, or <span class="literal">Other</span>.
+    * DESCRIPTION: Valid values are **Cash**, **Check**, **CreditCard**, or **Other**.
     */
    PaymentType?: "Cash" | "Check" | "CreditCard" | "Other";
    /**
     * META: Optional
     *
-    * DESCRIPTION: Bill-to address of the Invoice. If
-    * <span class="literal">BillAddr</span>is not specified, and a default
- <span class="literal">Customer:BillingAddr</span> is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks. <br>For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br>If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Bill-to address of the Invoice. If **BillAddr** is not specified, and a default **Customer:BillingAddr** is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks.
+    * For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    * If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    BillAddr?: PhysicalAddress;
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: If false or null, calculate the sales tax first, and then apply the discount. If true, subtract the discount first and then calculate the sales tax. <span style="color:#800080;">Default Value:</span> false 
-    *  <span style="color:#800080;">Constraints:</span> US versions of QuickBooks only.
+    * DESCRIPTION: If false or null, calculate the sales tax first, and then apply the discount. If true, subtract the discount first and then calculate the sales tax. Default Value: false 
+    *  Constraints: US versions of QuickBooks only.
     */
    ApplyTaxAfterDiscount?: boolean;
    /**
@@ -7855,13 +7261,13 @@ export interface RefundReceipt {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Convenience field containing the amount in <span class="literal">Balance</span> expressed in terms of the home currency. Calculated by QuickBooks business logic. Available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter. Applicable if multicurrency is enabled for the company
+    * DESCRIPTION: Convenience field containing the amount in **Balance** expressed in terms of the home currency. Calculated by QuickBooks business logic. Available when endpoint is evoked with the **minorversion=3** query parameter. Applicable if multicurrency is enabled for the company
     */
    readonly HomeBalance?: number;
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">RefundReceipt</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **RefundReceipt** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
@@ -7875,11 +7281,10 @@ export interface RefundReceipt {
    /**
     * META: read only ,minorVersion: 21 ,system defined
     *
-    * DESCRIPTION: Reference to the <span class="literal">TaxExepmtion</span> ID associated with this object. Available for companies that have <a href="https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax" title="Automatic Sales Tax">automated sales tax</a> enabled.
-    * <li><span class="literal">TaxExemptionRef.Name</span>: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state.</li>
- <li><span class="literal">TaxExemptionRef.value</span>: The system-generated Id of the exemption type.</li>
- 
-  For internal use only.
+    * DESCRIPTION: Reference to the **TaxExepmtion** ID associated with this object. Available for companies that have {@link https://developer.intuit.com/hub/blog/2017/12/11/using-quickbooks-online-api-automated-sales-tax | automated sales tax} enabled.
+    * **TaxExemptionRef.Name**: The Tax Exemption Id for the customer to which this object is associated. This Id is typically issued by the state., **TaxExemptionRef.value**: The system-generated Id of the exemption type.,
+    * 
+    *  For internal use only.
     */
    readonly TaxExemptionRef?: ReferenceType;
    /**
@@ -7887,8 +7292,7 @@ export interface RefundReceipt {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of
-    * <span class="literal">TotalAmt</span>. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
+    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of **TotalAmt**. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
     */
    readonly Balance?: number;
    /**
@@ -7897,7 +7301,7 @@ export interface RefundReceipt {
     * ADDON: Decimal
     *
     * DESCRIPTION: Total amount of the transaction in the home currency. Includes the total of all the charges, allowances and taxes. Calculated by QuickBooks business logic.
-    * Value is valid only when <span class="literal">CurrencyRef</span> is specified. Applicable if multicurrency is enabled for the company.
+    * Value is valid only when **CurrencyRef** is specified. Applicable if multicurrency is enabled for the company.
     */
    readonly HomeTotalAmt?: number;
    /**
@@ -7911,20 +7315,16 @@ export interface SalesReceipt_Line_SalesItemLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -7937,7 +7337,7 @@ export interface SalesReceipt_Line_SalesItemLine {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -7961,20 +7361,16 @@ export interface SalesReceipt_Line_GroupLineDetail_Line {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SalesItemLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SalesItemLineDetail** for this type of line.
     */
    DetailType: "SalesItemLineDetail";
    /**
@@ -7987,7 +7383,7 @@ export interface SalesReceipt_Line_GroupLineDetail_Line {
     * ADDON: Decimal
     *
     * DESCRIPTION: The amount of the line item.
-    *  For Invoice objects in global locales: when updating <span class="literal">Amount</span>, remove the <span class="literal">TxnTaxDetail</span> element in the object before submitting it in the update request payload.
+    *  For Invoice objects in global locales: when updating **Amount**, remove the **TxnTaxDetail** element in the object before submitting it in the update request payload.
     */
    Amount: number;
    /**
@@ -8011,14 +7407,10 @@ export interface SalesReceipt_Line_GroupLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -8028,8 +7420,7 @@ export interface SalesReceipt_Line_GroupLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">GroupLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **GroupLineDetail** for this type of line.
     */
    DetailType: "GroupLineDetail";
    /**
@@ -8053,21 +7444,16 @@ export interface SalesReceipt_Line_DescriptionOnlyLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the transaction, the request is considered an update operation for the description line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the transaction then the request is considered a create operation for the description line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DescriptionOnly</span>for this type of line.
+    * DESCRIPTION: Set to **DescriptionOnly** for this type of line.
     */
    DetailType: "DescriptionOnly";
    /**
@@ -8078,17 +7464,9 @@ export interface SalesReceipt_Line_DescriptionOnlyLine {
     * META: Optional ,max character: max 4000 chars
     *
     * DESCRIPTION: A string representing one of the following:
-    * <li>
- Free form text description of the line item that appears in the printed record.
- </li>
- <li>
- A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.
- </li><li>
- In create requests, set to <span class="literal">Subtotal:</span> (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.
- </li>
- <li>
- In read requests, lines with <span class="literal">Subtotal: nn.nn</span> returned in this field denote subtotal lines in the object.
- </li>
+    * Free form text description of the line item that appears in the printed record.,
+    * A subtotal line inline with other lines on the sales form and holds the sum of amounts on all lines above it. This is distinct from the overall transaction subtotal represented with a SubTotal detail line.,In create requests, set to **Subtotal:** (case sensitive) to create the subtotal line; the amount is generated by QuickBooks Online business logic.,
+    * In read requests, lines with **Subtotal: nn.nn** returned in this field denote subtotal lines in the object.,
     */
    Description?: string;
    /**
@@ -8104,7 +7482,7 @@ export interface SalesReceipt_Line_DescriptionOnlyLine {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of the line item. Available when <span class="literal">Amount</span> is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
+    * DESCRIPTION: The amount of the line item. Available when **Amount** is set via the QuickBooks UI. Returned only for Description Only line items that have a non-empty amount associated with them.
     */
    readonly Amount?: number;
 }
@@ -8114,30 +7492,23 @@ export interface SalesReceipt_Line_DiscountLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation. Not supported for BillPayment, Estimate, Invoice, or Payment objects.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
     * DESCRIPTION: Discount detail type for the entire transaction. This is in contrast to a discount applied to a specific line. The company preference
-    * <strong>Sales Form Entry | Discounts</strong> must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
+    * **Sales Form Entry | Discounts** must be enabled for this type of line to be available. Must be enabled for this type of line to be available.
     */
    DiscountLineDetail: DiscountLineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">DiscountLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **DiscountLineDetail** for this type of line.
     */
    DetailType: "DiscountLineDetail";
    /**
@@ -8169,30 +7540,22 @@ export interface SalesReceipt_Line_SubTotalLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>
- If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.
- </li>
- <li>
- If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.
- </li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Subtotal <strong>LineDetail</strong>
+    * DESCRIPTION: Subtotal **LineDetail**
     */
    SubtotalLineDetail: LineDetail;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to <span class="literal">SubtotalLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **SubtotalLineDetail** for this type of line.
     */
    DetailType: "SubTotalLineDetail";
    /**
@@ -8235,9 +7598,7 @@ export interface SalesReceipt_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -8246,14 +7607,13 @@ export interface SalesReceipt_TxnTaxDetail_TaxLine_Line {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">TaxLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **TaxLineDetail** for this type of line.
     */
    DetailType: "TaxLineDetail";
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>TaxLineDetail</strong>
+    * DESCRIPTION: **TaxLineDetail**
     */
    TaxLineDetail: TaxLineDetail;
    /**
@@ -8261,7 +7621,7 @@ export interface SalesReceipt_TxnTaxDetail_TaxLine_Line {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with <span class="literal">PostingType</span> set to <span class="literal">Credit.</span>
+    * DESCRIPTION: The amount of tax for this tax line.  This value is negative for JournalEntry objects with **PostingType** set to **Credit.**
     */
    Amount?: number;
 }
@@ -8278,37 +7638,32 @@ export interface SalesReceipt {
     * META: * Required
     *
     * DESCRIPTION: Individual line items of a transaction. 
-    * Valid <span class="literal">Line</span> types include:
- <span class="literal">SalesItemLine</span>,
- <span class="literal">GroupLine</span>,
- <span class="literal">DescriptionOnlyLine</span>,
- <span class="literal">DiscountLine</span> and 
- <span class="literal">SubTotalLine</span> (read-only)
+    * Valid **Line** types include: **SalesItemLine**, **GroupLine**, **DescriptionOnlyLine**, **DiscountLine** and  **SubTotalLine** (read-only)
     */
    Line: (SalesReceipt_Line_SalesItemLine | SalesReceipt_Line_GroupLine | SalesReceipt_Line_DescriptionOnlyLine | SalesReceipt_Line_DiscountLine | SalesReceipt_Line_SubTotalLine)[];
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively.
     */
    CustomerRef: ReferenceType;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * <br>Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company
     */
    CurrencyRef?: CurrencyRefType;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Identifies the e-mail address where the invoice is sent. Required if <span class="literal">EmailStatus=NeedToSend</span>
+    * DESCRIPTION: Identifies the e-mail address where the invoice is sent. Required if **EmailStatus=NeedToSend**
     */
    BillEmail?: EmailAddress;
    /**
@@ -8318,19 +7673,21 @@ export interface SalesReceipt {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional ,minorVersion: 35
     *
-    * DESCRIPTION: Identifies the address where the goods are shipped from. For transactions without shipping, it represents the address where the sale took place.<br> For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods are shipped from. For transactions without shipping, it represents the address where the sale took place.
+    *  For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipFromAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check <span class="literal">Preferences.SalesFormsPrefs.CustomField</span> and <span class="literal">Preferences.VendorAndPurchasesPrefs.POCustomField</span> for custom fields currenly configured. <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields" title="Custom Fields">Click here</a> to learn about managing custom fields.
+    * DESCRIPTION: One of, up to three custom fields for the transaction. Available for custom fields so configured for the company. Check **Preferences.SalesFormsPrefs.CustomField** and **Preferences.VendorAndPurchasesPrefs.POCustomField** for custom fields currenly configured. {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/create-custom-fields | Click here} to learn about managing custom fields.
     */
    CustomField?: CustomField[];
    /**
@@ -8350,18 +7707,14 @@ export interface SalesReceipt {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerTxn</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with the transaction. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerTxn** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
     * META: Optional
     *
     * DESCRIPTION: Printing status of the invoice.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToPrint</span>,
- <span class="literal">PrintComplete
- </span>.
+    * Valid values: **NotSet**, **NeedToPrint**, **PrintComplete**.
     */
    PrintStatus?: string;
    /**
@@ -8379,59 +7732,43 @@ export interface SalesReceipt {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Zero or more related transactions to this sales receipt object. The following linked relationships are supported:<ul><li>
-    * Links to <span class="literal">Estimate</span> and <span class="literal">TimeActivity</span> objects can be established directly to this sales receipt object with UI or with the API. Create, Read, Update, and Query operations are avaialble at the API level for these types of links.
- </li>
- <li>Only one link can be made to an <span class="literal">Estimate</span>. </li><li>
- Links to expenses incurred on behalf of the customer are returned in the response with <span class="literal">LinkedTxn.TxnType</span> set to <span class="literal">ReimburseCharge</span>, <span class="literal">ChargeCredit</span> or <span class="literal">StatementCharge</span> corresponding to billable customer expenses of type <span class="literal">Cash</span>, <span class="literal">Delayed Credit</span>, and <span class="literal">Delayed Charge</span>, respectively. Links to these types of transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.
- </li>
- <li>
- Links to payments applied to an sales receipt object are returned in the response with <span class="literal">LinkedTxn.TxnType</span> set to <span class="literal">Payment</span>. Links to Payment transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.
- </li>
- <li>Links the sales receipt to refundReceipt objects that are applied to the sales receipt. Returned in the response if 
- <span class="literal">linkedTxnTxnType</span> is a refundReceipt. Note that linking sales receipts to refund receipts can only be done via the customer-facing QuickBooks UI. This is only available as read-only via our API
- </li>
- </ul>
- Use <span class="literal">LinkedTxn.TxnId</span> as the ID in a separate read request for the specific resource to retrieve details of the linked object.
+    * DESCRIPTION: Zero or more related transactions to this sales receipt object. The following linked relationships are supported: Links to **Estimate** and **TimeActivity** objects can be established directly to this sales receipt object with UI or with the API. Create, Read, Update, and Query operations are avaialble at the API level for these types of links.,
+    * Only one link can be made to an **Estimate**.,Links to expenses incurred on behalf of the customer are returned in the response with **LinkedTxn.TxnType** set to **ReimburseCharge**, **ChargeCredit** or **StatementCharge** corresponding to billable customer expenses of type **Cash**, **Delayed Credit**, and **Delayed Charge**, respectively. Links to these types of transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.,
+    * Links to payments applied to an sales receipt object are returned in the response with **LinkedTxn.TxnType** set to **Payment**. Links to Payment transactions are established within the QuickBooks UI, only, and are available as read-only at the API level.,
+    * Links the sales receipt to refundReceipt objects that are applied to the sales receipt. Returned in the response if  **linkedTxnTxnType** is a refundReceipt. Note that linking sales receipts to refund receipts can only be done via the customer-facing QuickBooks UI. This is only available as read-only via our API,
+    * Use **LinkedTxn.TxnId** as the ID in a separate read request for the specific resource to retrieve details of the linked object.
     */
    LinkedTxn?: SalesReceipt_LinkedTxn[];
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
     * META: Optional ,
     *
     * DESCRIPTION: If false or null, calculate the sales tax first, and then apply the discount. If true, subtract the discount first and then calculate the sales tax.
-    * <span style="color:#800080;">Default Value:</span> false
- <span style="color:#800080;">Constraints:</span> US versions of QuickBooks only.
+    * Default Value: false
+    * Constraints: US versions of QuickBooks only.
     */
    ApplyTaxAfterDiscount?: boolean;
    /**
     * META: Optional ,max character: Maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:CustomTxnNumber</span> as follows:
-    * <li>If <span class="literal">Preferences:CustomTxnNumber</span> is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:CustomTxnNumber</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- If <span class="literal">Preferences:CustomTxnNumber</span> is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber.  <br><em>Note:</em> DocNumber is an optional field for all locales except France. For France locale if <span class="literal">Preferences:CustomTxnNumber</span> is enabled it will <b>not</b> be automatically generated and is a required field.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:CustomTxnNumber** as follows:
+    * If **Preferences:CustomTxnNumber** is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:CustomTxnNumber** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * If **Preferences:CustomTxnNumber** is false then do not send a value as it can lead to unwanted duplicates. If a DocNumber value is sent for an Update operation, then it just updates that particular invoice and does not alter the internal system DocNumber.  Note: DocNumber is an optional field for all locales except France. For France locale if **Preferences:CustomTxnNumber** is enabled it will **not** be automatically generated and is a required field.
     */
    DocNumber?: string;
    /**
@@ -8443,8 +7780,8 @@ export interface SalesReceipt {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Account to which payment money is deposited. Query the Account name list resource to determine the appropriate Account object for this reference, where <span class="literal">Account.AccountType</span> is <span class="literal">Other Current Asset</span> or <span class="literal">Bank</span>. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">DepositToAccountRef.value</span> and <span class="literal">DepositToAccountRef.name</span>, respectively.
-    * <br>If you do not specify this account, payment is applied to the Undeposited Funds account.
+    * DESCRIPTION: Account to which payment money is deposited. Query the Account name list resource to determine the appropriate Account object for this reference, where **Account.AccountType** is **Other Current Asset** or **Bank**. Use **Account.Id** and **Account.Name** from that object for **DepositToAccountRef.value** and **DepositToAccountRef.name**, respectively.
+    * If you do not specify this account, payment is applied to the Undeposited Funds account.
     */
    DepositToAccountRef?: ReferenceType;
    /**
@@ -8457,36 +7794,32 @@ export interface SalesReceipt {
     * META: Optional
     *
     * DESCRIPTION: Email status of the receipt.
-    * Valid values:
- <span class="literal">NotSet</span>,
- <span class="literal">NeedToSend</span>,
- <span class="literal">EmailSent
- </span>.
+    * Valid values: **NotSet**, **NeedToSend**, **EmailSent**.
     */
    EmailStatus?: string;
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Information about a credit card payment for the transaction. Used when PaymentType is <span class="literal">CreditCard</span>. Inject with data only if the payment was transacted through Intuit Payments API.
+    * DESCRIPTION: Information about a credit card payment for the transaction. Used when PaymentType is **CreditCard**. Inject with data only if the payment was transacted through Intuit Payments API.
     */
    CreditCardPayment?: CreditCardPayment;
    /**
     * META: Optional
     *
-    * DESCRIPTION: This element provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See <a href="https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales" title="Global Tax Model">Global tax model</a> for more information about this element.
-    * If sales tax is disabled (<span class="literal">Preferences.TaxPrefs.UsingSalesTax</span> is set to <span class="literal">false</span>) then <span class="literal">TxnTaxDetail</span> is ignored and not stored.
+    * DESCRIPTION: This element provides information for taxes charged on the transaction as a whole. It captures the details sales taxes calculated for the transaction based on the tax codes referenced by the transaction. This can be calculated by QuickBooks business logic or you may supply it when adding a transaction. See {@link https://developer.intuit.com/app/developer/qbo/docs/workflows/manage-sales-tax-for-non-us-locales | Global tax model} for more information about this element.
+    * If sales tax is disabled (**Preferences.TaxPrefs.UsingSalesTax** is set to **false**) then **TxnTaxDetail** is ignored and not stored.
     */
    TxnTaxDetail?: TxnTaxDetail;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use <span class="literal">PaymentMethod.Id</span> and <span class="literal">PaymentMethod.Name</span> from that object for <span class="literal">PaymentMethodRef.value</span> and <span class="literal">PaymentMethodRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a PaymentMethod associated with this transaction. Query the PaymentMethod name list resource to determine the appropriate PaymentMethod object for this reference. Use **PaymentMethod.Id** and **PaymentMethod.Name** from that object for **PaymentMethodRef.value** and **PaymentMethodRef.name**, respectively.
     */
    PaymentMethodRef?: ReferenceType;
    /**
@@ -8494,22 +7827,22 @@ export interface SalesReceipt {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Identifies the address where the goods must be shipped. If
-    * <span class="literal">ShipAddr</span>is not specified, and a default
- <span class="literal">Customer:ShippingAddr</span> is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks. <br> For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Identifies the address where the goods must be shipped. If **ShipAddr** is not specified, and a default **Customer:ShippingAddr** is specified in QuickBooks for this customer, the default ship-to address will be used by QuickBooks.
+    *  For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    ShipAddr?: PhysicalAddress;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * <br>Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
@@ -8521,9 +7854,9 @@ export interface SalesReceipt {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Bill-to address of the Invoice. If
-    * <span class="literal">BillAddr</span>is not specified, and a default
- <span class="literal">Customer:BillingAddr</span> is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks. <br> For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country. <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: Bill-to address of the Invoice. If **BillAddr** is not specified, and a default **Customer:BillingAddr** is specified in QuickBooks for this customer, the default bill-to address is used by QuickBooks.
+    *  For international addresses - countries should be passed as 3 ISO alpha-3 characters or the full name of the country.
+    *  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    BillAddr?: PhysicalAddress;
    /**
@@ -8537,7 +7870,7 @@ export interface SalesReceipt {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Convenience field containing the amount in <span class="literal">Balance</span> expressed in terms of the home currency. Calculated by QuickBooks business logic. Value is valid only when <span class="literal">CurrencyRef</span> is specified and available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter. Applicable if multicurrency is enabled for the company
+    * DESCRIPTION: Convenience field containing the amount in **Balance** expressed in terms of the home currency. Calculated by QuickBooks business logic. Value is valid only when **CurrencyRef** is specified and available when endpoint is evoked with the **minorversion=3** query parameter. Applicable if multicurrency is enabled for the company
     */
    readonly HomeBalance?: number;
    /**
@@ -8549,7 +7882,7 @@ export interface SalesReceipt {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">SalesReceipt</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **SalesReceipt** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
@@ -8557,9 +7890,7 @@ export interface SalesReceipt {
     *
     * ADDON: Big Decimal
     *
-    * DESCRIPTION: Indicates the total amount of the transaction. This includes the total of all the charges, allowances, and taxes. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks. If you process a linked refund transaction against a specific transaction, the 
-    * <span class="literal">totalAmt</span> value won't change. It will remain the same. However, voiding the linked refund will change the 
- <span class="literal">totalAmt</span> value to O.
+    * DESCRIPTION: Indicates the total amount of the transaction. This includes the total of all the charges, allowances, and taxes. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks. If you process a linked refund transaction against a specific transaction, the  **totalAmt** value won't change. It will remain the same. However, voiding the linked refund will change the  **totalAmt** value to O.
     */
    readonly TotalAmt?: number;
    /**
@@ -8567,8 +7898,7 @@ export interface SalesReceipt {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of
-    * <span class="literal">TotalAmt</span>. A Balance of 0 indicates the invoice is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
+    * DESCRIPTION: The balance reflecting any payments made against the transaction. Initially set to the value of **TotalAmt**. A Balance of 0 indicates the invoice is fully paid. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
     */
    readonly Balance?: number;
    /**
@@ -8577,13 +7907,13 @@ export interface SalesReceipt {
     * ADDON: Decimal
     *
     * DESCRIPTION: Total amount of the transaction in the home currency. Includes the total of all the charges, allowances and taxes. Calculated by QuickBooks business logic.
-    * Value is valid only when <span class="literal">CurrencyRef</span> is specified. Applicable if multicurrency is enabled for the company
+    * Value is valid only when **CurrencyRef** is specified. Applicable if multicurrency is enabled for the company
     */
    readonly HomeTotalAmt?: number;
    /**
     * META: system defined
     *
-    * DESCRIPTION: Denotes how <span class="literal">ShipAddr</span> is stored:&nbsp;formatted or unformatted. The value of this flag is system defined based on format of shipping address at object create time.<ul><li>If set to <span class="literal">false</span>, shipping address is returned in a formatted style using City, Country,&nbsp;CountrySubDivisionCode, Postal code.</li><li>If set to <span class="literal">true</span>, shipping address is returned in an unformatted style using Line1 through Line5 attributes.</li></ul>
+    * DESCRIPTION: Denotes how **ShipAddr** is stored:&nbsp;formatted or unformatted. The value of this flag is system defined based on format of shipping address at object create time. If set to **false**, shipping address is returned in a formatted style using City, Country,&nbsp;CountrySubDivisionCode, Postal code.,If set to **true**, shipping address is returned in an unformatted style using Line1 through Line5 attributes.,
     */
    FreeFormAddress?: boolean;
    /**
@@ -8608,7 +7938,7 @@ export interface TaxAgency {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -8646,9 +7976,7 @@ export interface TaxAgency {
    /**
     * META: read only ,minorVersion: 46
     *
-    * DESCRIPTION: Flag to identify whether the TaxAgency is system defined by Automated Sales Tax engine or user generated. Valid values include 
-    * <span class="literal">USER_DEFINED</span>, 
- <span class="literal">SYSTEM_GENERATED</span>SYSTEM_GENERATED.
+    * DESCRIPTION: Flag to identify whether the TaxAgency is system defined by Automated Sales Tax engine or user generated. Valid values include  **USER_DEFINED**,  **SYSTEM_GENERATED** SYSTEM_GENERATED.
     */
    readonly TaxAgencyConfig?: string;
 }
@@ -8659,20 +7987,15 @@ export interface TaxService_TaxRateDetails {
     *
     * ADDON: Percentage as String
     *
-    * DESCRIPTION: Required if: <span class="literal">TaxRateId</span>not present.
-    * The rate value. Must be between 0 and 100 (%). For create requests: do not include if
- <span class="literal">TaxRateId</span>has been specified.
+    * DESCRIPTION: Required if: **TaxRateId** not present.
+    * The rate value. Must be between 0 and 100 (%). For create requests: do not include if **TaxRateId** has been specified.
     */
    RateValue: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Required if: 
-    * <span class="literal">TaxRateName</span>,
- <span class="literal">RateValue</span>, and
- <span class="literal">TaxAgencyId</span>not present.
- The Id of an existing TaxRate. Query the TaxRate endpoint to determine the ID used for
- <span class="literal">TaxRateId</span>.
+    * DESCRIPTION: Required if:  **TaxRateName**, **RateValue**, and **TaxAgencyId** not present.
+    * The Id of an existing TaxRate. Query the TaxRate endpoint to determine the ID used for **TaxRateId**.
     */
    TaxRateId: string;
    /**
@@ -8680,23 +8003,19 @@ export interface TaxService_TaxRateDetails {
     *
     * ADDON: Integer as String
     *
-    * DESCRIPTION: The Id of the agency to whom tax is paid. Query the TaxAgency resource to determine the ID for the desired agency. For create requests: do not include if
-    * <span class="literal">TaxRateId</span>has been specified. Required if <span class="literal">TaxRateId</span>not present.
+    * DESCRIPTION: The Id of the agency to whom tax is paid. Query the TaxAgency resource to determine the ID for the desired agency. For create requests: do not include if **TaxRateId** has been specified. Required if **TaxRateId** not present.
     */
    TaxAgencyId?: string;
    /**
     * META: * Conditionally required ,  ,max character: Max 10 chars
     *
-    * DESCRIPTION: Required if <span class="literal">TaxRateId</span>not present. Name of a new tax rate. In Create requests: ignored if
-    * <span class="literal">TaxRateId</span>is present.
+    * DESCRIPTION: Required if **TaxRateId** not present. Name of a new tax rate. In Create requests: ignored if **TaxRateId** is present.
     */
    TaxRateName?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Specifies where this tax rate can be applied. Possible values are
-    * <span class="literal">Sales</span> or
- <span class="literal">Purchase</span>.
+    * DESCRIPTION: Specifies where this tax rate can be applied. Possible values are **Sales** or **Purchase**.
     */
    TaxApplicableOn?: "Sales" | "Purchase";
 }
@@ -8732,7 +8051,7 @@ export interface TaxCode_PurchaseTaxRateList_TaxRateDetail_TaxRateRef {
    /**
     * META: Optional
     *
-    * DESCRIPTION: An identifying name for the object being referenced by <span class="literal">value</span> and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use <span class="literal">Customer.DisplayName</span> to populate this field. Optionally returned in responses, implementation dependent.
+    * DESCRIPTION: An identifying name for the object being referenced by **value** and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use **Customer.DisplayName** to populate this field. Optionally returned in responses, implementation dependent.
     */
    name?: string;
 }
@@ -8779,7 +8098,7 @@ export interface TaxCode_SalesTaxRateList_TaxRateDetail_TaxRateRef {
    /**
     * META: Optional
     *
-    * DESCRIPTION: An identifying name for the object being referenced by <span class="literal">value</span> and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use <span class="literal">Customer.DisplayName</span> to populate this field. Optionally returned in responses, implementation dependent.
+    * DESCRIPTION: An identifying name for the object being referenced by **value** and is derived from the field that holds the common name of that object. This varies by context and specific type of object referenced. For example, references to a Customer object use **Customer.DisplayName** to populate this field. Optionally returned in responses, implementation dependent.
     */
    name?: string;
 }
@@ -8823,26 +8142,26 @@ export interface TaxCode {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: List of references to tax rates that apply for purchase transactions when this tax code represents a group of tax rates. Required when <span class="literal">TaxGroup</span> is set to <span class="literal">true</span>
+    * DESCRIPTION: List of references to tax rates that apply for purchase transactions when this tax code represents a group of tax rates. Required when **TaxGroup** is set to **true**
     */
    PurchaseTaxRateList?: TaxRateList;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: List of references to tax rates that apply for sales transactions when this tax code represents a group of tax rates. Required when <span class="literal">TaxGroup</span> is set to <span class="literal">true</span>
+    * DESCRIPTION: List of references to tax rates that apply for sales transactions when this tax code represents a group of tax rates. Required when **TaxGroup** is set to **true**
     */
    SalesTaxRateList?: TaxRateList;
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: <span class="literal">true</span>—-this object represents a group of one or more tax rates.
-    * <span class="literal">false</span>—-this object represents pseudo-tax codes TAX and NON.
+    * DESCRIPTION: **true**—-this object represents a group of one or more tax rates.
+    * **false**—-this object represents pseudo-tax codes TAX and NON.
     */
    readonly TaxGroup?: boolean;
    /**
@@ -8867,8 +8186,8 @@ export interface TaxCode {
     * META: Optional ,read only ,minorVersion: 21
     *
     * DESCRIPTION: Read-only. Denotes whether active tax codes are displayed on transactions.
-    * <span class="literal">true</span>—-This tax code is hidden on transactions.
- <span class="literal">false</span>—-This tax code is displayed on transactions.
+    * **true**—-This tax code is hidden on transactions.
+    * **false**—-This tax code is displayed on transactions.
     */
    readonly Hidden?: boolean;
    /**
@@ -8880,9 +8199,7 @@ export interface TaxCode {
    /**
     * META: read only ,minorVersion: 51
     *
-    * DESCRIPTION: Flag to identify whether the TaxCode is system defined by Automated Sales Tax engine or user generated. Valid values include 
-    * <span class="literal">USER_DEFINED</span>, 
- <span class="literal">SYSTEM_GENERATED</span>SYSTEM_GENERATED.
+    * DESCRIPTION: Flag to identify whether the TaxCode is system defined by Automated Sales Tax engine or user generated. Valid values include  **USER_DEFINED**,  **SYSTEM_GENERATED** SYSTEM_GENERATED.
     */
    readonly TaxCodeConfigType?: string;
 }
@@ -8895,59 +8212,31 @@ export interface TaxRate_EffectiveTaxRate_EffectiveTaxRateData {
     */
    RateValue?: number;
    /**
-    * DESCRIPTION: End date of this taxrate applicability:
-    * <em>
- <span class="literal">YYYY-MM-DDTHH:MM:SS
- </span>
- </em>
- UTC:
- <em></em>
- <em>YYYY-MM-DD</em>T
- <em>HH</em>
- <em>:MM:</em>
- <em>SS</em>Z
- Specific time zone:
- <em></em>
- <span class="literal">
- <em>YYYY-MM-DD</em>T</span>
- <em>
- <span class="literal">HH</span>
- </em>
- <em>
- <span class="literal">:MM:SS</span>
- </em>
- <span class="literal">+/-
- <em>HH</em>
- <em>:MM</em>
- </span>
+    * DESCRIPTION: End date of this taxrate applicability: **YYYY-MM-DDTHH:MM:SS**
+    * UTC:
+    * 
+    * YYYY-MM-DDT
+    * HH
+    * :MM:
+    * SSZ
+    * Specific time zone:
+    *  **YYYY-MM-DDT** **HH** **:MM:SS** **+/-
+    * HH
+    * :MM**
     */
    EndDate?: string;
    /**
-    * DESCRIPTION: Effective starting date for which this taxrate is applicable:
-    * <em>
- <span class="literal">YYYY-MM-DDTHH:MM:SS
- </span>
- </em>
- UTC:
- <em></em>
- <em>YYYY-MM-DD</em>T
- <em>HH</em>
- <em>:MM:</em>
- <em>SS</em>Z
- Specific time zone:
- <em></em>
- <span class="literal">
- <em>YYYY-MM-DD</em>T</span>
- <em>
- <span class="literal">HH</span>
- </em>
- <em>
- <span class="literal">:MM:SS</span>
- </em>
- <span class="literal">+/-
- <em>HH</em>
- <em>:MM</em>
- </span>
+    * DESCRIPTION: Effective starting date for which this taxrate is applicable: **YYYY-MM-DDTHH:MM:SS**
+    * UTC:
+    * 
+    * YYYY-MM-DDT
+    * HH
+    * :MM:
+    * SSZ
+    * Specific time zone:
+    *  **YYYY-MM-DDT** **HH** **:MM:SS** **+/-
+    * HH
+    * :MM**
     */
    EffectiveDate?: string;
 }
@@ -8963,7 +8252,7 @@ export interface TaxRate {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -9048,13 +8337,13 @@ export interface Term {
    /**
     * META: * Required ,max character: max 31 characters
     *
-    * DESCRIPTION: User recognizable name for the term. For example, <span class="literal">Net 30</span>.
+    * DESCRIPTION: User recognizable name for the term. For example, **Net 30**.
     */
    Name: string;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -9062,7 +8351,7 @@ export interface Term {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Discount percentage available against an amount if paid within the days specified by <span class="literal">DiscountDays</span>.
+    * DESCRIPTION: Discount percentage available against an amount if paid within the days specified by **DiscountDays**.
     */
    DiscountPercent?: number;
    /**
@@ -9070,7 +8359,7 @@ export interface Term {
     *
     * ADDON: Integer
     *
-    * DESCRIPTION: Discount applies if paid within this number of days. Used only when <span class="literal">DueDays</span> is specified.
+    * DESCRIPTION: Discount applies if paid within this number of days. Used only when **DueDays** is specified.
     */
    DiscountDays?: number;
    /**
@@ -9082,9 +8371,8 @@ export interface Term {
    /**
     * META: Optional ,system defined
     *
-    * DESCRIPTION: Type of the Sales Term. Valid values:
-    * <span class="literal">STANDARD</span>--Used if <span class="literal">DueDays</span> is not null.
- <span class="literal">DATE_DRIVEN</span>--Used if <span class="literal">DueDays</span> is null.
+    * DESCRIPTION: Type of the Sales Term. Valid values: **STANDARD**--Used if **DueDays** is not null.
+    * **DATE_DRIVEN**--Used if **DueDays** is null.
     */
    Type?: string;
    /**
@@ -9098,7 +8386,7 @@ export interface Term {
     *
     * ADDON: Integer
     *
-    * DESCRIPTION: Payment must be received by this day of the month. Used only if <span class="literal">DueDays</span> is not specified. Required if <span class="literal">DueDays</span> not present
+    * DESCRIPTION: Payment must be received by this day of the month. Used only if **DueDays** is not specified. Required if **DueDays** not present
     */
    DayOfMonthDue?: number;
    /**
@@ -9106,7 +8394,7 @@ export interface Term {
     *
     * ADDON: Positive Integer
     *
-    * DESCRIPTION: Discount applies if paid before this day of month. Required if <span class="literal">DueDays</span> not present
+    * DESCRIPTION: Discount applies if paid before this day of month. Required if **DueDays** not present
     */
    DiscountDayOfMonth?: number;
    /**
@@ -9114,7 +8402,7 @@ export interface Term {
     *
     * ADDON: Positive Integer
     *
-    * DESCRIPTION: Payment due next month if issued that many days before the <span class="literal">DayOfMonthDue</span>. Required if <span class="literal">DueDays</span> not present.
+    * DESCRIPTION: Payment due next month if issued that many days before the **DayOfMonthDue**. Required if **DueDays** not present.
     */
    DueNextMonthDays?: number;
    /**
@@ -9122,7 +8410,7 @@ export interface Term {
     *
     * ADDON: Integer
     *
-    * DESCRIPTION: Number of days from delivery of goods or services until the payment is due. Required if <span class="literal">DayOfMonthDue</span> not present
+    * DESCRIPTION: Number of days from delivery of goods or services until the payment is due. Required if **DayOfMonthDue** not present
     */
    DueDays?: number;
 }
@@ -9137,17 +8425,13 @@ export interface TimeActivity {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Enumeration of time activity types. Required in conjunction with either
-    * <span class="literal">EmployeeRef</span>or
- <span class="literal">VendorRef</span>attributes for create operations. Valid values:
- <span class="literal">Vendor</span>or
- <span class="literal">Employee</span>.
+    * DESCRIPTION: Enumeration of time activity types. Required in conjunction with either **EmployeeRef** or **VendorRef** attributes for create operations. Valid values: **Vendor** or **Employee**.
     */
    NameOf: string;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -9157,7 +8441,7 @@ export interface TimeActivity {
     *
     * DESCRIPTION: The date for the time activity. This is the posting date that affects financial statements. If the date is not supplied, the current date on the server is used.
     * Sort order is ASC by default. If you provide the StartTime and EndTime without including the timeZone offset, then you would need to pass the TxnDate for any historical or future dates. 
-  Lets say if you want to create a historical time activity then pass the TxnDate as the date and pass StartTime and EndTime as Hours without including the timeZone offset.
+    *  Lets say if you want to create a historical time activity then pass the TxnDate as the date and pass StartTime and EndTime as Hours without including the timeZone offset.
     */
    TxnDate?: string;
    /**
@@ -9167,7 +8451,7 @@ export interface TimeActivity {
     *
     * ADDON: Integer
     *
-    * DESCRIPTION: Hours and minutes of break taken between <span class="literal">StartTime</span> and <span class="literal">EndTime</span>. use when <span class="litera">StartTime</span> and <span class="literal">EndTime</span> are specified
+    * DESCRIPTION: Hours and minutes of break taken between **StartTime** and **EndTime**. use when **StartTime** and **EndTime** are specified
     */
    BreakHours?: number;
    BreakMinutes?: number;
@@ -9176,7 +8460,7 @@ export interface TimeActivity {
     *
     * ADDON: Local time zone: YYYY-MM-DDTHH:MM:SS UTC: YYYY-MM-DDT HH :MM: SSZ Specific time zone: YYYY-MM-DDT HH :MM:SS +/- HH :MM
     *
-    * DESCRIPTION: Time that work starts and ends, respectively. Required if <span class="literal">Hours</span> and <span class="literal">Minutes</span> not specified. 
+    * DESCRIPTION: Time that work starts and ends, respectively. Required if **Hours** and **Minutes** not specified. 
     *  Note: Kindly consider only the Hours without including the timeZone offset as it does not impact time activity hours calculation.
     */
    EndTime?: string;
@@ -9187,13 +8471,13 @@ export interface TimeActivity {
     *
     * ADDON: Integer
     *
-    * DESCRIPTION: Hours and minutes worked. Required if <span class="literal">StartTime</span> and <span class="literal">EndTime</span> not specified
+    * DESCRIPTION: Hours and minutes worked. Required if **StartTime** and **EndTime** not specified
     */
    Hours?: number;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Specifies the vendor whose time is being recorded. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use <span class="literal">Vendor.Id</span> and <span class="literal">Vendor.Name</span> from that object for <span class="literal">VendorRef.value</span> and <span class="literal">VendorRef.name</span>, respectively. Required if <span class="literal">NameOf</span> is set to <span class="literal">Vendor</span>
+    * DESCRIPTION: Specifies the vendor whose time is being recorded. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use **Vendor.Id** and **Vendor.Name** from that object for **VendorRef.value** and **VendorRef.name**, respectively. Required if **NameOf** is set to **Vendor**
     */
    VendorRef?: ReferenceType;
    /**
@@ -9201,19 +8485,19 @@ export interface TimeActivity {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: Hourly bill rate of the employee or vendor for this time activity. Required if <span class="literal">BillableStatus</span> is set to <span class="literal">Billable</span>
+    * DESCRIPTION: Hourly bill rate of the employee or vendor for this time activity. Required if **BillableStatus** is set to **Billable**
     */
    HourlyRate?: number;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use <span class="literal">Customer.Id</span> and <span class="literal">Customer.DisplayName</span> from that object for <span class="literal">CustomerRef.value</span> and <span class="literal">CustomerRef.name</span>, respectively. Required if <span class="literal">BillableStatus</span> is set to <span class="literal">Billable</span>
+    * DESCRIPTION: Reference to a customer or job. Query the Customer name list resource to determine the appropriate Customer object for this reference. Use **Customer.Id** and **Customer.DisplayName** from that object for **CustomerRef.value** and **CustomerRef.name**, respectively. Required if **BillableStatus** is set to **Billable**
     */
    CustomerRef?: ReferenceType;
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Specifies the employee whose time is being recorded. Query the Employee name list resource to determine the appropriate Employee object for this reference. Use <span class="literal">Employee.Id</span> and <span class="literal">Employee.DisplayName</span> from that object for <span class="literal">EmployeerRef.value</span> and <span class="literal">EmployeeRef.Name</span>, respectively. Required if <span class="literal">NameOf</span> is set to <span class="literal">Employee</span>
+    * DESCRIPTION: Specifies the employee whose time is being recorded. Query the Employee name list resource to determine the appropriate Employee object for this reference. Use **Employee.Id** and **Employee.DisplayName** from that object for **EmployeerRef.value** and **EmployeeRef.Name**, respectively. Required if **NameOf** is set to **Employee**
     */
    EmployeeRef?: ReferenceType;
    /**
@@ -9221,14 +8505,14 @@ export interface TimeActivity {
     *
     * ADDON: Local time zone: YYYY-MM-DDTHH:MM:SS UTC: YYYY-MM-DDT HH :MM: SSZ Specific time zone: YYYY-MM-DDT HH :MM:SS +/- HH :MM
     *
-    * DESCRIPTION: Time that work starts and ends, respectively. Required if <span class="literal">Hours</span> and <span class="literal">Minutes</span> not specified. 
+    * DESCRIPTION: Time that work starts and ends, respectively. Required if **Hours** and **Minutes** not specified. 
     *  Note: Kindly consider only the Hours without including the timeZone offset as it does not impact time activity hours calculation.
     */
    StartTime?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the Class associated with this object. Available if <span class="literal">Preferences.AccountingInfoPrefs.ClassTrackingPerTxn</span> is set to <span class="literal">true</span>. Query the Class name list resource to determine the appropriate Class object for this reference. Use <span class="literal">Class.Id</span> and <span class="literal">Class.Name</span> from that object for <span class="literal">ClassRef.value</span> and <span class="literal">ClassRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the Class associated with this object. Available if **Preferences.AccountingInfoPrefs.ClassTrackingPerTxn** is set to **true**. Query the Class name list resource to determine the appropriate Class object for this reference. Use **Class.Id** and **Class.Name** from that object for **ClassRef.value** and **ClassRef.name**, respectively.
     */
    ClassRef?: ReferenceType;
    /**
@@ -9246,13 +8530,9 @@ export interface TimeActivity {
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -9272,40 +8552,37 @@ export interface TimeActivity {
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to the service item associated with this object. Query the Item name list resource, where <span class="literal">Item.Type</span> is set to <span class="literal">Service</span>, to determine the appropriate Item object for this reference. Use <span class="literal">Item.Id</span> and <span class="literal">Item.Name</span> from that object for <span class="literal">ItemRef.value</span> and <span class="literal">ItemRef.name</span>, respectively. 
+    * DESCRIPTION: Reference to the service item associated with this object. Query the Item name list resource, where **Item.Type** is set to **Service**, to determine the appropriate Item object for this reference. Use **Item.Id** and **Item.Name** from that object for **ItemRef.value** and **ItemRef.name**, respectively. 
     * For France locales: The account associated with the referenced Item object is looked up in the account category list.
- <li>If this account has same location as specified in the transaction by the <span class="literal">TransactionLocationType</span> attribute and the same VAT as in the line item <span class="literal">TaxCodeRef</span> attribute, then the item account is used.</li>
- <li>If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.</li>
- <li>If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.</li>
+    * If this account has same location as specified in the transaction by the **TransactionLocationType** attribute and the same VAT as in the line item **TaxCodeRef** attribute, then the item account is used.,
+    * If there is a mismatch, then the account from the account category list that matches the transaction location and VAT is used.,
+    * If this account is not present in the account category list, then a new account is created with the new location, new VAT code, and all other attributes as in the default account.,
     */
    ItemRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 69
     *
-    * DESCRIPTION: Reference to the <span class="literal">Project</span> ID associated with this transaction. Available with Minor Version 69 and above
+    * DESCRIPTION: Reference to the **Project** ID associated with this transaction. Available with Minor Version 69 and above
     */
    ProjectRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Specifies how much the employee should be paid for doing the work specified by the Compensation Id. Query the EmployeeCompensation resource to determine the appropriate PayrollCompensation object for an employee. Use <span class="literal">EmployeeCompensation.Id</span> and <span class="literal">EmployerCompensation.Name</span> from that object for <span class="literal">PayrollItemRef.value</span> and <span class="literal">PayrollItemRef.name</span>, respectively.
+    * DESCRIPTION: Specifies how much the employee should be paid for doing the work specified by the Compensation Id. Query the EmployeeCompensation resource to determine the appropriate PayrollCompensation object for an employee. Use **EmployeeCompensation.Id** and **EmployerCompensation.Name** from that object for **PayrollItemRef.value** and **PayrollItemRef.name**, respectively.
     */
    PayrollItemRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Billable status of the time recorded. Valid values:
-    * <span class="literal">Billable</span>,
- <span class="literal">NotBillable</span>,
- <span class="literal">HasBeenBilled</span>.
- You cannot directly update the status to <span class="literal">HasBeenBilled</span>. To set the status to <span class="literal">HasBeenBilled</span>, create an Invoice object and attach this TimeActivity object as a linked transaction to that Invoice.
+    * DESCRIPTION: Billable status of the time recorded. Valid values: **Billable**, **NotBillable**, **HasBeenBilled**.
+    * You cannot directly update the status to **HasBeenBilled**. To set the status to **HasBeenBilled**, create an Invoice object and attach this TimeActivity object as a linked transaction to that Invoice.
     */
    BillableStatus?: "Billable" | "NotBillable" | "HasBeenBilled";
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of this object. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * <br>Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of this object. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
 }
@@ -9321,7 +8598,7 @@ export interface Transfer {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Identifies the asset account to which funds are transfered. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">ToAccountRef.value</span> and <span class="literal">ToAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.Classification</span> set to <span class="literal">Asset</span>.
+    * DESCRIPTION: Identifies the asset account to which funds are transfered. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **ToAccountRef.value** and **ToAccountRef.name**, respectively. The specified account must have **Account.Classification** set to **Asset**.
     */
    ToAccountRef: ReferenceType;
    /**
@@ -9335,13 +8612,13 @@ export interface Transfer {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Identifies the asset account from which funds are transfered. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">FromAccountRef.value</span> and <span class="literal">FromAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.Classification</span> set to <span class="literal">Asset</span>.
+    * DESCRIPTION: Identifies the asset account from which funds are transfered. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **FromAccountRef.value** and **FromAccountRef.name**, respectively. The specified account must have **Account.Classification** set to **Asset**.
     */
    FromAccountRef: ReferenceType;
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
@@ -9357,19 +8634,15 @@ export interface Transfer {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -9381,7 +8654,7 @@ export interface Transfer {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">Transfer</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **Transfer** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
@@ -9394,10 +8667,9 @@ export interface Vendor_OtherContactInfo_ContactInfo {
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span>The type of contact information.</span>
+    * DESCRIPTION: The type of contact information.
     * 
- <span>Valid values:</span>
- <span class="literal">TelephoneNumber</span>
+    * Valid values: **TelephoneNumber**
     */
    Type?: string;
    /**
@@ -9421,7 +8693,7 @@ export interface Vendor_CurrencyRef {
    /**
     * META: * Required
     *
-    * DESCRIPTION: A three letter string representing the ISO 4217 code for the currency. For example, <span class="literal">USD</span>, <span class="literal">AUD</span>, <span class="literal">EUR</span>, and so on.
+    * DESCRIPTION: A three letter string representing the ISO 4217 code for the currency. For example, **USD**, **AUD**, **EUR**, and so on.
     */
    value: string;
    /**
@@ -9497,50 +8769,50 @@ export interface Vendor {
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,  ,max character: Maximum of 16 chars
     *
-    * DESCRIPTION: Title of the person. This tag supports i18n, all locales. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes are required during create.
+    * DESCRIPTION: Title of the person. This tag supports i18n, all locales. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes are required during create.
     */
    Title?: string;
    /**
     * META: * Conditionally required ,  ,max character: Maximum of 100 chars
     *
-    * DESCRIPTION: Given name or first name of a person. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required for object create.
+    * DESCRIPTION: Given name or first name of a person. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required for object create.
     */
    GivenName?: string;
    /**
     * META: * Conditionally required ,  ,max character: Maximum of 100 chars
     *
-    * DESCRIPTION: Middle name of the person. The person can have zero or more middle names. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required for object create.
+    * DESCRIPTION: Middle name of the person. The person can have zero or more middle names. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required for object create.
     */
    MiddleName?: string;
    /**
     * META: * Conditionally required ,  ,max character: Maximum of 16 chars
     *
-    * DESCRIPTION: Suffix of the name. For example, <span class="literal">Jr</span>. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required for object create.
+    * DESCRIPTION: Suffix of the name. For example, **Jr**. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required for object create.
     */
    Suffix?: string;
    /**
     * META: * Conditionally required ,  ,max character: Maximum of 100 chars
     *
-    * DESCRIPTION: Family name or the last name of the person. The <span class="literal">DisplayName</span> attribute or at least one of <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, or <span class="literal">Suffix</span> attributes is required for object create.
+    * DESCRIPTION: Family name or the last name of the person. The **DisplayName** attribute or at least one of **Title**, **GivenName**, **MiddleName**, **FamilyName**, or **Suffix** attributes is required for object create.
     */
    FamilyName?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span class="literal">Primary email address.</span>
+    * DESCRIPTION: **Primary email address.**
     */
    PrimaryEmailAddr?: EmailAddress;
    /**
     * META: Optional ,max character: Maximum of 500 chars
     *
     * DESCRIPTION: The name of the vendor as displayed. Must be unique across all Vendor, Customer, and Employee objects. Cannot be removed with sparse update.
-    * If not supplied, the system generates <span class="literal">DisplayName</span> by concatenating vendor name components supplied in the request from the following list: <span class="literal">Title</span>, <span class="literal">GivenName</span>, <span class="literal">MiddleName</span>, <span class="literal">FamilyName</span>, and <span class="literal">Suffix</span>.
+    * If not supplied, the system generates **DisplayName** by concatenating vendor name components supplied in the request from the following list: **Title**, **GivenName**, **MiddleName**, **FamilyName**, and **Suffix**.
     */
    DisplayName?: string;
    /**
@@ -9552,20 +8824,20 @@ export interface Vendor {
    /**
     * META: Optional ,minorVersion: 3 ,
     *
-    * DESCRIPTION: Identifies the accounts payable account to be used for this supplier. Each supplier must have his own AP account. Applicable for France companies, only. Available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter.
-    *  Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">APAccountRef.value</span> and <span class="literal">APAccountRef.name</span>, respectively.
+    * DESCRIPTION: Identifies the accounts payable account to be used for this supplier. Each supplier must have his own AP account. Applicable for France companies, only. Available when endpoint is evoked with the **minorversion=3** query parameter.
+    *  Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **APAccountRef.value** and **APAccountRef.name**, respectively.
     */
    APAccountRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Reference to a default Term associated with this Vendor object. Query the Term name list resource to determine the appropriate Term object for this reference. Use <span class="literal">Term.Id</span> and <span class="literal">Term.Name</span> from that object for <span class="literal">TermRef.value</span> and <span class="literal">TermRef.name</span>, respectively.
+    * DESCRIPTION: Reference to a default Term associated with this Vendor object. Query the Term name list resource to determine the appropriate Term object for this reference. Use **Term.Id** and **Term.Name** from that object for **TermRef.value** and **TermRef.name**, respectively.
     */
    TermRef?: ReferenceType;
    /**
     * META: Optional ,minorVersion: 59
     *
-    * DESCRIPTION: The Source type of the transactions created by QuickBooks Commerce. Valid values include: <span class="literal">QBCommerce</span>
+    * DESCRIPTION: The Source type of the transactions created by QuickBooks Commerce. Valid values include: **QBCommerce**
     */
    Source?: string;
    /**
@@ -9595,7 +8867,7 @@ export interface Vendor {
    /**
     * META: Optional ,read only
     *
-    * DESCRIPTION: Reference to the currency in which all amounts associated with this vendor are expressed. Once set, it cannot be changed. If specified currency is not currently in the company's currency list, it is added. If not specified, currency for this vendor is the home currency of the company, as defined by <span class="literal">Preferences.CurrencyPrefs.HomeCurrency</span>. Read-only after object is created.
+    * DESCRIPTION: Reference to the currency in which all amounts associated with this vendor are expressed. Once set, it cannot be changed. If specified currency is not currently in the company's currency list, it is added. If not specified, currency for this vendor is the home currency of the company, as defined by **Preferences.CurrencyPrefs.HomeCurrency**. Read-only after object is created.
     */
    readonly CurrencyRef?: Vendor_CurrencyRef;
    /**
@@ -9607,9 +8879,8 @@ export interface Vendor {
    /**
     * META: Optional ,minorVersion: 3 ,
     *
-    * DESCRIPTION: The method in which the supplier tracks their income. Applicable for France companies, only. Available when endpoint is evoked with the <span class="literal">minorversion=3</span> query parameter.
-    * Valid values include:
- <span class="literal">Cash</span> and <span class="literal">Accrual</span>.
+    * DESCRIPTION: The method in which the supplier tracks their income. Applicable for France companies, only. Available when endpoint is evoked with the **minorversion=3** query parameter.
+    * Valid values include: **Cash** and **Accrual**.
     */
    TaxReportingBasis?: string;
    /**
@@ -9667,7 +8938,7 @@ export interface Vendor {
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span class="literal">Website address.</span>
+    * DESCRIPTION: **Website address.**
     */
    WebAddr?: WebSiteAddress;
    /**
@@ -9685,13 +8956,13 @@ export interface Vendor {
    /**
     * META: Optional ,minorVersion: 40 ,
     *
-    * DESCRIPTION: <span class="literal">Vendor Payment Bank Detail.</span>
+    * DESCRIPTION: **Vendor Payment Bank Detail.**
     */
    VendorPaymentBankDetail?: Vendor_VendorPaymentBankDetail;
    /**
     * META: Optional ,max character: Max 20 characters
     *
-    * DESCRIPTION: The tax ID of the Person or Organization. The value is masked in responses, exposing only last four characters. For example, the ID of <span class="literal">123-45-6789</span> is returned as <span class="literal">XXXXXXX6789</span>.
+    * DESCRIPTION: The tax ID of the Person or Organization. The value is masked in responses, exposing only last four characters. For example, the ID of **123-45-6789** is returned as **XXXXXXX6789**.
     */
    TaxIdentifier?: string;
    /**
@@ -9703,26 +8974,19 @@ export interface Vendor {
    /**
     * META: Optional ,max character: maximum of 15 chars ,minorVersion: 33 ,
     *
-    * DESCRIPTION: For the filing of GSTR, transactions need to be classified depending on the type of vendor from whom the purchase is made. To facilitate this, we have introduced a new field as 'GST registration type'. Possible values are listed below:
-    * <li><span class="literal">GST_REG_REG</span> GST registered- Regular. Customer who has a business which is registered under GST and has a GSTIN (doesn’t include customers registered under composition scheme, as an SEZ or as EOU's, STP's EHTP's etc.).</li>
- <li><span class="literal">GST_REG_COMP</span> GST registered-Composition. Customer who has a business which is registered under the composition scheme of GST and has a GSTIN.</li>
- <li><span class="literal">GST_UNREG</span> GST unregistered. Customer who has a business which is not registered under GST and does not have a GSTIN.</li>
- <li><span class="literal">CONSUMER</span> Consumer. Customer who is not registered under GST and is the final consumer of the service or product sold.</li>
- <li><span class="literal">OVERSEAS</span> Overseas. Customer who has a business which is located out of India.</li>
- <li><span class="literal">SEZ</span> SEZ. Customer who has a business which is registered under GST, has a GSTIN and is located in a SEZ or is a SEZ Developer.</li>
- <li><span class="literal">DEEMED</span> Deemed exports- EOU's, STP's EHTP's etc. Customer who has a business which is registered under GST and falls in the category of companies (EOU's, STP's EHTP's etc.), to which supplies are made they are termed as deemed exports.</li>
+    * DESCRIPTION: For the filing of GSTR, transactions need to be classified depending on the type of vendor from whom the purchase is made. To facilitate this, we have introduced a new field as 'GST registration type'. Possible values are listed below: **GST_REG_REG** GST registered- Regular. Customer who has a business which is registered under GST and has a GSTIN (doesn’t include customers registered under composition scheme, as an SEZ or as EOU's, STP's EHTP's etc.)., **GST_REG_COMP** GST registered-Composition. Customer who has a business which is registered under the composition scheme of GST and has a GSTIN., **GST_UNREG** GST unregistered. Customer who has a business which is not registered under GST and does not have a GSTIN., **CONSUMER** Consumer. Customer who is not registered under GST and is the final consumer of the service or product sold., **OVERSEAS** Overseas. Customer who has a business which is located out of India., **SEZ** SEZ. Customer who has a business which is registered under GST, has a GSTIN and is located in a SEZ or is a SEZ Developer., **DEEMED** Deemed exports- EOU's, STP's EHTP's etc. Customer who has a business which is registered under GST and falls in the category of companies (EOU's, STP's EHTP's etc.), to which supplies are made they are termed as deemed exports.,
     */
    GSTRegistrationType?: string;
    /**
     * META: Optional ,max character: Maximum of 100 chars
     *
-    * DESCRIPTION: Name of the person or organization as printed on a check. If not provided, this is populated from <span class="literal">DisplayName</span>. Cannot be removed with sparse update.
+    * DESCRIPTION: Name of the person or organization as printed on a check. If not provided, this is populated from **DisplayName**. Cannot be removed with sparse update.
     */
    PrintOnCheckName?: string;
    /**
     * META: Optional
     *
-    * DESCRIPTION: <span class="literal">Default billing address.</span> <br> If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created:<p></p><ul><li><span class="literal">Line1</span> and <span class="literal">Line2</span> elements are populated with the customer name and company name.</li><li>Original <span class="literal">Line1</span> through <span class="literal">Line 5</span> contents, <span class="literal">City</span>, <span class="literal">SubDivisionCode</span>, and <span class="literal">PostalCode</span> flow into <span class="literal">Line3</span> through <span class="literal">Line5</span>as a free format strings.</li></ul>
+    * DESCRIPTION: **Default billing address.**  If a physical address is updated from within the transaction object, the QuickBooks Online API flows individual address components differently into the Line elements of the transaction response then when the transaction was first created: **Line1** and **Line2** elements are populated with the customer name and company name.,Original **Line1** through **Line 5** contents, **City**, **SubDivisionCode**, and **PostalCode** flow into **Line3** through **Line5** as a free format strings.,
     */
    BillAddr?: PhysicalAddress;
    /**
@@ -9751,9 +9015,7 @@ export interface VendorCredit_Line_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -9763,14 +9025,10 @@ export interface VendorCredit_Line_ItemBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
@@ -9788,14 +9046,13 @@ export interface VendorCredit_Line_ItemBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">ItemBasedExpenseLineDetail</span> for this type of line.
+    * DESCRIPTION: Set to **ItemBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "ItemBasedExpenseLineDetail";
    /**
     * META: Optional ,minorVersion: 55
     *
-    * DESCRIPTION: Zero or more transactions linked to this object. The <span class="literal">LinkedTxn.TxnType</span> can be set to <span class="literal">ReimburseCharge</span>. The <span class="literal">LinkedTxn.TxnId</span> can be set as the ID of the transaction.
+    * DESCRIPTION: Zero or more transactions linked to this object. The **LinkedTxn.TxnType** can be set to **ReimburseCharge**. The **LinkedTxn.TxnId** can be set as the ID of the transaction.
     */
    LinkedTxn?: VendorCredit_Line_LinkedTxn[];
    /**
@@ -9819,21 +9076,16 @@ export interface VendorCredit_Line_AccountBasedExpenseLine {
     * META: * Required for update ,read only ,system defined
     *
     * DESCRIPTION: The Id of the line item. Its use in requests is as folllows:
-    * <li>If
- <span class="literal">Id</span>is greater than zero and exists for the company, the request is considered an update operation for a line item.</li>
- <li>If no
- <span class="literal">Id</span>is provided, the
- <span class="literal">Id</span>provided is less than or equal to zero, or the
- <span class="literal">Id</span>provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.</li>
- 
- Available in all objects that use lines and support the update operation.
+    * If **Id** is greater than zero and exists for the company, the request is considered an update operation for a line item.,
+    * If no **Id** is provided, the **Id** provided is less than or equal to zero, or the **Id** provided is greater than zero and does not exist for the company then the request is considered a create operation for a line item.,
+    * 
+    * Available in all objects that use lines and support the update operation.
     */
    readonly Id?: string;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Set to
-    * <span class="literal">AccountBasedExpenseLineDetail</span>for this type of line.
+    * DESCRIPTION: Set to **AccountBasedExpenseLineDetail** for this type of line.
     */
    DetailType: "AccountBasedExpenseLineDetail";
    /**
@@ -9847,7 +9099,7 @@ export interface VendorCredit_Line_AccountBasedExpenseLine {
    /**
     * META: * Required
     *
-    * DESCRIPTION: <strong>LineDetail</strong>
+    * DESCRIPTION: **LineDetail**
     */
    AccountBasedExpenseLineDetail: AccountBasedExpense;
    /**
@@ -9882,9 +9134,7 @@ export interface VendorCredit_LinkedTxn {
    /**
     * META: * Conditionally required ,
     *
-    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the
-    * <span class="literal">TxnId</span> and
- <span class="literal">TxnType</span> attributes of the linked transaction must also be populated.
+    * DESCRIPTION: Required for Deposit and Bill entities. The line number of a specific line of the linked transaction. If supplied, the **TxnId** and **TxnType** attributes of the linked transaction must also be populated.
     */
    TxnLineId?: string;
 }
@@ -9899,39 +9149,37 @@ export interface VendorCredit {
    /**
     * META: * Required
     *
-    * DESCRIPTION: Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use <span class="literal">Vendor.Id</span> and <span class="literal">Vendor.Name</span> from that object for <span class="literal">VendorRef.value</span> and <span class="literal">VendorRef.name</span>, respectively.
+    * DESCRIPTION: Reference to the vendor for this transaction. Query the Vendor name list resource to determine the appropriate Vendor object for this reference. Use **Vendor.Id** and **Vendor.Name** from that object for **VendorRef.value** and **VendorRef.name**, respectively.
     */
    VendorRef: ReferenceType;
    /**
     * META: * Required
     *
-    * DESCRIPTION: Individual line items of a transaction. Valid <span class="literal">Line</span> types include:
-    * <span class="literal">ItemBasedExpenseLine</span> and 
- <span class="literal">AccountBasedExpenseLine</span>
+    * DESCRIPTION: Individual line items of a transaction. Valid **Line** types include: **ItemBasedExpenseLine** and  **AccountBasedExpenseLine**
     */
    Line: (VendorCredit_Line_ItemBasedExpenseLine | VendorCredit_Line_AccountBasedExpenseLine)[];
    /**
     * META: * Required for update ,read only ,system defined
     *
-    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its <span class="literal">SyncToken</span> is incremented. Attempts to modify an object specifying an older <span class="literal">SyncToken</span> fails. Only the latest version of the object is maintained by QuickBooks Online.
+    * DESCRIPTION: Version number of the object. It is used to lock an object for use by one app at a time. As soon as an application modifies an object, its **SyncToken** is incremented. Attempts to modify an object specifying an older **SyncToken** fails. Only the latest version of the object is maintained by QuickBooks Online.
     */
    readonly SyncToken?: string;
    /**
     * META: * Conditionally required ,
     *
     * DESCRIPTION: Reference to the currency in which all amounts on the associated transaction are expressed. This must be defined if multicurrency is enabled for the company.
-    * Multicurrency is enabled for the company if <span class="literal">Preferences.MultiCurrencyEnabled</span> is set to <span class="literal">true</span>. Read more about multicurrency support <a href="https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies" title="Currency">here</a>. Required if multicurrency is enabled for the company
+    * Multicurrency is enabled for the company if **Preferences.MultiCurrencyEnabled** is set to **true**. Read more about multicurrency support {@link https://developer.intuit.com/app/developer/qbo/docs/develop/tutorials/manage-multiple-currencies | here}. Required if multicurrency is enabled for the company
     */
    CurrencyRef?: CurrencyRefType;
    /**
     * META: Optional ,max character: Maximum of 21 chars
     *
-    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> as follows:
-    * <li>If <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.</li>
- <li>If <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> is false, resulting DocNumber is system generated by incrementing the last number by 1.</li>
- 
- Throws an error when duplicate DocNumber is sent in the request. Recommended best practice: check the setting of <span class="literal">Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers</span> before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, <span class="literal">include=allowduplicatedocnum</span> to the URI.
- Sort order is ASC by default.
+    * DESCRIPTION: Reference number for the transaction. If not explicitly provided at create time, this field is populated based on the setting of **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** as follows:
+    * If **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** is true a custom value can be provided. If no value is supplied, the resulting DocNumber is null.,
+    * If **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** is false, resulting DocNumber is system generated by incrementing the last number by 1.,
+    * 
+    * Throws an error when duplicate DocNumber is sent in the request. Recommended best practice: check the setting of **Preferences:OtherPrefs:NameValue.Name = VendorAndPurchasesPrefs.UseCustomTxnNumbers** before setting DocNumber. If a duplicate DocNumber needs to be supplied, add the query parameter name/value pair, **include=allowduplicatedocnum** to the URI.
+    * Sort order is ASC by default.
     */
    DocNumber?: string;
    /**
@@ -9943,16 +9191,13 @@ export interface VendorCredit {
    /**
     * META: Optional ,minorVersion: 55
     *
-    * DESCRIPTION: Zero or more transactions linked to this object. The <span class="literal">LinkedTxn.TxnType</span> can be set to <span class="literal">ReimburseCharge</span>. The <span class="literal">LinkedTxn.TxnId</span> can be set as the ID of the transaction.
+    * DESCRIPTION: Zero or more transactions linked to this object. The **LinkedTxn.TxnType** can be set to **ReimburseCharge**. The **LinkedTxn.TxnId** can be set as the ID of the transaction.
     */
    LinkedTxn?: VendorCredit_LinkedTxn[];
    /**
     * META: Optional ,
     *
-    * DESCRIPTION: Method in which tax is applied. Allowed values are:
-    * <span class="literal">TaxExcluded</span>,
- <span class="literal">TaxInclusive</span>, and
- <span class="literal">NotApplicable</span>.
+    * DESCRIPTION: Method in which tax is applied. Allowed values are: **TaxExcluded**, **TaxInclusive**, and **NotApplicable**.
     */
    GlobalTaxCalculation?: "TaxExcluded" | "TaxInclusive" | "NotApplicable";
    /**
@@ -9960,21 +9205,21 @@ export interface VendorCredit {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by <span class="literal">CurrencyRef</span>. Applicable if multicurrency is enabled for the company.
+    * DESCRIPTION: The number of home currency units it takes to equal one unit of currency specified by **CurrencyRef**. Applicable if multicurrency is enabled for the company.
     */
    ExchangeRate?: number;
    /**
     * META: Optional
     *
-    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use <span class="literal">Account.Id</span> and <span class="literal">Account.Name</span> from that object for <span class="literal">APAccountRef.value</span> and <span class="literal">APAccountRef.name</span>, respectively. The specified account must have <span class="literal">Account.Classification</span> set to <span class="literal">Liability</span> and <span class="literal">Account.AccountSubType</span> set to <span class="literal">AccountsPayable</span>.
+    * DESCRIPTION: Specifies to which AP account the bill is credited. Query the Account name list resource to determine the appropriate Account object for this reference. Use **Account.Id** and **Account.Name** from that object for **APAccountRef.value** and **APAccountRef.name**, respectively. The specified account must have **Account.Classification** set to **Liability** and **Account.AccountSubType** set to **AccountsPayable**.
     * If the company has a single AP account, the account is implied. However, it is recommended that the AP Account be explicitly specified in all cases to prevent unexpected errors when relating transactions to each other.
     */
    APAccountRef?: ReferenceType;
    /**
     * META: Optional
     *
-    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if <span class="literal">Preferences.AccountingInfoPrefs.TrackDepartments</span> is set to <span class="literal">true</span>.
-    * Query the Department name list resource to determine the appropriate department object for this reference. Use <span class="literal">Department.Id</span> and <span class="literal">Department.Name</span> from that object for <span class="literal">DepartmentRef.value</span> and <span class="literal">DepartmentRef.name</span>, respectively.
+    * DESCRIPTION: A reference to a Department object specifying the location of the transaction. Available if **Preferences.AccountingInfoPrefs.TrackDepartments** is set to **true**.
+    * Query the Department name list resource to determine the appropriate department object for this reference. Use **Department.Id** and **Department.Name** from that object for **DepartmentRef.value** and **DepartmentRef.name**, respectively.
     */
    DepartmentRef?: ReferenceType;
    /**
@@ -9984,7 +9229,7 @@ export interface VendorCredit {
     *
     * DESCRIPTION: The date entered by the user when this transaction occurred.
     * For posting transactions, this is the posting date that affects the financial statements. If the date is not supplied, the current date on the server is used.
- <br>Sort order is ASC by default.
+    * Sort order is ASC by default.
     */
    TxnDate?: string;
    /**
@@ -9996,13 +9241,9 @@ export interface VendorCredit {
    /**
     * META: Optional ,minorVersion: 4 ,
     *
-    * DESCRIPTION: The account location. Valid values include:
-    * <li><span class="literal">WithinFrance</span></li>
- <li><span class="literal">FranceOverseas</span></li>
- <li><span class="literal">OutsideFranceWithEU</span></li>
- <li><span class="literal">OutsideEU</span></li>
- 
- For France locales, only.
+    * DESCRIPTION: The account location. Valid values include: **WithinFrance**, **FranceOverseas**, **OutsideFranceWithEU**, **OutsideEU**,
+    * 
+    * For France locales, only.
     */
    TransactionLocationType?: string;
    /**
@@ -10010,8 +9251,7 @@ export interface VendorCredit {
     *
     * ADDON: Decimal
     *
-    * DESCRIPTION: The current amount of the vendor credit reflecting any adjustments to the original credit amount.  Initially set to the value of
-    * <span class="literal">TotalAmt</span>. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
+    * DESCRIPTION: The current amount of the vendor credit reflecting any adjustments to the original credit amount.  Initially set to the value of **TotalAmt**. Calculated by QuickBooks business logic; any value you supply is over-written by QuickBooks.
     */
    readonly Balance?: number;
    /**
@@ -10023,7 +9263,7 @@ export interface VendorCredit {
    /**
     * META: read only ,minorVersion: 52
     *
-    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the <span class="literal">VendorCredit</span> was created from.
+    * DESCRIPTION: A reference to the Recurring Transaction. It captures what recurring transaction template the **VendorCredit** was created from.
     */
    readonly RecurDataRef?: ReferenceType;
    /**
