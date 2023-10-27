@@ -37,13 +37,6 @@ import { QuickbooksTypes } from "./qbTypes";
 
 const csrf = new Tokens();
 
-export interface WebhookEventNotification {
-  realmId: string;
-  dataChangeEvent: {
-    entities: WebhookEntity[];
-  };
-}
-
 export interface WebhookEntity {
   /** The name of the entity that changed (customer, Invoice, etc.) */
   name: EntityName;
@@ -55,6 +48,13 @@ export interface WebhookEntity {
   lastUpdated: string;
   /** The ID of the deleted or merged entity (this only applies to merge events) */
   deletedID?: string;
+}
+
+export interface WebhookEventNotification {
+  realmId: string;
+  dataChangeEvent: {
+    entities: WebhookEntity[];
+  };
 }
 
 export interface WebhookPayload {
