@@ -241,6 +241,57 @@ const customers = await qbo.findCustomers({
 });
 ```
 
+## Webhook
+
+The webhook is used to verify the webhook signature.  The webhook signature is a sha256 hash of the payload and compared with the verify webhook string you receive once you create the webhook in Quickbooks.  To see how to configure the webhook url, go here: [Quickbooks Webhook Docs](https://developer.intuit.com/app/developer/qbo/docs/develop/webhooks).
+There is a helper method for checking the signature against the payload to confirm the webhook is verfied.  There is also types to use for the payload. The webhook will be sent to periodically (seems pretty quick) with all changes on any realms your app is connected to.
+
+```typescript
+app.post("/qbwebhook", (req, res) => {
+  const webhookPayload = req.body as WebhookPayload
+  const signature = req.get('intuit-signature');
+  console.log("signature", signature, "webhookPayload", JSON.stringify(webhookPayload, null, 2))
+
+  if (!signature) {
+    console.log("no signature");
+    res.status(401).send('FORBIDDEN');
+    return;
+  }
+
+  const signatureCheck = Quickbooks.VerifyWebhookWithConfig(QBAppconfig, webhookPayload, signature);
+  // const signatureCheck = Quickbooks.VerifyWebhook(verifyString, webhookPayload, signature);
+  // const signatureCheck = qbo.VerifyWebhook(webhookPayload, signature); // instance
+  if (!signatureCheck) {
+    console.log("signatureCheck failed");
+    res.status(401).send('FORBIDDEN');
+    return
+  }
+
+  console.log("webhookPayload is verified", webhookPayload);
+  res.status(200).send('SUCCESS');
+
+  // Do stuff here with the webhookPayload
+  /*
+  {
+    "eventNotifications": [{
+      "realmId": "193514507456064",
+      "dataChangeEvent": {
+        "entities": [
+          {
+            "name": "Customer",
+            "id": "67",
+            "operation": "Create",
+            "lastUpdated": "2023-10-27T19:26:27.000Z"
+          }
+        ]
+      }
+    }]
+  }
+  */
+})
+
+```
+
 <a name="QuickBooks"></a>
 
 # QuickBooks Methods
