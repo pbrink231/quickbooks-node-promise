@@ -1,3 +1,7 @@
+## [3.1.8]
+
+- Added typescript code picture to readme
+
 ## [3.1.7]
 
 - updated package description
