@@ -1,3 +1,12 @@
+## [3.1.5]
+
+- Added operators usable to readme
+- Removed string as a type for Date
+- Added date as a type for Store expired time
+- Added Webhook signature check
+- Added Webhook signature check to server example
+- updated scraper to remove html code
+
 ## [3.1.4]
 
 - NPM version error fix with bumping version
