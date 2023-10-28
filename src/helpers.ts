@@ -1,5 +1,7 @@
-import {
+import Quickbooks, {
   AppConfig,
+  AppConfigClean,
+  AppConfigCleanBase,
   CriteriaItem,
   QueryBase,
   QueryData,
@@ -9,13 +11,71 @@ import {
   QuerySortInput,
 } from ".";
 
-export const checkConfig = (appConfig: AppConfig) => {
-  if (!appConfig.appKey) throw new Error("appKey is missing");
-  if (!appConfig.appSecret) throw new Error("appScret is missing");
-  if (!appConfig.redirectUrl) throw new Error("RedirectUrl is missing");
-  if (!appConfig.scope) throw new Error("scope is missing");
-  if (!appConfig.storeStrategy) throw new Error("storeStrategy is missing");
-};
+export const getAuthBase64 = (appConfig: AppConfigClean) => {
+  const { appKey, appSecret } = appConfig;
+  return Buffer.from(`${appKey}:${appSecret}`).toString("base64");
+}
+
+export const getConfigWithStoreMethod = (appConfig: AppConfig): AppConfigClean => {
+  const hasStoreTokenProperties = 'accessToken' in appConfig;
+  const hasStoreClassProperties = 'storeStrategy' in appConfig;
+  const hasStoreFunctionsProperties =
+    ('saveToken' in appConfig && appConfig.saveToken !== undefined) ||
+    ('getToken' in appConfig && appConfig.getToken !== undefined);
+
+  const typeCount = [hasStoreTokenProperties, hasStoreClassProperties, hasStoreFunctionsProperties].filter(Boolean).length;
+
+  if (typeCount > 1) {
+    throw new Error('Invalid AppConfig. Please check the properties and only use one store method.');
+  }
+
+  const useProduction = appConfig.useProduction === "true" || appConfig.useProduction === true ? true : false;
+  const base: AppConfigCleanBase = 
+    {
+      ...appConfig,
+      debug: appConfig.debug === "true" || appConfig.debug === true ? true : false,
+      autoRefresh: appConfig.autoRefresh === false ? false : true,
+      autoRefreshBufferSeconds: appConfig.autoRefreshBufferSeconds ? appConfig.autoRefreshBufferSeconds : Quickbooks.EXPIRATION_BUFFER_SECONDS,
+      useProduction: useProduction,
+      endpoint: useProduction
+      ? Quickbooks.V3_ENDPOINT_BASE_URL.replace("sandbox-", "")
+      : Quickbooks.V3_ENDPOINT_BASE_URL
+    }
+
+
+
+  if (hasStoreTokenProperties) {
+    return {
+      ...appConfig,
+      ...base,
+      storeMethod: 'Internal'
+    }
+  }
+  if (hasStoreClassProperties) {
+    return {
+      ...appConfig,
+      ...base,
+      storeMethod: 'Class'
+    }
+  }
+  if (hasStoreFunctionsProperties) {
+    return {
+      ...appConfig,
+      ...base,
+      storeMethod: 'Function'
+    }
+  }
+  if (!appConfig.appKey || !appConfig.appSecret) {
+    throw new Error('appKey and appSecret are required if not token given on internal storage');
+  }
+  return {
+    ...appConfig,
+    ...base,
+    storeMethod: 'Internal'
+  }
+  throw new Error('Invalid AppConfigStore. Please check the properties.');
+}
+
 
 export const getDateCheck = (dateItem: Date | number) => {
   let dateToCheck: number | null = null;

@@ -16,15 +16,37 @@ import { Invoice } from "../src/qbTypes";
 const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD, QB_WEBHOOK_VERIFIER_TOKEN } =
   process.env;
 
+const realms: { [realmId: string]: StoreTokenData } = {};
+
 // QB config
 const QBAppconfig: AppConfig = {
-  appKey: QB_APP_KEY ?? "",
-  appSecret: QB_APP_SECRET ?? "",
-  redirectUrl: QB_REDIRECT_URL ?? "",
+  appKey: QB_APP_KEY ?? undefined,
+  appSecret: QB_APP_SECRET ?? undefined,
+  redirectUrl: QB_REDIRECT_URL ?? undefined,
+  getToken(realmId, appConfig) {
+      return Promise.resolve(realms[realmId]);
+  },
+  saveToken(saveTokenData, appConfig) {
+      realms[saveTokenData.realmID] = saveTokenData;
+      return Promise.resolve(saveTokenData);
+  },
+};
+
+// QB config minimal
+const QBAppconfigMinimal: AppConfig = {
+  autoRefresh: false,
+  accessToken: '123'
+};
+
+// QB config example
+const QBAppconfigSample: AppConfig = {
+  appKey: QB_APP_KEY ?? undefined,
+  appSecret: QB_APP_SECRET ?? undefined,
+  redirectUrl: QB_REDIRECT_URL ?? undefined,
   useProduction: QB_USE_PROD /* default is false */,
   debug: NODE_ENV == "production" ? false : true /* default is false */,
-  storeStrategy: new DefaultStore(),
   webhookVerifierToken: QB_WEBHOOK_VERIFIER_TOKEN,
+  storeStrategy: new DefaultStore(),
   scope: [
     Quickbooks.scopes.Accounting,
     Quickbooks.scopes.OpenId,
@@ -46,10 +68,39 @@ app.get("/health", (req, res) => {
 
 // --- End points required to get inital token
 // QB requestToken - Used to start the process
-app.get("/quickbooks/requestToken", (req, res) => {
+app.get("/requestToken", (req, res) => {
   let authUrl = Quickbooks.authorizeUrl(QBAppconfig);
   res.redirect(authUrl);
 });
+
+// QB token callback - This endpoint must match what you put in your quickbooks app and config
+app.get("/callback", async (req, res) => {
+  let realmID = req.query.realmId;
+  let authCode = req.query.code;
+  // let state = req.query.state;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("realmID is required");
+    return;
+  }
+  if (!authCode || typeof authCode !== "string") {
+    res.status(500).send("authCode is required");
+    return;
+  }
+  try {
+    var qbo = new Quickbooks(QBAppconfig, realmID);
+    const newToken = await qbo.createToken(authCode);
+    // const newToken = await Quickbooks.createToken(
+    //   QBAppconfig,
+    //   authCode,
+    //   realmID
+    // );
+    res.send(newToken); // Should not send token out
+  } catch (err) {
+    console.log("Error getting token", err);
+    res.send(err).status(500);
+  }
+});
+
 
 app.post("/qbwebhook", (req, res) => {
   const webhookPayload = req.body as WebhookPayload
@@ -73,33 +124,7 @@ app.post("/qbwebhook", (req, res) => {
   res.status(200).send('SUCCESS');
 })
 
-// QB token callback - This endpoint must match what you put in your quickbooks app and config
-app.get("/quickbooks/callback", async (req, res) => {
-  let realmID = req.query.realmId;
-  let authCode = req.query.code;
-  // let state = req.query.state;
-  if (!realmID || typeof realmID !== "string") {
-    res.status(500).send("realmID is required");
-    return;
-  }
-  if (!authCode || typeof authCode !== "string") {
-    res.status(500).send("authCode is required");
-    return;
-  }
-  try {
-    const newToken = await Quickbooks.createToken(
-      QBAppconfig,
-      authCode,
-      realmID
-    );
-    res.send(newToken); // Should not send token out
-  } catch (err) {
-    console.log("Error getting token", err);
-    res.send(err).status(500);
-  }
-});
-
-app.get("/quickbooks/getinvoice", async (req, res) => {
+app.get("/getinvoice", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
@@ -122,7 +147,7 @@ app.get("/quickbooks/getinvoice", async (req, res) => {
   }
 });
 
-app.get("/quickbooks/findinvoices", async (req, res) => {
+app.get("/findinvoices", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
@@ -153,7 +178,7 @@ app.get("/quickbooks/findinvoices", async (req, res) => {
   }
 });
 
-app.post("/quickbooks/findinvoicesquery", async (req, res) => {
+app.post("/findinvoicesquery", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   const body = req.body;
@@ -181,7 +206,7 @@ app.post("/quickbooks/findinvoicesquery", async (req, res) => {
   }
 });
 
-app.post("/quickbooks/countinvoicesquery", async (req, res) => {
+app.post("/countinvoicesquery", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   const body = req.body;
@@ -200,7 +225,7 @@ app.post("/quickbooks/countinvoicesquery", async (req, res) => {
   }
 });
 
-app.get("/quickbooks/getInvoicePDF", async (req, res) => {
+app.get("/getInvoicePDF", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
@@ -224,7 +249,7 @@ app.get("/quickbooks/getInvoicePDF", async (req, res) => {
   }
 });
 
-app.get("/quickbooks/createInvoice", async (req, res) => {
+app.get("/createInvoice", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
@@ -261,7 +286,7 @@ app.get("/quickbooks/createInvoice", async (req, res) => {
   }
 });
 
-app.get("/quickbooks/reports", async (req, res) => {
+app.get("/reports", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
@@ -285,7 +310,7 @@ app.get("/quickbooks/reports", async (req, res) => {
   }
 });
 
-app.get("/quickbooks/bigInvoice", async (req, res) => {
+app.get("/bigInvoice", async (req, res) => {
   const realmID = req.query.realmID;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("Realm is required");

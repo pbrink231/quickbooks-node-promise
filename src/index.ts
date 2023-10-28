@@ -24,12 +24,12 @@ import _, { any } from "underscore";
 import qs from "qs";
 import jwt from "jsonwebtoken";
 import fetch, { Response } from "node-fetch";
-import util from "util";
 import Tokens from "csrf";
 import crypto from "crypto";
 import {
-  checkConfig,
   dateNotExpired,
+  getAuthBase64,
+  getConfigWithStoreMethod,
   getDateCheck,
   getQueryString,
 } from "./helpers";
@@ -66,26 +66,32 @@ export interface TokenData {
   token_type: string; // 'bearer',
   x_refresh_token_expires_in: number; // 8726400,
   refresh_token: string;
-  id_token: string;
+  id_token?: string; // (Optional) Used only for user OpenID verification
   expires_in: 3600;
+}
+
+export interface TokenExtraFields {
+  access_expire_timestamp?: number | Date;
+  refresh_expire_timestamp?: number | Date;
 }
 export interface RealmTokenData {
   realmID: number | string;
+  /** @deprecated - data is just joined with realm and no longer a seperate property */
   token: TokenData;
 }
 
-export interface StoreSaveTokenData extends RealmTokenData {
-  access_expire_timestamp: number;
-  refresh_expire_timestamp: number;
+export interface StoreTokenData extends Partial<TokenData> {
+  realmID: number | string;
+  access_token: string;
+  access_expire_timestamp?: number | Date;
+  refresh_expire_timestamp?: number | Date;
 }
 
-export interface StoreTokenData {
-  realmID?: number | string;
+export interface StoreSaveTokenData extends StoreTokenData, RealmTokenData {
+  realmID: number | string;
   access_token: string;
-  refresh_token: string;
-  access_expire_timestamp: number | Date;
-  refresh_expire_timestamp: number | Date;
-  id_token?: string; // (Optional) Used only for user OpenID verification
+  access_expire_timestamp?: number | Date;
+  refresh_expire_timestamp?: number | Date;
 }
 
 export interface StoreGetTokenData {
@@ -93,8 +99,8 @@ export interface StoreGetTokenData {
 }
 
 export interface QBStoreStrategy {
-  getQBToken(storeGetTokenData: StoreGetTokenData): Promise<StoreTokenData>;
-  storeQBToken(storeSaveTokenData: StoreSaveTokenData): Promise<StoreTokenData>;
+  getQBToken(storeGetTokenData: StoreGetTokenData, appConfig: AppConfigClean, extra: any): Promise<StoreTokenData>;
+  storeQBToken(storeSaveTokenData: StoreSaveTokenData, appConfig: AppConfigClean, extra: any): Promise<StoreTokenData>;
 }
 
 export class DefaultStore implements QBStoreStrategy {
@@ -104,59 +110,23 @@ export class DefaultStore implements QBStoreStrategy {
   }
   getQBToken(getTokenData: StoreGetTokenData) {
     const realmID = getTokenData.realmID.toString();
-    return new Promise<StoreTokenData>((resolve, reject) => {
-      if (!this.realmInfo[realmID]) {
-        reject("missing realm informaiton");
-      }
-      const token = this.realmInfo[realmID];
-      if (!token) reject("Realm token information is missing");
-      resolve(token);
-    });
-  }
-  storeQBToken({
-    realmID,
-    token,
-    access_expire_timestamp,
-    refresh_expire_timestamp,
-  }: StoreSaveTokenData) {
-    return new Promise<StoreTokenData>((resolve) => {
-      this.realmInfo[realmID] = {
-        realmID: realmID,
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
-        access_expire_timestamp: access_expire_timestamp,
-        refresh_expire_timestamp: refresh_expire_timestamp,
-      };
-      const storeToken = this.realmInfo[realmID];
-      resolve(storeToken);
-    });
-  }
-}
+    if (!this.realmInfo[realmID]) {
+      return Promise.reject("missing realm informaiton");
+    }
 
-export interface AppConfig {
-  appKey: string;
-  appSecret: string;
-  redirectUrl: string;
-  storeStrategy: QBStoreStrategy;
-  scope: string[];
-  /** null for latest version */
-  minorversion?: number | null;
-  /** Used for verifying the webook */
-  webhookVerifierToken?: string;
-  /** default is false */
-  useProduction?: string | boolean;
-  /** default is false */
-  debug?: boolean | string;
-  /** CSRF Token */
-  state?: string;
-  /** default is true, will auto refresh auth token if about to expire */
-  autoRefresh?: boolean;
-  /**
-   * number of seconds before token expires that will trigger to get a new token
-   *
-   * defualt is 60 seconds (1 minute)
-   */
-  autoRefreshBufferSeconds?: number;
+    const token = this.realmInfo[realmID];
+    if (!token) {
+      return Promise.reject("Realm token information is missing");
+    }
+
+    return Promise.resolve(token)
+  }
+  storeQBToken(storeTokenData: StoreTokenData) {
+    const realmID = storeTokenData.realmID.toString();
+    this.realmInfo[realmID] = storeTokenData;
+    return Promise.resolve(storeTokenData)
+
+  }
 }
 
 // missing Batch?
@@ -373,6 +343,82 @@ class QBResponseError extends Error {
   }
 }
 
+interface AppConfigBase {
+  /** Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints */
+  appKey?: string;
+  /** Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints */
+  appSecret?: string;
+  /** Required if using Oauth flow.  Must be the same as the url put on the quickbooks developer portal */
+  redirectUrl?: string;
+  /** Required if using Oauth flow. */
+  scope?: string[];
+  /** null for latest version */
+  minorversion?: number | null;
+  /** Used for verifying the webook */
+  webhookVerifierToken?: string;
+  /** default is false */
+  useProduction?: string | boolean;
+  /** default is false */
+  debug?: boolean | string;
+  /** CSRF Token */
+  state?: string;
+  /** default is true, will auto refresh auth token if about to expire */
+  autoRefresh?: boolean;
+  /**
+   * number of seconds before token expires that will trigger to get a new token
+   *
+   * defualt is 60 seconds (1 minute)
+   */
+  autoRefreshBufferSeconds?: number;
+}
+
+export type StoreMethod = 'Class' | 'Function' | 'Internal';
+
+interface AppConfigWithToken {
+  accessToken: string;
+  refreshToken?: string;
+}
+
+interface AppConfigStoreClass {
+  storeStrategy: QBStoreStrategy;
+}
+
+interface AppConfigStoreFunctions {
+  saveToken?: (saveTokenData: StoreTokenData, appConfig: AppConfigClean) => Promise<StoreTokenData>;
+  getToken?: (realmId: number | string, appConfig: AppConfigClean) => Promise<StoreTokenData>;
+}
+
+export type AppConfig = AppConfigBase &
+  (AppConfigWithToken | AppConfigStoreClass | AppConfigStoreFunctions);
+
+interface AppConfigCleanInternal {
+  storeMethod: 'Internal';
+  accessToken?: string;
+  refreshToken?: string;
+}
+
+interface AppConfigCleanClass {
+  storeMethod: 'Class';
+  storeStrategy: QBStoreStrategy;
+}
+
+interface AppConfigCleanFunctions {
+  storeMethod: 'Function';
+  saveToken?: (saveTokenData: StoreTokenData, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
+  getToken?: (realmId: number | string, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
+}
+
+export interface AppConfigCleanBase extends AppConfigBase {
+  useProduction: boolean;
+  debug: boolean;
+  autoRefresh: boolean;
+  autoRefreshBufferSeconds: number;
+  endpoint: string;
+}
+
+export type AppConfigClean = AppConfigCleanBase &
+  (AppConfigCleanInternal | AppConfigCleanClass | AppConfigCleanFunctions);
+
 class Quickbooks {
   static AUTHORIZATION_URL = "https://appcenter.intuit.com/connect/oauth2";
   static TOKEN_URL =
@@ -402,50 +448,41 @@ class Quickbooks {
     Intuit_name: "intuit_name",
   };
 
-  config: AppConfig;
-  appKey: string;
-  appSecret: string;
-  redirectUrl: string;
-  storeStrategy: QBStoreStrategy;
-  useProduction: boolean;
-  minorversion?: number | null;
-  debug: boolean;
+  config: AppConfigClean;
   realmID: number | string;
-  endpoint: string;
-  autoRefresh: boolean;
-  autoRefreshTimeBuffer: number;
+  storeTokenData?: StoreTokenData;
+  useProduction: boolean;
+  extra: any;
 
   /**
    * Node.js client encapsulating access to the QuickBooks V3 Rest API. An instance
    * of this class should be instantiated on behalf of each user and company accessing the api.
    */
-  constructor(appConfig: AppConfig, realmID: string | number) {
+  constructor(appConfig: AppConfig, realmID: string | number, extra?: any) {
     if (!realmID) throw new Error("realmID is required");
-    checkConfig(appConfig);
-    this.config = appConfig;
+    const checkedAppConfig = getConfigWithStoreMethod(appConfig);
 
-    this.appKey = appConfig.appKey;
-    this.appSecret = appConfig.appSecret;
-    this.redirectUrl = appConfig.redirectUrl;
-    this.storeStrategy = appConfig.storeStrategy;
-    this.useProduction =
-      appConfig.useProduction === "true" || appConfig.useProduction === true
-        ? true
-        : false;
-    this.minorversion = appConfig.minorversion;
-    this.debug =
-      appConfig.debug === "true" || appConfig.debug === true ? true : false;
-    this.autoRefresh = appConfig.autoRefresh === false ? false : true;
-    this.autoRefreshTimeBuffer = appConfig.autoRefreshBufferSeconds
-      ? appConfig.autoRefreshBufferSeconds
-      : Quickbooks.EXPIRATION_BUFFER_SECONDS;
+    if (checkedAppConfig.autoRefresh && (!checkedAppConfig.appKey || !checkedAppConfig.appSecret)) {
+      throw new Error("appKey and appSecret are required for autoRefresh");
+    }
 
+    this.config = checkedAppConfig;
+    this.extra = extra;
     this.realmID = realmID;
-    this.endpoint = this.useProduction
-      ? Quickbooks.V3_ENDPOINT_BASE_URL.replace("sandbox-", "")
-      : Quickbooks.V3_ENDPOINT_BASE_URL;
-    if ("production" !== process.env.NODE_ENV && this.debug) {
-      console.log("using enpoint for calls", this.endpoint);
+
+    if (this.config.storeMethod === 'Internal') {
+      this.storeTokenData = {
+        realmID: realmID,
+        access_token: this.config.accessToken,
+        refresh_token: this.config.refreshToken,
+      }
+    }
+
+    console.log('method', this.config.storeMethod, this.storeTokenData)
+
+
+    if ("production" !== process.env.NODE_ENV && this.config.debug) {
+      console.log("using enpoint for calls", this.config.endpoint);
     }
   }
 
@@ -453,11 +490,13 @@ class Quickbooks {
    * Redirect link to Authorization Page
    */
   static authorizeUrl = (appConfig: AppConfig) => {
-    checkConfig(appConfig);
+    if (!appConfig.appKey) throw new Error("appKey is missing");
+    if (!appConfig.redirectUrl) throw new Error("RedirectUrl is missing");
+    if (!appConfig.scope) throw new Error("scope is missing");
 
     let scopes = Array.isArray(appConfig.scope)
       ? appConfig.scope.join(" ")
-      : appConfig.scope;
+      : appConfig.scope
     let querys = {
       client_id: appConfig.appKey,
       redirect_uri: appConfig.redirectUrl, //Make sure this path matches entry in application dashboard
@@ -473,51 +512,87 @@ class Quickbooks {
   };
 
   /**
-   * Redirect link to Authorization Page
-   */
-  authorizeUrl = () => {
-    return Quickbooks.authorizeUrl(this.config);
-  };
-
-  /**
    * Save token
+   * 
+   * @deprecated - use Quickbooks instance method going forward
    */
   static saveToken = (
-    storeStrategy: QBStoreStrategy,
+    appConfig: AppConfig,
     tokenData: RealmTokenData
   ) => {
     // Get expired dates
-    let extraInfo = {
-      access_expire_timestamp: Date.now() + tokenData.token.expires_in * 1000,
-      refresh_expire_timestamp:
-        Date.now() + tokenData.token.x_refresh_token_expires_in * 1000,
-    };
-    return storeStrategy.storeQBToken(Object.assign({}, extraInfo, tokenData));
+    const realmId = tokenData.realmID.toString();
+    const qbo = new Quickbooks(appConfig, realmId);
+    return qbo.saveToken(tokenData);
   };
 
   /**
    * Save token
+   * @param tokenData - token information sent back from Quickbooks or as simple as { access_token: string },  Realm token information is depricated going forward
    */
-  saveToken = (token: TokenData) => {
-    return Quickbooks.saveToken(this.storeStrategy, {
+  saveToken = (tokenInput: TokenData | RealmTokenData) => {
+    let tokenData: TokenData | null = null;
+    if ("token" in tokenInput) {
+      console.warn('tokenInput.token is depricated and will be removed in future versions on Quickbooks saveToken method')
+      tokenData = tokenInput.token;
+    } else {
+      tokenData = tokenInput as TokenData;
+    }
+    let storeData: StoreTokenData = {
+      ...tokenData,
       realmID: this.realmID,
-      token,
-    });
+      access_expire_timestamp: Date.now() + tokenData.expires_in * 1000,
+      refresh_expire_timestamp:
+        Date.now() + tokenData.x_refresh_token_expires_in * 1000,
+    };
+    console.log('saving token', this.config.storeMethod, storeData)
+
+    if (this.config.storeMethod === 'Internal') {
+      this.storeTokenData = storeData
+      return Promise.resolve(storeData)
+    }
+    if (this.config.storeMethod === 'Function') {
+      return this.config.saveToken(storeData, this.config, this.extra);
+    }
+    if (this.config.storeMethod === 'Class') {
+      const appConfigStore = this.config;
+      return appConfigStore.storeStrategy.storeQBToken({
+        token: tokenData,
+        ...storeData,
+      }, this.config, this.extra);
+    }
   };
 
   /**
    * Creates new token for the realmID from the returned authorization code received in the callback request
+   * 
+   * @deprecated - use Quickbooks instance method going forward
    */
-  static createToken = (
+  static createToken = async (
     appConfig: AppConfig,
     authCode: string,
     realmID: string | number
   ) => {
-    checkConfig(appConfig);
+    const qbo = new Quickbooks(appConfig, realmID);
+    return qbo.createToken(authCode);
+  };
 
-    const auth = Buffer.from(
-      appConfig.appKey + ":" + appConfig.appSecret
-    ).toString("base64");
+  /**
+   * Creates new token for the realmID from the returned authorization code received in the callback request
+   * @param authCode - The code returned in your callback as a param called "code"
+   * @param realmID - DEPRICATED The company identifier in your callback as a param called "realmId"
+   * @returns new token with expiration dates from storeStrategy
+   */
+  createToken = async (authCode: string, realmID?: string | number) => {
+    if (realmID) {
+      console.warn('realmID is depricated and will be removed in future versions on Quickbooks createToken method')
+    }
+
+    if (!this.config.redirectUrl) throw new Error("RedirectUrl is missing");
+    if (!this.config.appKey) throw new Error("appKey is missing");
+    if (!this.config.appSecret) throw new Error("appScret is missing");
+
+    const auth = getAuthBase64(this.config)
 
     let fetchOptions = {
       method: "post",
@@ -529,34 +604,16 @@ class Quickbooks {
       body: qs.stringify({
         grant_type: "authorization_code",
         code: authCode, // From Callback request
-        redirect_uri: appConfig.redirectUrl, //Make sure this path matches entry in application dashboard
+        redirect_uri: this.config.redirectUrl, //Make sure this path matches entry in application dashboard
       }),
     };
 
-    return fetch(Quickbooks.TOKEN_URL, fetchOptions)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new QBFetchError(response.statusText, response);
-        }
-      })
-      .then((newToken: TokenData) => {
-        return Quickbooks.saveToken(appConfig.storeStrategy, {
-          realmID,
-          token: newToken,
-        });
-      });
-  };
-
-  /**
-   * Creates new token for the realmID from the returned authorization code received in the callback request
-   * @param authCode - The code returned in your callback as a param called "code"
-   * @param realmID - The company identifier in your callback as a param called "realmId"
-   * @returns new token with expiration dates from storeStrategy
-   */
-  createToken = (authCode: string, realmID: string | number) => {
-    return Quickbooks.createToken(this.config, authCode, realmID);
+    const response = await fetch(Quickbooks.TOKEN_URL, fetchOptions)
+    if (!response.ok) {
+      throw new QBFetchError(response.statusText, response);
+    }
+    const newTokenData: TokenData = await response.json();
+    return this.saveToken(newTokenData);
   };
 
   /**
@@ -564,19 +621,19 @@ class Quickbooks {
    *
    * uses default expire time buffer
    * @param token - returned from storeStrategy
-   * @param timeoutBuffer - optional timout in seconds, default is 1 min
+   * @param timoutBufferSeconds - optional timout in seconds, default is 1 min
    * @return token has expired or not
    */
-  static isAccessTokenValid = (
+  static isAccessTokenExpired = (
     token: StoreTokenData,
-    timoutBuffer?: number
+    timoutBufferSeconds?: number
   ) => {
-    const expireBufferSeconds = timoutBuffer
-      ? timoutBuffer
+    const expireBufferSeconds = timoutBufferSeconds
+      ? timoutBufferSeconds
       : Quickbooks.EXPIRATION_BUFFER_SECONDS;
     if (!token.access_expire_timestamp) {
-      console.log("Access Token expire date MISSING, ASSUMING EXPIRED");
-      return false;
+      console.log("Access Token expire date MISSING, ASSUMING NOT EXPIRED");
+      return true;
     } else {
       return dateNotExpired(token.access_expire_timestamp, expireBufferSeconds);
     }
@@ -585,15 +642,15 @@ class Quickbooks {
   /**
    * Check if there is a valid (not expired) access token
    * @param token - returned from storeStrategy
-   * @param timeoutBuffer - optional timout in seconds, default is 1 min
+   * @param timoutBufferSeconds - optional timout in seconds, default is 1 min
    * @return token has expired or not
    */
-  static isRefreshTokenValid = (
+  static isRefreshTokenExpired = (
     token: StoreTokenData,
-    timoutBuffer?: number
+    timoutBufferSeconds?: number
   ) => {
-    const expireBufferSeconds = timoutBuffer
-      ? timoutBuffer
+    const expireBufferSeconds = timoutBufferSeconds
+      ? timoutBufferSeconds
       : Quickbooks.EXPIRATION_BUFFER_SECONDS;
     if (!token.refresh_expire_timestamp) {
       console.log("Refresh Token expire date MISSING, ASSUMING NOT EXPIRED");
@@ -608,12 +665,15 @@ class Quickbooks {
 
   /**
    * Get token
+   * 
+   * @deprecated use Quickbooks instance method going forward
    */
   static getToken = (
-    storeStrategy: QBStoreStrategy,
+    appConfig: AppConfig,
     info: StoreGetTokenData
   ) => {
-    return storeStrategy.getQBToken(info);
+    const qbo = new Quickbooks(appConfig, info.realmID);
+    return qbo.getToken();
   };
 
   /**
@@ -621,7 +681,16 @@ class Quickbooks {
    */
   getToken = () => {
     const getStoreData: StoreGetTokenData = { realmID: this.realmID };
-    return Quickbooks.getToken(this.storeStrategy, getStoreData);
+
+    if (this.config.storeMethod === 'Internal') {
+      return Promise.resolve(this.storeTokenData)
+    }
+    if (this.config.storeMethod === 'Function') {
+      return this.config.getToken(this.realmID, this.config, this.extra);
+    }
+    if (this.config.storeMethod === 'Class') {
+      return this.config.storeStrategy.getQBToken(getStoreData, this.config, this.extra);
+    }
   };
 
   /**
@@ -630,37 +699,25 @@ class Quickbooks {
    * If config has autoRefresh false then return token regardless
    */
   getTokenWithRefresh = async () => {
-    let tokenData = await this.getToken();
-    if (!tokenData.access_token) throw Error("Access Token missing");
-    if (!Quickbooks.isAccessTokenValid(tokenData) && this.autoRefresh) {
-      tokenData = await this.refreshWithAccessToken(tokenData);
+    let storeTokenData = await this.getToken();
+    if (!this.config.autoRefresh) {
+      return storeTokenData;
     }
-    return tokenData;
+    if (storeTokenData.refresh_token &&
+      !Quickbooks.isAccessTokenExpired(storeTokenData, this.config.autoRefreshBufferSeconds)) {
+      storeTokenData = await this.refreshWithAccessToken(storeTokenData.refresh_token);
+    }
+    return storeTokenData;
   };
 
-  /**
-   * Use the refresh token to obtain a new access token.
-   * @param token - has the refresh_token
-   * @returns returns fresh token with access_token and refresh_token
-   *
-   */
-  refreshWithAccessToken = (
-    storeTokenOrRefreshString: { refresh_token: string } | string
-  ) => {
+  refreshAcessTokenWithToken = async (refreshToken: string) => {
     let refreshString: string | null = null;
-    if (typeof storeTokenOrRefreshString === "string") {
-      refreshString = storeTokenOrRefreshString;
-    } else {
-      refreshString = storeTokenOrRefreshString.refresh_token;
-    }
-    if ("production" !== process.env.NODE_ENV && this.debug) {
+    if ("production" !== process.env.NODE_ENV && this.config.debug) {
       console.log("Refreshing quickbooks access_token");
     }
     if (!refreshString) throw Error("Refresh Token missing");
 
-    const auth = Buffer.from(this.appKey + ":" + this.appSecret).toString(
-      "base64"
-    );
+    const auth = getAuthBase64(this.config)
 
     let fetchOptions = {
       method: "post",
@@ -675,68 +732,81 @@ class Quickbooks {
       }),
     };
 
-    return fetch(Quickbooks.TOKEN_URL, fetchOptions)
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new QBFetchError(response.statusText, response);
-        }
-      })
-      .then((newToken: TokenData) => {
-        return Quickbooks.saveToken(this.storeStrategy, {
-          realmID: this.realmID,
-          token: newToken,
-        });
-      });
+    const response = await fetch(Quickbooks.TOKEN_URL, fetchOptions)
+    if (!response.ok) {
+      throw new QBFetchError(response.statusText, response);
+    }
+    const newTokenData: TokenData = await response.json();
+    return this.saveToken(newTokenData);
+
+  }
+
+  /**
+   * Use the refresh token to obtain a new access token.
+   * @param token - has the refresh_token
+   * @returns returns fresh token with access_token and refresh_token
+   *
+   * @deprecated use new method refreshAccessTokenWithToken going forward
+   */
+  refreshWithAccessToken = async (
+    storeTokenOrRefreshString: { refresh_token: string } | string
+  ) => {
+    let refreshString: string | null = null;
+    if (typeof storeTokenOrRefreshString === "string") {
+      refreshString = storeTokenOrRefreshString;
+    } else {
+      refreshString = storeTokenOrRefreshString.refresh_token;
+    }
+    return this.refreshAcessTokenWithToken(refreshString);
   };
 
   /**
    * Use the refresh token to obtain a new access token.
-   * @returns returns fresh token with access_token and refresh_token
-   *
    */
-  refreshAccessToken = () => {
-    return this.getToken().then((token) => {
-      return this.refreshWithAccessToken(token);
-    });
+  refreshAccessToken = async () => {
+    const tokenData = await this.getToken()
+    if (!tokenData.refresh_token) throw Error("Refresh Token missing");
+    return this.refreshAcessTokenWithToken(tokenData.refresh_token);
   };
+
+  revokeAccessOtherToken = async (token: string) => {
+    if (!this.config.appKey) throw new Error("appKey is missing");
+    if (!this.config.appSecret) throw new Error("appScret is missing");
+
+    if (!token) throw Error("Token missing to revoke");
+
+    const auth = getAuthBase64(this.config)
+
+    let fetchOptions = {
+      method: "post",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: "Basic " + auth,
+      },
+      body: qs.stringify({
+        token: token,
+      }),
+    };
+
+    const response = await fetch(Quickbooks.REVOKE_URL, fetchOptions)
+    if (response.ok) {
+      return response;
+    }
+    throw new QBFetchError(response.statusText, response);
+  }
 
   /**
    * Use either refresh token or access token to revoke access (OAuth2).
    *
    * @param useRefresh - boolean - Indicates which token to use: true to use the refresh token, false to use the access token.
    */
-  revokeAccess = (useRefresh?: boolean) => {
-    return this.getToken().then((token) => {
-      const revokeToken = useRefresh ? token.refresh_token : token.access_token;
+  revokeAccess = async (useRefresh?: boolean) => {
+    const token = await this.getToken()
 
-      if (!revokeToken) throw Error("Token missing");
+    const revokeToken = useRefresh ? token.refresh_token : token.access_token;
 
-      const auth = Buffer.from(this.appKey + ":" + this.appSecret).toString(
-        "base64"
-      );
-
-      let fetchOptions = {
-        method: "post",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/x-www-form-urlencoded",
-          Authorization: "Basic " + auth,
-        },
-        body: qs.stringify({
-          token: revokeToken,
-        }),
-      };
-
-      return fetch(Quickbooks.REVOKE_URL, fetchOptions).then((response) => {
-        if (response.ok) {
-          return response;
-        } else {
-          throw new QBFetchError(response.statusText, response);
-        }
-      });
-    });
+    return this.revokeAccessOtherToken(revokeToken);
   };
 
   /**
@@ -747,9 +817,7 @@ class Quickbooks {
     const token = await this.getToken();
     if (!token.id_token) throw Error("ID Token missing");
 
-    const auth = Buffer.from(this.appKey + ":" + this.appSecret).toString(
-      "base64"
-    );
+    if (!this.config.appKey) throw new Error("appKey is missing");
 
     // Decode ID Token
     const token_parts = token.id_token.split(".");
@@ -762,7 +830,7 @@ class Quickbooks {
     if (id_token_payload.iss != Quickbooks.IDTOKEN_ISSUER_URL) return false;
 
     // Step 2 : check if the aud field in idToken is same as application's key
-    if (id_token_payload.aud != this.appKey) return false;
+    if (id_token_payload.aud != this.config.appKey) return false;
 
     // Step 3 : ensure the timestamp has not elapsed
     if (id_token_payload.exp < Date.now() / 1000) return false;
@@ -814,19 +882,17 @@ class Quickbooks {
     signature: string,
   ) => {
     var webhookPayloadJson = JSON.stringify(payload);
-    // if signature is empty return 401
+    if (!verifierToken) {
+      return false
+    }
     if (!signature) {
       return false
     }
-
-    // if payload is empty, don't do anything
+    // empty payload is fine
     if (!payload) {
       return true;
     }
 
-    /**
-     * Validates the payload with the intuit-signature hash
-     */
     var hash = crypto.createHmac('sha256', verifierToken).update(webhookPayloadJson).digest('base64');
     if (signature !== hash) {
       return false
@@ -852,11 +918,10 @@ class Quickbooks {
 
   /*** API HELPER FUNCTIONS  ***/
   request = async <T>(verb: string, options: RequestOptions, entity: any) => {
-    let token = await this.getToken();
+    let token = await this.getTokenWithRefresh();
+    console.log('token', token)
+    if (!token) throw Error("Token missing");
     if (!token.access_token) throw Error("Access Token missing");
-    if (!Quickbooks.isAccessTokenValid(token)) {
-      token = await this.refreshWithAccessToken(token);
-    }
 
     const opts: {
       qs: Record<string, any>;
@@ -872,7 +937,7 @@ class Quickbooks {
     if (options.fullurl) {
       url = options.url;
     } else {
-      url = this.endpoint + this.realmID + options.url;
+      url = this.config.endpoint + this.realmID + options.url;
     }
 
     if (entity && entity.allowDuplicateDocNum) {
@@ -883,8 +948,8 @@ class Quickbooks {
       opts.qs.requestid = uuidv4();
     }
 
-    if (this.minorversion) {
-      opts.qs.minorversion = this.minorversion;
+    if (this.config.minorversion) {
+      opts.qs.minorversion = this.config.minorversion;
     }
     opts.headers["Authorization"] = "Bearer " + token.access_token;
     opts.headers["accept"] = "application/json";
@@ -901,7 +966,7 @@ class Quickbooks {
     };
     url = `${url}?${qs.stringify(opts.qs)}`;
 
-    if ("production" !== process.env.NODE_ENV && this.debug) {
+    if ("production" !== process.env.NODE_ENV && this.config.debug) {
       console.log("invoking endpoint:", url);
       console.log("fetch options", fetchOptions);
     }
@@ -925,11 +990,9 @@ class Quickbooks {
   };
 
   requestPdf = async (entityName: EntityName, id: string | number) => {
-    let token = await this.getToken();
+    let token = await this.getTokenWithRefresh();
+    if (!token) throw Error("Token missing");
     if (!token.access_token) throw Error("Access Token missing");
-    if (!Quickbooks.isAccessTokenValid(token)) {
-      token = await this.refreshWithAccessToken(token);
-    }
 
     const fetchOptions = {
       method: "get",
@@ -941,14 +1004,14 @@ class Quickbooks {
     const qsv: {
       minorversion?: number;
     } = {};
-    if (this.minorversion) {
-      qsv.minorversion = this.minorversion;
+    if (this.config.minorversion) {
+      qsv.minorversion = this.config.minorversion;
     }
 
-    const sendUrl = `${this.endpoint}${this.realmID
+    const sendUrl = `${this.config.endpoint}${this.realmID
       }/${entityName.toLowerCase()}/${id}/pdf?${qs.stringify(qsv)}`;
 
-    if ("production" !== process.env.NODE_ENV && this.debug) {
+    if ("production" !== process.env.NODE_ENV && this.config.debug) {
       console.log("invoking endpoint:", sendUrl);
       console.log("fetch options", fetchOptions);
     }
@@ -1052,7 +1115,7 @@ class Quickbooks {
     queryInput?: QueryInput | null
   ) => {
     const [query, queryData] = getQueryString(entityName, queryInput ?? null);
-    if ("production" !== process.env.NODE_ENV && this.debug) {
+    if ("production" !== process.env.NODE_ENV && this.config.debug) {
       console.log("using query:", query);
       console.log("query data:", queryData);
     }

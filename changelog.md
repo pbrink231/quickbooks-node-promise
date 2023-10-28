@@ -1,3 +1,9 @@
+## [3.2.0]
+
+- Added new store methods
+- all simple usage with access token
+- new store functiones instead of using a class
+
 ## [3.1.8]
 
 - Added typescript code picture to readme
