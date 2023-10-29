@@ -109,13 +109,11 @@ Quickbooks.scopes = {
 
 ## Create Store
 
-The store is how the token information is saved and retrieved.  There are 3 different ways to use for a store.  Internal, Class and Functions.  
+The store is how the token information is saved and retrieved.  There are 3 different ways to create a store.  Internal, Class and Functions.  Only one method can be used at a time.  If more than one method is being used, an error will be thrown.
 
 ### The Internal Method
 
-The internal method is used if you are managing the OAuth process and token information yourself.  
-
-If you supply only the `appKey`, `appSecret`, `redirectUrl` and `scope` only in the config and no other store properties, then this is the method that will be used. You will have to use createToken to save token information in this case. You can also supply the accessToken directly in the config and it will be used, but you must set autoRefesh to false if you do not also supply the `appKey` and `appSecret`.
+The internal method is used if you are managing the OAuth process and token information yourself.  by setting `autoRefresh` to `false` and supplying the `accessToken` you can use all of the instance methods to access quickbooks.  You will not be able to create, refresh or revoke tokens.  If you add the optional `refreshToken` you can use the `refreshAccessToken` method to refresh the token and can set `autoRefresh` to `true` to auto refresh the token.  With this method, `appKey` and `appSecret` are not required as long as an accessToken is supplied.  If you do not supply an accessToken, you must supply the `appKey`, `appSecret`, `refreshUrl` and `scope` to create, refresh or revoke tokens.
 
 ```javascript
 // QB config
@@ -249,16 +247,19 @@ There are two main methods for querying. find[EntityName] and count[EntityName].
 
 ### Special query properties
 
-- limit: The limit is the number of resources to return. The default is 100. The max is 1000.  special default of 1000 if fetchAll is true
-- offset: The offset is the number of resources to skip. The default is 0. converts to startposition in the query string by adding 1
-- asc: The asc is the field name to sort by in ascending order. The default is undefined. Cannot be used with desc or sort
-- desc: The desc is the field name to sort by in descending order. The default is undefined. Cannot be used with asc or sort
-- sort: The sort is an array of field names to sort by. The default is undefined. Cannot be used with asc or desc
-- fetchAll: The fetchAll is a boolean to fetch all the resources. The default is false. If true, will make multiple requests to get all the resources.  Limit and offset will be used so setting a smaller limit will make more requests to fetch all the resources.  If limit is not set, a default limit of 1000 will be used.
-- items: The items is an array of query items. The default is undefined. The items array is an array of query items.  The query item is an object with the following properties:
-  - field: The field is the field name to filter by. Required
-  - value: The value is the value to filter by. Required
-  - operator: The operator is the operator to use for the filter. The default is "=". Available values are "=", "IN", "<", ">", "<=", ">=", "LIKE"
+| Property | Type | Description |
+| --- | --- | --- |
+| limit | number | The limit is the number of resources to return. The default and max is 1000.  special default of 1000 if fetchAll is true |
+| offset | number | The offset is the number of resources to skip. The default is 0. converts to startposition in the query string by adding 1 |
+| asc | string | The asc is the field name to sort by in ascending order. The default is undefined. Cannot be used with desc or sort |
+| desc | string | The desc is the field name to sort by in descending order. The default is undefined. Cannot be used with asc or sort |
+| sort | string, string[], string[][] | The sort is an array of field names to sort by. The default is undefined. Cannot be used with asc or desc.  More information on sorting below |
+| fetchAll | boolean | The fetchAll is a boolean to fetch all the resources. The default is false. If true, will make multiple requests to get all the resources.  Limit and offset will be used so setting a smaller limit will make more requests to fetch all the resources.  If limit is not set, a default limit of 1000 will be used. |
+| items | QueryItem[] | The items is an array of query items. The default is undefined. The items array is an array of query items.  The query item is an object with the following properties: |
+| items.field | string | The field is the field name to filter by. Required |
+| items.value | string | The value is the value to filter by. Required |
+| items.operator | "=", "IN", "<", ">", "<=", ">=", "LIKE" | The operator is the operator to use for the filter. The default is "=". Available values are |
+| [key] | string | Any other property will be converted to a query string.  The key will be the field name and the value will be the value to filter by.  The operator will be "=" |
 
 ### Find
 

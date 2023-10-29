@@ -1,3 +1,8 @@
+## [3.3.3]
+
+- Converted Query information to table in readme
+- Updated internal method description in readme
+
 ## [3.3.2]
 
 - Removed console logs used for testing
