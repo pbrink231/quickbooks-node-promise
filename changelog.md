@@ -1,3 +1,9 @@
+## [3.3.2]
+
+- Removed console logs used for testing
+- updated readme with AppConfig properties as a table
+- added console log links in server example
+
 ## [3.3.1]
 
 - Updated Readme with direct link to server example
