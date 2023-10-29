@@ -74,18 +74,19 @@ const QBAppconfig = {
   },
 };
 ```
-
-- appKey: string; Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints
-- appSecret: string; Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints
-- redirectUrl: string; Required if using Oauth flow.  Must be the same as the url put on the quickbooks developer portal
-- scope: string[]; Required if using Oauth flow.  Available scopes detailed below
-  minorversion: number | null; null for latest version
-- webhookVerifierToken: string; Used for verifying the webhook
-- useProduction?: string | boolean; default is false, determines weather to use production or sandbox url
-  debug?: boolean | string; default is false, if true will console log all requests and responses.
-- state?: string; CSRF Token, used to prevent CSRF attacks.  If not supplied, one will be generated for you.  Can optionally be supplied in the authorizeUrl method.  Used to compare with the state returned from the OAuth process.
-- autoRefresh?: boolean; default is true, will auto refresh auth token if about to expire and the appKey and appSecret are supplied
-- autoRefreshBufferSeconds?: number; defualt is 60 seconds, number of seconds before token expires that will trigger to get a new token
+| Property | Type | Description |
+| --- | --- | --- |
+| appKey | string | Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints |
+| appSecret | string | Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints |
+| redirectUrl | string | Required if using Oauth flow.  Must be the same as the url put on the quickbooks developer portal |
+| scope | string[] | Required if using Oauth flow.  Available scopes detailed below |
+| minorversion | number | null for latest version |
+| webhookVerifierToken | string | Used for verifying the webhook |
+| useProduction | string | default is false, determines weather to use production or sandbox url |
+| debug | boolean | default is false, if true will console log all requests and responses. |
+| state | string | CSRF Token, used to prevent CSRF attacks.  If not supplied, one will be generated for you.  Can optionally be supplied in the authorizeUrl method.  Used to compare with the state returned from the OAuth process. |
+| autoRefresh | boolean | default is true, will auto refresh auth token if about to expire and the appKey and appSecret are supplied |
+| autoRefreshBufferSeconds | number | defualt is 60 seconds, number of seconds before token expires that will trigger to get a new token |
 
 
 ### Scopes available:
