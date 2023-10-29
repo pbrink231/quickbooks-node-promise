@@ -81,7 +81,7 @@ export interface RealmTokenData {
 }
 
 export interface StoreTokenData extends Partial<TokenData> {
-  realmID: number | string;
+  realmID?: number | string;
   access_token: string;
   access_expire_timestamp?: number | Date;
   refresh_expire_timestamp?: number | Date;
@@ -375,7 +375,7 @@ interface AppConfigBase {
 export type StoreMethod = 'Class' | 'Function' | 'Internal';
 
 interface AppConfigWithToken {
-  accessToken: string;
+  accessToken?: string;
   refreshToken?: string;
 }
 
@@ -384,28 +384,23 @@ interface AppConfigStoreClass {
 }
 
 interface AppConfigStoreFunctions {
-  saveToken?: (saveTokenData: StoreTokenData, appConfig: AppConfigClean) => Promise<StoreTokenData>;
-  getToken?: (realmId: number | string, appConfig: AppConfigClean) => Promise<StoreTokenData>;
+  saveToken: (realmId: number | string, saveTokenData: StoreTokenData, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
+  getToken: (realmId: number | string, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
 }
 
 export type AppConfig = AppConfigBase &
   (AppConfigWithToken | AppConfigStoreClass | AppConfigStoreFunctions);
 
-interface AppConfigCleanInternal {
+interface AppConfigCleanInternal extends AppConfigWithToken {
   storeMethod: 'Internal';
-  accessToken?: string;
-  refreshToken?: string;
 }
 
-interface AppConfigCleanClass {
+interface AppConfigCleanClass extends AppConfigStoreClass {
   storeMethod: 'Class';
-  storeStrategy: QBStoreStrategy;
 }
 
-interface AppConfigCleanFunctions {
+interface AppConfigCleanFunctions extends AppConfigStoreFunctions {
   storeMethod: 'Function';
-  saveToken?: (saveTokenData: StoreTokenData, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
-  getToken?: (realmId: number | string, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
 }
 
 export interface AppConfigCleanBase extends AppConfigBase {
@@ -552,11 +547,12 @@ class Quickbooks {
       return Promise.resolve(storeData)
     }
     if (this.config.storeMethod === 'Function') {
-      return this.config.saveToken(storeData, this.config, this.extra);
+      return this.config.saveToken(this.realmID, storeData, this.config, this.extra);
     }
     if (this.config.storeMethod === 'Class') {
       const appConfigStore = this.config;
       return appConfigStore.storeStrategy.storeQBToken({
+        realmID: this.realmID,
         token: tokenData,
         ...storeData,
       }, this.config, this.extra);
