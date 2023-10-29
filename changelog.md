@@ -1,3 +1,7 @@
+## [3.3.4]
+
+- Updated readme overview paragraph
+
 ## [3.3.3]
 
 - Converted Query information to table in readme
