@@ -1,3 +1,9 @@
+## [3.3.0]
+
+- Changed store function save method to have realmId as first parameter
+- Updated readme with new store methods
+- Updated readme with OAuth process
+
 ## [3.2.0]
 
 - Added new store methods
