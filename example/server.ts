@@ -24,21 +24,21 @@ const QBAppconfig: AppConfig = {
   appSecret: QB_APP_SECRET ?? undefined,
   redirectUrl: QB_REDIRECT_URL ?? undefined,
   getToken(realmId, appConfig) {
-      return Promise.resolve(realms[realmId]);
+    return Promise.resolve(realms[realmId]);
   },
   saveToken(realmId, saveTokenData, appConfig, extra) {
-      realms[realmId] = saveTokenData;
-      return Promise.resolve(saveTokenData);
+    realms[realmId] = saveTokenData;
+    return Promise.resolve(saveTokenData);
   },
 };
 
-// QB config minimal
+// QB config minimal, not used in this example
 const QBAppconfigMinimal: AppConfig = {
   autoRefresh: false,
   accessToken: '123'
 };
 
-// QB config example
+// QB config example, not used in this example
 const QBAppconfigSample: AppConfig = {
   appKey: QB_APP_KEY ?? undefined,
   appSecret: QB_APP_SECRET ?? undefined,
@@ -77,23 +77,17 @@ app.get("/requestToken", (req, res) => {
 app.get("/callback", async (req, res) => {
   let realmID = req.query.realmId;
   let authCode = req.query.code;
-  // let state = req.query.state;
-  if (!realmID || typeof realmID !== "string") {
-    res.status(500).send("realmID is required");
+  let state = req.query.state;
+  if (!realmID || typeof realmID !== "string" || !authCode || typeof authCode !== "string") {
+    res.sendStatus(404)
     return;
   }
-  if (!authCode || typeof authCode !== "string") {
-    res.status(500).send("authCode is required");
-    return;
-  }
+  // can check the state here if supplied to make sure it matches
+
+  // create token
   try {
     var qbo = new Quickbooks(QBAppconfig, realmID);
     const newToken = await qbo.createToken(authCode);
-    // const newToken = await Quickbooks.createToken(
-    //   QBAppconfig,
-    //   authCode,
-    //   realmID
-    // );
     res.send(newToken); // Should not send token out
   } catch (err) {
     console.log("Error getting token", err);
