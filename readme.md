@@ -32,35 +32,66 @@ npm i quickbooks-node-promise
 
 ## Config setup
 
-A config setup is needed for each app. Some values have defaults but should supply your own
+A config setup is needed for each instance. The minimum needed is supplying the instance with a store method properties which are explained later.  The `appKey` and `appSecret` are required to create, refresh, and revoke tokens.  To create a token the `redirectUrl` and `scope` fields are also required.  Use the `authorizeUrl` method to generate an OAuth link.  More on the OAuth process later.  The `useProduction` field is false by default so for production enviroment you must supply `true` for this.
+
+A very basic example using internal store.  This example will not autoRefresh the token and cannot be used to manage token information such as revoking a token.
 
 ```javascript
+const appConfig: AppConfig = {
+  autoRefresh: false,
+  accessToken: '123'
+};
+
+const qbo = new Quickbooks(appConfig, realmID);
+
+const customers = await qbo.findCustomers({ Id: "1234" });
+```
+
+A more advanced example using a Class Store.  When the accessToken expires, it will automatically refresh the accessToken.  You should change getToken and saveToken to use a database or some other storage method.
+
+```javascript
+const realms = {};
+
 // QB config
-QBAppconfig = {
+const QBAppconfig = {
   appKey: QB_APP_KEY,
   appSecret: QB_APP_SECRET,
   redirectUrl: QB_REDIRECT_URL,
-  storeStrategy:
-    new DefaultStore() /* should create your own, can use the exported DefaultStore */,
-  minorversion: 69 /* OPTIONAL, default is the latest */,
-  useProduction: QB_USE_PROD /* OPTIONAL, default is false */,
-  debug:
-    NODE_ENV == "production" ? false : true /* OPTIONAL, default is false */,
   scope: [
-    QuickBooks.scopes.Accounting,
-    QuickBooks.scopes.OpenId,
-    QuickBooks.scopes.Profile,
-    QuickBooks.scopes.Email,
-    QuickBooks.scopes.Phone,
-    QuickBooks.scopes.Address,
+    Quickbooks.scopes.Accounting,
+    Quickbooks.scopes.OpenId,
+    Quickbooks.scopes.Profile,
+    Quickbooks.scopes.Email,
+    Quickbooks.scopes.Phone,
+    Quickbooks.scopes.Address,
   ],
+  getToken(realmId, appConfig) {
+      return Promise.resolve(realms[realmId]);
+  },
+  saveToken(realmId, tokenData, appConfig, extra) {
+      realms[realmId] = saveTokenData;
+      return Promise.resolve(saveTokenData);
+  },
 };
 ```
+
+- appKey: string; Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints
+- appSecret: string; Required for token management such as creating, refreshing or revoking tokens.  not needed if supplying a token and just need to hit normal endpoints
+- redirectUrl: string; Required if using Oauth flow.  Must be the same as the url put on the quickbooks developer portal
+- scope: string[]; Required if using Oauth flow.  Available scopes detailed below
+  minorversion: number | null; null for latest version
+- webhookVerifierToken: string; Used for verifying the webook
+- useProduction?: string | boolean; default is false, determines weather to use production or sandbox url
+  debug?: boolean | string; default is false, if true will console log all requests and responses.
+- state?: string; CSRF Token, used to prevent CSRF attacks.  If not supplied, one will be generated for you.  Can optionally be supplied in the authorizeUrl method.  Used to compare with the state returned from the OAuth process.
+- autoRefresh?: boolean; default is true, will auto refresh auth token if about to expire and the appKey and appSecret are supplied
+- autoRefreshBufferSeconds?: number; defualt is 60 seconds, number of seconds before token expires that will trigger to get a new token
+
 
 ### Scopes available:
 
 ```javascript
-QuickBooks.scopes = {
+Quickbooks.scopes = {
   Accounting: "com.intuit.quickbooks.accounting",
   Payment: "com.intuit.quickbooks.payment",
   Payroll: "com.intuit.quickbooks.payroll",
@@ -75,56 +106,139 @@ QuickBooks.scopes = {
 };
 ```
 
-### Create Store Strategy
+## Create Store
 
-The store strategy is used to Save and Retreive token information. Both methods return a promise. The example below uses memory to store the token. Should create your own store strategy to save to a database or some other location.
+The store is how the token information is saved and retrieved.  There are 3 different ways to use for a store.  Internal, Class and Functions.  
+
+### The Internal Method
+
+The internal method is used if you are managing the OAuth process and token information yourself.  
+
+If you supply only the `appKey`, `appSecret`, `redirectUrl` and `scope` only in the config and no other store properties, then this is the method that will be used. You will have to use createToken to save token information in this case. You can also supply the accessToken directly in the config and it will be used, but you must set autoRefesh to false if you do not also supply the `appKey` and `appSecret`.
+
+```javascript
+// QB config
+const QBAppconfig = {
+  autoRefresh: false,
+  accessToken: '123',
+};
+```
+
+```javascript
+// QB config
+const QBAppconfig = {
+  appKey: QB_APP_KEY,
+  appSecret: QB_APP_SECRET,
+  redirectUrl: QB_REDIRECT_URL,
+  scope: [
+    Quickbooks.scopes.Accounting,
+  ],
+  accessToken: '123',
+  refreshToken: '123',
+};
+```
+
+### The Functions method
+
+The functions method supplies the appConfig with two functions.  `getToken` and `saveToken`.  These functions will be used to get and save the token information.  The `getToken` and `saveToken` functions both return a promise with token information. `extra` has the information supplied in the original qbo instance.
+
+```javascript
+// QB config
+const QBAppconfig = {
+  appKey: QB_APP_KEY,
+  appSecret: QB_APP_SECRET,
+  redirectUrl: QB_REDIRECT_URL,
+  scope: [
+    Quickbooks.scopes.Accounting,
+  ],
+  getToken(realmId: number | string, appConfig: AppConfig, extra: any) {
+    // should pull from database or some other storage method
+    return Promise.resolve(realms[realmId]);
+  },
+  saveToken(realmId: number | string, tokenData: StoreTokenData, appConfig: AppConfig, extra: any) {
+    // should save to database or some other storage method
+    realms[realmId] = saveTokenData;
+    return Promise.resolve(saveTokenData);
+  },
+};
+```
+
+### The Class method 
+
+This method was previously the only store method.  It was a class given to AppConfig with a getQBToken and storeQBToken.  It returns a promise with the token information. `extra` has the information supplied in the original qbo instance.
 
 ```ts
 class QBStore implements QBStoreStrategy {
-  realmInfo: { [key: string]: StoreTokenData } = {};
-  constructor() {
-    this.realmInfo = {};
-  }
   /**
    * Uses a realmID to lookup the token information.
    * Must return a promise with the token information
-   * give { realmID: number} as input
    */
-  getQBToken(getTokenData: StoreGetTokenData) {
+  getQBToken(getTokenData: StoreGetTokenData, appConfig: AppConfig, extra: any) {
     const realmID = getTokenData.realmID.toString();
-    return new Promise<StoreTokenData>((resolve, reject) => {
-      console.log("realm info", this.realmInfo[realmID]);
-      if (!this.realmInfo[realmID]) {
-        reject("missing realm informaiton");
-      }
-      const token = this.realmInfo[realmID];
-      resolve(token);
-    });
+    // should pull from database or some other storage method
+    Promise.resolve(realmInfo[realmID]);
   }
   /**
    * Used to store the new token information
    * Will be looked up using the realmID
    */
-  storeQBToken({
-    realmID,
-    token,
-    access_expire_timestamp,
-    refresh_expire_timestamp,
-  }: StoreSaveTokenData) {
-    return new Promise<StoreTokenData>((resolve) => {
-      this.realmInfo[realmID] = {
-        realmID: realmID,
-        access_token: token.access_token,
-        refresh_token: token.refresh_token,
-        access_expire_timestamp: access_expire_timestamp,
-        refresh_expire_timestamp: refresh_expire_timestamp,
-      };
-      const storeToken = this.realmInfo[realmID];
-      resolve(storeToken);
-    });
+  storeQBToken(storeData: StoreSaveTokenData, appConfig: AppConfig, extra: any) {
+    const realmID = storeData.realmID.toString();
+    // should save to database or some other storage method
+    realmInfo[realmID] = storeData
+    Promis.resolve(realmInfo[realmID])
   }
 }
+
+// QB config
+const QBAppconfig = {
+  appKey: QB_APP_KEY,
+  appSecret: QB_APP_SECRET,
+  redirectUrl: QB_REDIRECT_URL,
+  scope: [
+    Quickbooks.scopes.Accounting,
+  ],
+  storeStrategy: new QBStore(),
+};
 ```
+
+## OAuth
+
+The OAuth process is used to get the initial token information.  The OAuth process is a 3 step process.  The first step is to generate an OAuth link.  The second step is to use the authCode to create the token.  The third step is to use the token to make requests to Quickbooks.  The first step is done by using the authorizeUrl method.  The second step is done by using the createToken method.  The third step is done by using the Quickbooks class.
+
+The authorizeUrl method will return a url to redirect the user to.  The user will then login to Quickbooks and authorize your app.  Once the user authorizes your app, they will be redirected to the redirectUrl you supplied in the config.  The redirectUrl will have a query string with the authCode and realmID.  The authCode is used to create the token and the realmID is used to make requests to Quickbooks.
+
+```javascript
+// --- End points required to get inital token, Express example
+// QB requestToken - Used to start the process
+app.get("/requestToken", (req, res) => {
+  let authUrl = Quickbooks.authorizeUrl(QBAppconfig);
+  res.redirect(authUrl);
+});
+
+// QB token callback - This endpoint must match what you put in your quickbooks app and config
+app.get("/callback", async (req, res) => {
+  let realmID = req.query.realmId;
+  let authCode = req.query.code;
+  let state = req.query.state;
+  if (!realmID || typeof realmID !== "string" || !authCode || typeof authCode !== "string") {
+    res.sendStatus(404)
+    return;
+  }
+  // can check the state here if supplied to make sure it matches
+
+  // create token
+  try {
+    var qbo = new Quickbooks(QBAppconfig, realmID);
+    const newToken = await qbo.createToken(authCode);
+    res.send(newToken); // Should not send token out
+  } catch (err) {
+    console.log("Error getting token", err);
+    res.send(err).status(500);
+  }
+});
+```
+
 
 ## Query
 
