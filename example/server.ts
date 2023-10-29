@@ -95,7 +95,8 @@ app.get("/callback", async (req, res) => {
   }
 });
 
-
+// Url created inside of quickbooks dev portal
+// Also requires webhookVerifierToken on the AppConfig
 app.post("/qbwebhook", (req, res) => {
   const webhookPayload = req.body as WebhookPayload
   const signature = req.get('intuit-signature');
