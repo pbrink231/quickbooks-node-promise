@@ -1,8 +1,6 @@
 # Overview
 
-This library was created for Quickbooks OAuth2. It converted a lot of node-quickbooks into promises.
-
-Will handle the authentication and auto renew Access Tokens when they are expired.
+This library was created for Quickbooks OAuth2.  It simplifies the OAuth process and renewing of the access token when it is about to expire. This can be turned off in the AppConfig.  It also simplifies the process of making requests to Quickbooks.  It has typescript types for all the requests and responses.
 
 ## Example grabbing a customer from Quickbooks
 
@@ -15,6 +13,8 @@ console.log(`Hi my customer's name is ${customer.Name}`);
 ```
 
 ## Fully typed using documentation
+
+Typescript types were scrapped from the Quickbooks documentation. The types may not be perfect at the moment due to quickbooks documentation not being perfect.  If you find any issues, please create an issue on github.
 
 ![image](https://github.com/pbrink231/quickbooks-node-promise/assets/8224560/f69e5d97-3f33-4460-a851-036f47ff4347)
 
