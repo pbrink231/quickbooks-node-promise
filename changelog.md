@@ -1,3 +1,9 @@
+## [3.3.1]
+
+- Updated Readme with direct link to server example
+- Updated server example with comment on webhook endpoint
+- Fixed grammer in readme
+
 ## [3.3.0]
 
 - Changed store function save method to have realmId as first parameter
