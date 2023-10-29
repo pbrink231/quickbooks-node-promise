@@ -23,6 +23,14 @@ const QBAppconfig: AppConfig = {
   appKey: QB_APP_KEY ?? undefined,
   appSecret: QB_APP_SECRET ?? undefined,
   redirectUrl: QB_REDIRECT_URL ?? undefined,
+  scope: [
+    Quickbooks.scopes.Accounting,
+    Quickbooks.scopes.OpenId,
+    Quickbooks.scopes.Profile,
+    Quickbooks.scopes.Email,
+    Quickbooks.scopes.Phone,
+    Quickbooks.scopes.Address,
+  ],
   getToken(realmId, appConfig) {
     return Promise.resolve(realms[realmId]);
   },
@@ -89,6 +97,7 @@ app.get("/callback", async (req, res) => {
     var qbo = new Quickbooks(QBAppconfig, realmID);
     const newToken = await qbo.createToken(authCode);
     res.send(newToken); // Should not send token out
+    console.log(`try http://localhost:${port}/findinvoices?realmID=${realmID}`);
   } catch (err) {
     console.log("Error getting token", err);
     res.send(err).status(500);
@@ -119,6 +128,28 @@ app.post("/qbwebhook", (req, res) => {
   res.status(200).send('SUCCESS');
 })
 
+app.get("/findinvoices", async (req, res) => {
+  const realmID = req.query.realmID;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("realmID is required");
+    return;
+  }
+
+  var qbo = new Quickbooks(QBAppconfig, realmID);
+
+  const queryData: QueryDataWithProperties = {
+    limit: 10,
+  };
+
+  try {
+    const foundInvoices = await qbo.findInvoices(queryData);
+    res.send(foundInvoices.QueryResponse.Invoice);
+  } catch (err: any) {
+    console.log("could not run accounts because", err);
+    res.send(err);
+  }
+});
+
 app.get("/getinvoice", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
@@ -142,7 +173,7 @@ app.get("/getinvoice", async (req, res) => {
   }
 });
 
-app.get("/findinvoices", async (req, res) => {
+app.get("/findInvoicesTest", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
@@ -244,7 +275,7 @@ app.get("/getInvoicePDF", async (req, res) => {
   }
 });
 
-app.get("/createInvoice", async (req, res) => {
+app.post("/createInvoice", async (req, res) => {
   const realmID = req.query.realmID;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
@@ -305,7 +336,7 @@ app.get("/reports", async (req, res) => {
   }
 });
 
-app.get("/bigInvoice", async (req, res) => {
+app.post("/bigInvoice", async (req, res) => {
   const realmID = req.query.realmID;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("Realm is required");
@@ -416,4 +447,7 @@ app.get("/bigInvoice", async (req, res) => {
   }
 });
 
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`)
+  console.log(`try http://localhost:${port}/requestToken`)
+});
