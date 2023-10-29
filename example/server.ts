@@ -404,15 +404,15 @@ app.post("/bigInvoice", async (req, res) => {
     ],
     CustomerRef: {
       value: "61",
-      name: "JLSPORT",
+      name: "Test Customer",
     },
     CustomerMemo: {
       value: "Thank you for your business and have a great day!",
     },
     BillAddr: {
       Id: "98",
-      Line1: "4 Shadbush",
-      City: "Westport",
+      Line1: "42 Earth St",
+      City: "Hitchhiker",
       Country: "USA",
       CountrySubDivisionCode: "CT",
       PostalCode: "06880",
@@ -432,7 +432,7 @@ app.post("/bigInvoice", async (req, res) => {
     PrintStatus: "NotSet",
     EmailStatus: "NotSet",
     BillEmail: {
-      Address: "peterg@varpro.org",
+      Address: "somebody@gmail.come",
     },
   };
 
