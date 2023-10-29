@@ -473,9 +473,6 @@ class Quickbooks {
       }
     }
 
-    console.log('method', this.config.storeMethod, this.storeTokenData)
-
-
     if ("production" !== process.env.NODE_ENV && this.config.debug) {
       console.log("using enpoint for calls", this.config.endpoint);
     }
@@ -540,7 +537,6 @@ class Quickbooks {
       refresh_expire_timestamp:
         Date.now() + tokenData.x_refresh_token_expires_in * 1000,
     };
-    console.log('saving token', this.config.storeMethod, storeData)
 
     if (this.config.storeMethod === 'Internal') {
       this.storeTokenData = storeData
@@ -628,7 +624,6 @@ class Quickbooks {
       ? timoutBufferSeconds
       : Quickbooks.EXPIRATION_BUFFER_SECONDS;
     if (!token.access_expire_timestamp) {
-      console.log("Access Token expire date MISSING, ASSUMING NOT EXPIRED");
       return true;
     } else {
       return dateNotExpired(token.access_expire_timestamp, expireBufferSeconds);
@@ -649,7 +644,6 @@ class Quickbooks {
       ? timoutBufferSeconds
       : Quickbooks.EXPIRATION_BUFFER_SECONDS;
     if (!token.refresh_expire_timestamp) {
-      console.log("Refresh Token expire date MISSING, ASSUMING NOT EXPIRED");
       return true;
     } else {
       return dateNotExpired(
@@ -915,7 +909,6 @@ class Quickbooks {
   /*** API HELPER FUNCTIONS  ***/
   request = async <T>(verb: string, options: RequestOptions, entity: any) => {
     let token = await this.getTokenWithRefresh();
-    console.log('token', token)
     if (!token) throw Error("Token missing");
     if (!token.access_token) throw Error("Access Token missing");
 
