@@ -109,13 +109,11 @@ Quickbooks.scopes = {
 
 ## Create Store
 
-The store is how the token information is saved and retrieved.  There are 3 different ways to use for a store.  Internal, Class and Functions.  
+The store is how the token information is saved and retrieved.  There are 3 different ways to create a store.  Internal, Class and Functions.  Only one method can be used at a time.  If more than one method is being used, an error will be thrown.
 
 ### The Internal Method
 
-The internal method is used if you are managing the OAuth process and token information yourself.  
-
-If you supply only the `appKey`, `appSecret`, `redirectUrl` and `scope` only in the config and no other store properties, then this is the method that will be used. You will have to use createToken to save token information in this case. You can also supply the accessToken directly in the config and it will be used, but you must set autoRefesh to false if you do not also supply the `appKey` and `appSecret`.
+The internal method is used if you are managing the OAuth process and token information yourself.  by setting `autoRefresh` to `false` and supplying the `accessToken` you can use all of the instance methods to access quickbooks.  You will not be able to create, refresh or revoke tokens.  If you add the optional `refreshToken` you can use the `refreshAccessToken` method to refresh the token and can set `autoRefresh` to `true` to auto refresh the token.  With this method, `appKey` and `appSecret` are not required as long as an accessToken is supplied.  If you do not supply an accessToken, you must supply the `appKey`, `appSecret`, `refreshUrl` and `scope` to create, refresh or revoke tokens.
 
 ```javascript
 // QB config
