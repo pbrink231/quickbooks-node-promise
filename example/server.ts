@@ -26,8 +26,8 @@ const QBAppconfig: AppConfig = {
   getToken(realmId, appConfig) {
       return Promise.resolve(realms[realmId]);
   },
-  saveToken(saveTokenData, appConfig) {
-      realms[saveTokenData.realmID] = saveTokenData;
+  saveToken(realmId, saveTokenData, appConfig, extra) {
+      realms[realmId] = saveTokenData;
       return Promise.resolve(saveTokenData);
   },
 };
