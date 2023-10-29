@@ -22,7 +22,7 @@ console.log(`Hi my customer's name is ${customer.Name}`);
 
 **Check the example for node express setup endpoints**
 
-[Example of server on github](https://github.com/pbrink231/quickbooks-node-promise/tree/master/example)
+[Example of server on github](https://github.com/pbrink231/quickbooks-node-promise/blob/main/example/server.ts)
 
 ## Install
 
@@ -80,7 +80,7 @@ const QBAppconfig = {
 - redirectUrl: string; Required if using Oauth flow.  Must be the same as the url put on the quickbooks developer portal
 - scope: string[]; Required if using Oauth flow.  Available scopes detailed below
   minorversion: number | null; null for latest version
-- webhookVerifierToken: string; Used for verifying the webook
+- webhookVerifierToken: string; Used for verifying the webhook
 - useProduction?: string | boolean; default is false, determines weather to use production or sandbox url
   debug?: boolean | string; default is false, if true will console log all requests and responses.
 - state?: string; CSRF Token, used to prevent CSRF attacks.  If not supplied, one will be generated for you.  Can optionally be supplied in the authorizeUrl method.  Used to compare with the state returned from the OAuth process.
