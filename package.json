@@ -42,6 +42,6 @@
     "dev": "ts-node example/server.ts",
     "scrape": "ts-node quickbooks-type-scrape/index.ts",
     "prepublish": "tsc",
-    "sendnpm": "npm run prepublish && npm publish"
+    "pushnpm": "npm run prepublish && npm publish"
   }
 }
