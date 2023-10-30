@@ -1,6 +1,7 @@
 ## [unreleased]
 
 - Changed readme config setup to say function store instaed of class store for the example
+- Updated readme internal method description
 
 ## [3.3.4]
 
