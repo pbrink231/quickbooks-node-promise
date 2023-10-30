@@ -1,3 +1,7 @@
+## [unreleased]
+
+- Changed readme config setup to say function store instaed of class store for the example
+
 ## [3.3.4]
 
 - Updated readme overview paragraph

@@ -47,7 +47,7 @@ const qbo = new Quickbooks(appConfig, realmID);
 const customers = await qbo.findCustomers({ Id: "1234" });
 ```
 
-A more advanced example using a Class Store.  When the accessToken expires, it will automatically refresh the accessToken.  You should change getToken and saveToken to use a database or some other storage method.
+A more advanced example using a Function Store.  When the accessToken expires, it will automatically refresh the accessToken.  You should change getToken and saveToken to use a database or some other storage method.
 
 ```javascript
 const realms = {};
