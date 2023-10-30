@@ -701,11 +701,10 @@ class Quickbooks {
   };
 
   refreshAcessTokenWithToken = async (refreshToken: string) => {
-    let refreshString: string | null = null;
     if ("production" !== process.env.NODE_ENV && this.config.debug) {
       console.log("Refreshing quickbooks access_token");
     }
-    if (!refreshString) throw Error("Refresh Token missing");
+    if (!refreshToken) throw Error("Refresh Token missing");
 
     const auth = getAuthBase64(this.config)
 
@@ -718,7 +717,7 @@ class Quickbooks {
       },
       body: qs.stringify({
         grant_type: "refresh_token",
-        refresh_token: refreshString,
+        refresh_token: refreshToken,
       }),
     };
 

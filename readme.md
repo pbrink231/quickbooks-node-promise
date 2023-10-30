@@ -47,7 +47,7 @@ const qbo = new Quickbooks(appConfig, realmID);
 const customers = await qbo.findCustomers({ Id: "1234" });
 ```
 
-A more advanced example using a Class Store.  When the accessToken expires, it will automatically refresh the accessToken.  You should change getToken and saveToken to use a database or some other storage method.
+A more advanced example using a Function Store.  When the accessToken expires, it will automatically refresh the accessToken.  You should change getToken and saveToken to use a database or some other storage method.
 
 ```javascript
 const realms = {};
@@ -113,7 +113,9 @@ The store is how the token information is saved and retrieved.  There are 3 diff
 
 ### The Internal Method
 
-The internal method is used if you are managing the OAuth process and token information yourself.  by setting `autoRefresh` to `false` and supplying the `accessToken` you can use all of the instance methods to access quickbooks.  You will not be able to create, refresh or revoke tokens.  If you add the optional `refreshToken` you can use the `refreshAccessToken` method to refresh the token and can set `autoRefresh` to `true` to auto refresh the token.  With this method, `appKey` and `appSecret` are not required as long as an accessToken is supplied.  If you do not supply an accessToken, you must supply the `appKey`, `appSecret`, `refreshUrl` and `scope` to create, refresh or revoke tokens.
+The internal method is used if you are managing the OAuth process and token information yourself.  by setting `autoRefresh` to `false` and supplying the `accessToken` you can use all of the instance methods to access quickbooks.  You will not be able to create, refresh or revoke tokens.  If you add the optional `refreshToken` you can use the `refreshAccessToken` method to refresh the token and can set `autoRefresh` to `true` to auto refresh the token.  `autoRefresh` requires `appKey` and `appSecret`.
+
+If you do not supply an accessToken, you must supply the `appKey`, `appSecret`, `refreshUrl` and `scope` to create, refresh or revoke tokens.  If no other store properties are given, this is the method chosen.
 
 ```javascript
 // QB config
