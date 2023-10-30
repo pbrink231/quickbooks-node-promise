@@ -1,7 +1,8 @@
-## [unreleased]
+## [3.3.5]
 
 - Changed readme config setup to say function store instaed of class store for the example
 - Updated readme internal method description
+- Fixed refresh token using wrong variable
 
 ## [3.3.4]
 
