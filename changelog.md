@@ -1,3 +1,11 @@
+## [3.3.6]
+
+- Updated processing to allow forced types
+- Allow type meta and description changes
+- Fixed TelephoneNumber to be combined type
+- Fixed Customer PreferredDeliveryMethod to be literal type
+- Fixed Vendor_OtherContactInfo_ContactInfo Telephone to be string and not TelephoneNumber type
+
 ## [3.3.5]
 
 - Changed readme config setup to say function store instaed of class store for the example

@@ -2,6 +2,7 @@ import { TypeInformation } from ".";
 import { EntityName } from "../src";
 import {
   enumValueFixes,
+  forceCombineTypes,
   indent,
   typeAttributeFixes,
   typeConversion,
@@ -145,7 +146,7 @@ export const processTypesForText = (entityData: TypeInformation) => {
   // check attributes are the same for name, metaData, and description
   const allTypes = entityData.Types;
   const combineCheckedTypes: string[] = [];
-  const toCombineTypes: string[] = [];
+  const toCombineTypes: string[] = forceCombineTypes;
   for (const typeName in allTypes) {
     const type = allTypes[typeName];
     if (!type.typeRefName) {
@@ -154,10 +155,12 @@ export const processTypesForText = (entityData: TypeInformation) => {
     }
     const combineTypeName = type.typeRefName;
     if (combineCheckedTypes.includes(combineTypeName)) {
+      // Already checked type for combining
       //   console.log("already checked type for combining", typeName);
       continue;
     }
     combineCheckedTypes.push(combineTypeName);
+
     let shouldCombine = true;
     let count = 0;
     for (const checkTypeName in allTypes) {
@@ -197,12 +200,9 @@ export const processTypesForText = (entityData: TypeInformation) => {
       }
     }
     if (shouldCombine && count > 0) {
-      console.log("found type to combine", typeName, combineTypeName);
       toCombineTypes.push(combineTypeName);
     }
   }
-
-  console.log("should combine types", toCombineTypes);
 
   // special fix case, if type has attributes length of 1 and attribute has no properties
   // then remove type and update any reference types with any
@@ -230,30 +230,33 @@ export const processTypesForText = (entityData: TypeInformation) => {
   let allTypeText = "";
 
   const combinedTypesFinished: string[] = [];
+
   for (const typeName in allTypes) {
     const type = allTypes[typeName];
     let mainTypeName = typeName;
 
     // check if a combined type and only run once
-
     if (type.typeRefName && toCombineTypes.includes(type.typeRefName)) {
       if (combinedTypesFinished.includes(type.typeRefName)) {
         // already processed type
-        console.log(
-          "skipping already processed type",
-          typeName,
-          type.typeRefName
-        );
+        // console.log(
+        //   "skipping already processed type",
+        //   typeName,
+        //   type.typeRefName
+        // );
         continue;
       }
       combinedTypesFinished.push(type.typeRefName);
       mainTypeName = type.typeRefName;
     }
-    console.log("Running type", typeName, type.typeRefName);
+
+    const typeFixes = typeAttributeFixes[mainTypeName];
+
+    console.log("Running type", typeName, mainTypeName, type.typeRefName, typeFixes);
 
     // add sparse to Payment if not already included
     if (
-      typeName === "Payment" &&
+      mainTypeName === "Payment" &&
       !type.attributes.find((attr) => attr.name === "sparse")
     ) {
       type.attributes.push({
@@ -273,6 +276,8 @@ export const processTypesForText = (entityData: TypeInformation) => {
     for (const attribute of type.attributes) {
       let useName = attribute.name;
       let useType = attribute.type;
+      let useMetaData = attribute.metaData;
+      let useDescription = attribute.description;
       let addOn: string | null = null;
 
       if (attribute.name === "") {
@@ -280,17 +285,23 @@ export const processTypesForText = (entityData: TypeInformation) => {
       }
 
       // check typeAttribute fixes
-      const typeAttributeFix = typeAttributeFixes[typeName]?.[attribute.name];
-      if (typeAttributeFix) {
-        if (typeAttributeFix.interfaceValue) {
-          typeText += typeAttributeFix.interfaceValue;
+      const typeAttributeReplacements = typeFixes?.attributeReplacements?.[attribute.name];
+      if (typeAttributeReplacements) {
+        if (typeAttributeReplacements.replacedInterface) {
+          typeText += typeAttributeReplacements.replacedInterface;
           continue;
         }
-        if (typeAttributeFix.fixedName) {
-          useName = typeAttributeFix.fixedName;
+        if (typeAttributeReplacements.fixedName) {
+          useName = typeAttributeReplacements.fixedName;
         }
-        if (typeAttributeFix.fixedType) {
-          useType = typeAttributeFix.fixedType;
+        if (typeAttributeReplacements.fixedType) {
+          useType = typeAttributeReplacements.fixedType;
+        }
+        if (typeAttributeReplacements.fixedMetaData) {
+          useMetaData = typeAttributeReplacements.fixedMetaData;
+        }
+        if (typeAttributeReplacements.fixedDescription) {
+          useDescription = typeAttributeReplacements.fixedDescription;
         }
       }
 
@@ -307,17 +318,16 @@ export const processTypesForText = (entityData: TypeInformation) => {
 
       // check if metadata starts with "* Required" to know if required
       let isReq =
-        attribute.metaData?.startsWith("* Required") &&
-          !attribute.metaData?.startsWith("* Required for update")
+        useMetaData?.startsWith("* Required") &&
+          !useMetaData?.startsWith("* Required for update")
           ? ""
           : "?";
-      let isReadOnly = attribute.metaData?.includes("read only")
+      let isReadOnly = useMetaData?.includes("read only")
         ? "readonly "
         : "";
       let isList = attribute.isList ? "[]" : "";
       let attrNames = useName.split(" ");
 
-      // convert type
       if (useType && typeConversion[useType]) {
         const typeCheck = typeConversion[useType];
         if (typeCheck.newType) {
@@ -336,14 +346,14 @@ export const processTypesForText = (entityData: TypeInformation) => {
         // get all values in description that are between <span class="literal">{value}</span>
         // clear distinct values, add quotes around each value, and join with " | "
         // if no values, add "string" to type
-        if (!attribute.description) {
+        if (!useDescription) {
           throw new Error("description not set for enum value");
         }
         const enumValues: string[] = [];
         const enumValuesRegex = /<span class="literal">([^<]+)<\/span>/g;
         let enumValuesMatch;
         while (
-          (enumValuesMatch = enumValuesRegex.exec(attribute.description))
+          (enumValuesMatch = enumValuesRegex.exec(useDescription))
         ) {
           let enumTest = enumValuesMatch[1];
           if (enumValueFixes[enumTest]) {
@@ -352,7 +362,6 @@ export const processTypesForText = (entityData: TypeInformation) => {
 
           enumValues.push(`"${enumTest}"`);
         }
-        console.log("enum values", useName, enumValues);
         if (enumValues.length === 0) {
           enumValues.push("string");
           addOn += "\n   *\n   * No values given for enum";
@@ -362,15 +371,15 @@ export const processTypesForText = (entityData: TypeInformation) => {
         useType = [...new Set(enumValues)].join(" | ");
       }
 
-      if (attribute.metaData || attribute.description || addOn) {
+      if (useMetaData || useDescription || addOn) {
         // add comment
         typeText += `  /**\n`;
         let addSpacer = false;
-        if (attribute.metaData) {
+        if (useMetaData) {
           if (addSpacer) {
             typeText += `   *\n`;
           }
-          typeText += `   * META: ${attribute.metaData}\n`;
+          typeText += `   * META: ${useMetaData}\n`;
           addSpacer = true;
         }
         if (addOn) {
@@ -380,11 +389,11 @@ export const processTypesForText = (entityData: TypeInformation) => {
           typeText += `   * ADDON: ${addOn}\n`;
           addSpacer = true;
         }
-        if (attribute.description) {
+        if (useDescription) {
           if (addSpacer) {
             typeText += `   *\n`;
           }
-          typeText += `   * DESCRIPTION: ${cleanseDescription(attribute.description)}\n`;
+          typeText += `   * DESCRIPTION: ${cleanseDescription(useDescription)}\n`;
           addSpacer = true;
         }
         typeText += `   */\n`;
