@@ -1,3 +1,10 @@
+## [3.3.10]
+
+- Added special header for CDC
+- Added typing for CDC endpoint
+- Updated server example with cdc
+- Updated readme with cdc information
+
 ## [3.3.9]
 
 - Added in special headers to most returns to allow for easier debugging
