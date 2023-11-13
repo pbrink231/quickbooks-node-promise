@@ -214,16 +214,34 @@ export interface RequestOptions {
   qs?: Record<string, any>;
   headers?: object;
   fullurl?: boolean;
+  returnHeadersInBody?: boolean;
 }
 
 interface BaseRequest {
   time: string;
 }
 
-interface QueryRequest {
+interface HeaderAdditions {
+  specialHeaders: {
+    intuitTid: string;
+    server: string;
+    qboVersion: string;
+    expires: string;
+    date: string;
+  }
+}
+
+type QueryRequest<K extends keyof QuickbooksTypes> = {
   startPosition: number;
   totalCount: number;
   maxResults: number;
+} & Record<K, Array<QuickbooksTypes[K]>>
+
+type QueryResponse<K extends keyof QuickbooksTypes> = {
+  QueryResponse: {
+    [P in keyof (QueryRequest<K>)]?: (QueryRequest<K>)[P];
+  }
+  time: string;
 }
 
 export interface CriteriaItem {
@@ -285,13 +303,15 @@ interface GetExchangeRateOptions {
   asOfDate?: string;
 }
 
-type DeleteResponse = {
-  [entity in EntityName]: {
-    status: string;
-    domain: string;
-    Id: string;
-  };
-};
+type DeleteResponse<K extends keyof QuickbooksTypes> = Record<K, {
+  status: string
+  domain: string
+  Id: string
+}>;
+
+type DeleteNewResponse<K extends keyof QuickbooksTypes> = {
+  [P in keyof (BaseRequest & HeaderAdditions & DeleteResponse<K>)]: (BaseRequest & HeaderAdditions & DeleteResponse<K>)[P];
+}
 
 export interface AttachableResponseData {
   AttachableResponse: {
@@ -922,9 +942,11 @@ class Quickbooks {
       headers: Record<string, any>;
       body?: string;
       encoding?: null;
+      returnHeadersInBody?: boolean;
     } = {
       qs: options.qs || {},
       headers: options.headers || {},
+      returnHeadersInBody: options.returnHeadersInBody || false,
     };
 
     let url: string | null = null;
@@ -967,7 +989,18 @@ class Quickbooks {
 
     const response = await fetch(url, fetchOptions);
     if (response.ok) {
+
       const returnedObject: T = await response.json();
+      if (opts.returnHeadersInBody) {
+        const specialHeaders: HeaderAdditions['specialHeaders'] = {
+          intuitTid: response.headers.get("intuit_tid"),
+          server: response.headers.get("Server"),
+          qboVersion: response.headers.get("QBO-Version"),
+          expires: response.headers.get("Expires"),
+          date: response.headers.get("Date"),
+        }
+        return { ...returnedObject, specialHeaders } as T
+      }
       return returnedObject;
     } else {
       try {
@@ -1025,9 +1058,9 @@ class Quickbooks {
   ) => {
     const url = "/" + entityName.toLowerCase();
     return this.request<{
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+      [P in keyof (BaseRequest & HeaderAdditions & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
         Record<K, QuickbooksTypes[K]>)[P];
-    }>("post", { url: url }, entity);
+    }>("post", { url: url, returnHeadersInBody: true }, entity);
   };
 
   read = <K extends keyof QuickbooksTypes>(
@@ -1038,9 +1071,9 @@ class Quickbooks {
     let url = "/" + entityName.toLowerCase();
     if (id) url = `${url}/${id}`;
     return this.request<{
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+      [P in keyof (BaseRequest & HeaderAdditions & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
         Record<K, QuickbooksTypes[K]>)[P];
-    }>("get", { url: url, qs: options }, null);
+    }>("get", { url: url, qs: options, returnHeadersInBody: true }, null);
   };
 
   update = <K extends Exclude<keyof QuickbooksTypes, EntityName.Exchangerate>>(
@@ -1052,15 +1085,15 @@ class Quickbooks {
     }
     let url = "/" + entityName.toLowerCase();
     let qs = { operation: "update" };
-    let opts = { url: url, qs: qs };
+    let opts: RequestOptions = { url: url, qs: qs, returnHeadersInBody: true };
     return this.request<{
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+      [P in keyof (BaseRequest & HeaderAdditions & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
         Record<K, QuickbooksTypes[K]>)[P];
     }>("post", opts, entity);
   };
 
   delete = async <K extends keyof QuickbooksTypes>(
-    entityName: EntityName,
+    entityName: K,
     idOrEntity: string | number | Partial<QuickbooksTypes[K]>
   ) => {
     // requires minimum Id and SyncToken
@@ -1068,14 +1101,18 @@ class Quickbooks {
     let url = "/" + entityName.toLowerCase();
     let qs = { operation: "delete" };
     if (_.isObject(idOrEntity)) {
-      return this.request<DeleteResponse>(
+      return this.request<{
+        [P in keyof (DeleteResponse<K> & HeaderAdditions)]: (DeleteResponse<K> & HeaderAdditions)[P];
+      }>(
         "post",
-        { url: url, qs: qs },
+        { url: url, qs: qs, returnHeadersInBody: true },
         idOrEntity
       );
     } else {
       const entity = await this.read(entityName, idOrEntity);
-      return this.request<DeleteResponse>("post", { url: url, qs: qs }, entity);
+      return this.request<{
+        [P in keyof (DeleteResponse<K> & HeaderAdditions)]: (DeleteResponse<K> & HeaderAdditions)[P];
+      }>("post", { url: url, qs: qs, returnHeadersInBody: true }, entity);
     }
   };
 
@@ -1089,17 +1126,17 @@ class Quickbooks {
     let qs = { operation: "void" };
     if (_.isObject(idOrEntity)) {
       return this.request<{
-        [P in keyof (BaseRequest &
-          Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+        [P in keyof (BaseRequest & HeaderAdditions &
+          Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
             Record<K, QuickbooksTypes[K]>)[P];
-      }>("post", { url: url, qs: qs }, idOrEntity);
+      }>("post", { url: url, qs: qs, returnHeadersInBody: true }, idOrEntity);
     } else {
       const entity = await this.read(entityName, idOrEntity);
       return this.request<{
-        [P in keyof (BaseRequest &
-          Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+        [P in keyof (BaseRequest & HeaderAdditions &
+          Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
             Record<K, QuickbooksTypes[K]>)[P];
-      }>("post", { url: url, qs: qs }, entity);
+      }>("post", { url: url, qs: qs, returnHeadersInBody: true }, entity);
     }
   };
 
@@ -1123,13 +1160,8 @@ class Quickbooks {
     }
 
     const data = await this.request<{
-      QueryResponse: {
-        [P in keyof (QueryRequest &
-          Record<K, Array<QuickbooksTypes[K]>>)]?: (QueryRequest &
-            Record<K, Array<QuickbooksTypes[K]>>)[P];
-      };
-      time: string;
-    }>("get", { url: url, qs: qs }, null);
+      [P in keyof (QueryResponse<K> & HeaderAdditions)]: (QueryResponse<K> & HeaderAdditions)[P];
+    }>("get", { url: url, qs: qs, returnHeadersInBody: true }, null);
     if (
       queryData?.fetchAll &&
       queryData?.limit &&
@@ -1177,7 +1209,7 @@ class Quickbooks {
     return this.request<{
       QueryResponse: { totalCount: number };
       time: string;
-    }>("get", { url: url, qs: qs }, null);
+    } & HeaderAdditions>("get", { url: url, qs: qs, returnHeadersInBody: true }, null);
   };
 
   // **********************  Report Api **********************
