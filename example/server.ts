@@ -1,5 +1,6 @@
 import Quickbooks, {
   AppConfig,
+  AppConfigStoreFunctions,
   DefaultStore,
   QBStoreStrategy,
   QueryData,
@@ -18,11 +19,21 @@ const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD, QB_WE
 
 const realms: { [realmId: string]: StoreTokenData } = {};
 
+const storeFunctions: AppConfigStoreFunctions = {
+  getToken(realmId, appConfig) {
+    return Promise.resolve(realms[realmId]);
+  },
+  saveToken(realmId, saveTokenData, appConfig, extra) {
+    realms[realmId] = saveTokenData;
+    return Promise.resolve(saveTokenData);
+  },
+}
 // QB config
 const QBAppconfig: AppConfig = {
   appKey: QB_APP_KEY ?? undefined,
   appSecret: QB_APP_SECRET ?? undefined,
   redirectUrl: QB_REDIRECT_URL ?? undefined,
+  ...storeFunctions,
   scope: [
     Quickbooks.scopes.Accounting,
     Quickbooks.scopes.OpenId,
