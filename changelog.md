@@ -1,3 +1,7 @@
+## [3.3.9]
+
+- Added in special headers to most returns to allow for easier debugging
+
 ## [3.3.8]
 
 - exported store interfaces
