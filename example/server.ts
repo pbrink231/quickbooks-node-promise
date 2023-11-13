@@ -19,6 +19,8 @@ const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD, QB_WE
 
 const realms: { [realmId: string]: StoreTokenData } = {};
 
+let usingRealm: string | undefined = undefined;
+
 const storeFunctions: AppConfigStoreFunctions = {
   getToken(realmId, appConfig) {
     return Promise.resolve(realms[realmId]);
@@ -137,9 +139,10 @@ app.get("/callback", async (req, res) => {
 
   // create token
   try {
-    var qbo = new Quickbooks(QBAppconfig, realmID);
+    const qbo = new Quickbooks(QBAppconfig, realmID);
     const newToken = await qbo.createToken(authCode);
     res.send(newToken); // Should not send token out
+    usingRealm = realmID;
     console.log(`try http://localhost:${port}/findinvoices?realmID=${realmID}`);
   } catch (err) {
     console.log("Error getting token", err);
@@ -169,16 +172,36 @@ app.post("/qbwebhook", (req, res) => {
 
   console.log("webhookPayload is verified");
   res.status(200).send('SUCCESS');
+
+  // do stuff here
 })
 
-app.get("/findinvoices", async (req, res) => {
-  const realmID = req.query.realmID;
+app.get("/cdc", async (req, res) => {
+  const realmID = req.query.realmID ?? usingRealm;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("realmID is required");
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
+
+  const cdcData = await qbo.changeDataCapture(['Invoice', 'Customer'], '2023-11-01');
+
+  console.log("cdcData", cdcData);
+  console.log("cdcData Custermer", cdcData.CDCResponse[0].QueryResponse[0].Customer);
+
+  res.send(cdcData);
+})
+
+
+app.get("/findinvoices", async (req, res) => {
+  const realmID = req.query.realmID ?? usingRealm;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("realmID is required");
+    return;
+  }
+
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   const queryData: QueryDataWithProperties = {
     limit: 10,
@@ -194,7 +217,7 @@ app.get("/findinvoices", async (req, res) => {
 });
 
 app.get("/getinvoice", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("realmID is required");
@@ -205,7 +228,7 @@ app.get("/getinvoice", async (req, res) => {
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     const grabbedInvoice = await qbo.getInvoice(entityID);
@@ -217,14 +240,14 @@ app.get("/getinvoice", async (req, res) => {
 });
 
 app.get("/findInvoicesTest", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("realmID is required");
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   const queryData: QueryDataWithProperties = {
     offset: 1,
@@ -248,7 +271,7 @@ app.get("/findInvoicesTest", async (req, res) => {
 });
 
 app.post("/findinvoicesquery", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
   const body = req.body;
   if (!realmID || typeof realmID !== "string") {
@@ -256,7 +279,7 @@ app.post("/findinvoicesquery", async (req, res) => {
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     const foundInvoices = await qbo.findInvoices(body);
@@ -276,7 +299,7 @@ app.post("/findinvoicesquery", async (req, res) => {
 });
 
 app.post("/countinvoicesquery", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
   const body = req.body;
   if (!realmID || typeof realmID !== "string") {
@@ -284,7 +307,7 @@ app.post("/countinvoicesquery", async (req, res) => {
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     const countInvoices = await qbo.countInvoices(body);
@@ -295,7 +318,7 @@ app.post("/countinvoicesquery", async (req, res) => {
 });
 
 app.get("/getInvoicePDF", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("Realm is required");
@@ -306,7 +329,7 @@ app.get("/getInvoicePDF", async (req, res) => {
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     const pdfData = await qbo.getInvoicePdf(entityID);
@@ -319,7 +342,7 @@ app.get("/getInvoicePDF", async (req, res) => {
 });
 
 app.post("/createInvoice", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("Realm is required");
@@ -330,7 +353,7 @@ app.post("/createInvoice", async (req, res) => {
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     const newInvoiceData = await qbo.createInvoice({
@@ -356,7 +379,7 @@ app.post("/createInvoice", async (req, res) => {
 });
 
 app.get("/reports", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("Realm is required");
@@ -367,7 +390,7 @@ app.get("/reports", async (req, res) => {
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     //  @ts-ignore
@@ -380,7 +403,7 @@ app.get("/reports", async (req, res) => {
 });
 
 app.post("/bigInvoice", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   if (!realmID || typeof realmID !== "string") {
     res.status(500).send("Realm is required");
     return;
@@ -479,7 +502,7 @@ app.post("/bigInvoice", async (req, res) => {
     },
   };
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     const pdfData = await qbo.createInvoice(newInvoice);
@@ -491,7 +514,7 @@ app.post("/bigInvoice", async (req, res) => {
 });
 
 app.post("/deleteInvoice", async (req, res) => {
-  const realmID = req.query.realmID;
+  const realmID = req.query.realmID ?? usingRealm;
   const entityID = req.query.entityID;
 
   if (!realmID || typeof realmID !== "string") {
@@ -503,7 +526,7 @@ app.post("/deleteInvoice", async (req, res) => {
     return;
   }
 
-  var qbo = new Quickbooks(QBAppconfig, realmID);
+  const qbo = new Quickbooks(QBAppconfig, realmID);
 
   try {
     const deletedInvoice = await qbo.deleteInvoice(entityID);
