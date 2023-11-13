@@ -1,3 +1,6 @@
+## [3.3.8]
+
+- exported store interfaces
 
 ## [3.3.7]
 

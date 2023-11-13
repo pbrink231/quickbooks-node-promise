@@ -374,24 +374,24 @@ interface AppConfigBase {
 
 export type StoreMethod = 'Class' | 'Function' | 'Internal';
 
-interface AppConfigWithToken {
+export interface AppConfigStoreInternal {
   accessToken?: string;
   refreshToken?: string;
 }
 
-interface AppConfigStoreClass {
+export interface AppConfigStoreClass {
   storeStrategy: QBStoreStrategy;
 }
 
-interface AppConfigStoreFunctions {
+export interface AppConfigStoreFunctions {
   saveToken: (realmId: number | string, saveTokenData: StoreTokenData, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
   getToken: (realmId: number | string, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
 }
 
 export type AppConfig = AppConfigBase &
-  (AppConfigWithToken | AppConfigStoreClass | AppConfigStoreFunctions);
+  (AppConfigStoreInternal | AppConfigStoreClass | AppConfigStoreFunctions);
 
-interface AppConfigCleanInternal extends AppConfigWithToken {
+interface AppConfigCleanInternal extends AppConfigStoreInternal {
   storeMethod: 'Internal';
 }
 
