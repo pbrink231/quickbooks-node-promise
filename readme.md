@@ -212,8 +212,11 @@ The authorizeUrl method will return a url to redirect the user to.  The user wil
 ```javascript
 // --- End points required to get inital token, Express example
 // QB requestToken - Used to start the process
+const states = {}; // optional, can be anything you want to track states
 app.get("/requestToken", (req, res) => {
-  let authUrl = Quickbooks.authorizeUrl(QBAppconfig);
+  const state = Quickbooks.generateState(); // optional
+  states[state] = true; // optional
+  const authUrl = Quickbooks.authorizeUrl(QBAppconfig, state); // state is optional
   res.redirect(authUrl);
 });
 
@@ -222,11 +225,19 @@ app.get("/callback", async (req, res) => {
   let realmID = req.query.realmId;
   let authCode = req.query.code;
   let state = req.query.state;
+
+  // should check state here to prevent CSRF attacks
+  if (!states[state]) {
+    res.sendStatus(401);
+    return;
+  }
+  states[state] = false;
+
+  // check if realmID and authCode are present
   if (!realmID || typeof realmID !== "string" || !authCode || typeof authCode !== "string") {
     res.sendStatus(404)
     return;
   }
-  // can check the state here if supplied to make sure it matches
 
   // create token
   try {

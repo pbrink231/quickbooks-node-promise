@@ -74,10 +74,23 @@ app.get("/health", (req, res) => {
   res.send("Looking goood!!");
 });
 
+const statesMap: {
+  [state: string]: {
+    expire: Date;
+    used: boolean;
+  }
+} = {};
+
 // --- End points required to get inital token
 // QB requestToken - Used to start the process
 app.get("/requestToken", (req, res) => {
-  let authUrl = Quickbooks.authorizeUrl(QBAppconfig);
+  const newState = Quickbooks.generateCsrf();
+  statesMap[newState] = {
+    expire: new Date(Date.now() + 60 * 5 * 1000), // 5 minutes
+    used: false,
+  };
+
+  const authUrl = Quickbooks.authorizeUrl(QBAppconfig, newState);
   res.redirect(authUrl);
 });
 
@@ -86,11 +99,37 @@ app.get("/callback", async (req, res) => {
   let realmID = req.query.realmId;
   let authCode = req.query.code;
   let state = req.query.state;
+
+  // check state
+  if (!state || typeof state !== "string") {
+    res.sendStatus(404)
+    console.log("state is required");
+    return;
+  }
+  const stateData = statesMap[state];
+  console.log("stateData", state, stateData);
+  if (!stateData) {
+    res.sendStatus(404)
+    console.log("state not found");
+    return;
+  }
+  if (stateData.expire < new Date()) {
+    res.sendStatus(404)
+    console.log("state expired");
+    return;
+  }
+  if (stateData.used) {
+    res.sendStatus(404)
+    console.log("state already used");
+    return;
+  }
+  stateData.used = true;
+
+  // check realm and authCode
   if (!realmID || typeof realmID !== "string" || !authCode || typeof authCode !== "string") {
     res.sendStatus(404)
     return;
   }
-  // can check the state here if supplied to make sure it matches
 
   // create token
   try {

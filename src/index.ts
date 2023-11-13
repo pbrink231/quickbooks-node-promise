@@ -478,10 +478,16 @@ class Quickbooks {
     }
   }
 
+  static generateCsrf = () => {
+    return csrf.create(csrf.secretSync())
+  };
+
   /**
    * Redirect link to Authorization Page
+   * 
+   * Can use generateCsrf to create a state string
    */
-  static authorizeUrl = (appConfig: AppConfig) => {
+  static authorizeUrl = (appConfig: AppConfig, state?: string) => {
     if (!appConfig.appKey) throw new Error("appKey is missing");
     if (!appConfig.redirectUrl) throw new Error("RedirectUrl is missing");
     if (!appConfig.scope) throw new Error("scope is missing");
@@ -494,7 +500,7 @@ class Quickbooks {
       redirect_uri: appConfig.redirectUrl, //Make sure this path matches entry in application dashboard
       scope: scopes,
       response_type: "code",
-      state: appConfig.state || csrf.create(csrf.secretSync()),
+      state: state ?? appConfig.state ?? csrf.create(csrf.secretSync()),
     };
 
     let authorizeUri = `${Quickbooks.AUTHORIZATION_URL}?${qs.stringify(

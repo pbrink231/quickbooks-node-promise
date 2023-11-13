@@ -1,3 +1,10 @@
+
+## [3.3.7]
+
+- Added state as optional paramater to authorize url
+- Updated readme with new authorize url paramater
+- Updated example serveer
+
 ## [3.3.6]
 
 - Updated processing to allow forced types
