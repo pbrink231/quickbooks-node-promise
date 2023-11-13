@@ -42,13 +42,6 @@ const QBAppconfig: AppConfig = {
     Quickbooks.scopes.Phone,
     Quickbooks.scopes.Address,
   ],
-  getToken(realmId, appConfig) {
-    return Promise.resolve(realms[realmId]);
-  },
-  saveToken(realmId, saveTokenData, appConfig, extra) {
-    realms[realmId] = saveTokenData;
-    return Promise.resolve(saveTokenData);
-  },
 };
 
 // QB config minimal, not used in this example
@@ -247,7 +240,7 @@ app.get("/findInvoicesTest", async (req, res) => {
 
   try {
     const foundInvoices = await qbo.findInvoices(queryData);
-    res.send(foundInvoices.QueryResponse.Invoice);
+    res.send(foundInvoices);
   } catch (err: any) {
     console.log("could not run accounts because", err);
     res.send(err);
