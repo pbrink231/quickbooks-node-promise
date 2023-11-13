@@ -425,6 +425,22 @@ app.post("/qbwebhook", (req, res) => {
 
 ```
 
+## Change Data Capture (CDC)
+
+The change data capture (cdc) operation returns a list of objects that have changed since a specified time. This operation is for an app that periodically polls data services in order to refresh its local copy of object data. The app calls the cdc operation, specifying a comma separated list of object types and a date-time stamp specifying how far to look back. Data services returns all objects specified by entityList that have changed since the specified date-time. Look-back time can be up to 30 days.
+
+[Quickbooks CDC Docs](https://developer.intuit.com/app/developer/qbo/docs/api/accounting/all-entities/changedatacapture)
+
+The since date can be a Date, number or string.  If it is a number, it will be converted to a date then ISO 8601 string.  If it is a string, it will be sent as is.  Can be YYYY-MM-DD or full ISO 8601.  If it is a date, it will be converted to ISO 8601
+
+```typescript
+  // minus 30 days from today
+  const testDateDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  const cdcData = await qbo.changeDataCapture(['Invoice', 'Customer'], testDateDate);
+
+  console.log("cdcData", cdcData);
+```
+
 <a name="QuickBooks"></a>
 
 # QuickBooks Methods
