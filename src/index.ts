@@ -31,6 +31,7 @@ import {
   getAuthBase64,
   getConfigWithStoreMethod,
   getDateCheck,
+  getDateString,
   getQueryString,
 } from "./helpers";
 import { QuickbooksTypes } from "./qbTypes";
@@ -49,6 +50,11 @@ export interface WebhookEntity {
   /** The ID of the deleted or merged entity (this only applies to merge events) */
   deletedID?: string;
 }
+
+type QuickbooksTypesKeys = keyof QuickbooksTypes;
+type QuickbooksTypesArrayed = {
+  [P in QuickbooksTypesKeys]: QuickbooksTypes[P][];
+};
 
 export interface WebhookEventNotification {
   realmId: string;
@@ -1268,21 +1274,27 @@ class Quickbooks {
    * @param  entities - Comma separated list or JavaScript array of entities to search for changes
    * @param  since - JS Date object, JS Date milliseconds, or string in ISO 8601 - to look back for changes until
    */
-  changeDataCapture = (
-    entities: string | string[],
-    since: Date | number
+  changeDataCapture = <K extends keyof QuickbooksTypes | (keyof QuickbooksTypes)[]>(
+    entities: K,
+    since: Date | number | string
   ) => {
-    const dateToCheck = getDateCheck(since);
-    if (!dateToCheck) {
-      throw new Error("Invalid date passed to changeDataCapture");
-    }
+    const dateString = getDateString(since);
 
     let url = "/cdc";
     let qs = {
       entities: typeof entities === "string" ? entities : entities.join(","),
-      changedSince: new Date(dateToCheck).toISOString(),
+      changedSince: dateString,
     };
-    return this.request("get", { url: url, qs: qs }, null);
+    return this.request<{
+      CDCResponse: {
+        QueryResponse: ({
+          startPosition?: number
+          maxResults?: number
+          totalCount?: number
+        } & Pick<Partial<QuickbooksTypesArrayed>, K extends Array<any> ? K[number] : K>)[]
+      }[]
+      time: string
+    } & HeaderAdditions>("get", { url: url, qs: qs, returnHeadersInBody: true }, null);
   };
 
   /**

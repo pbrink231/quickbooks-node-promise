@@ -185,7 +185,10 @@ app.get("/cdc", async (req, res) => {
 
   const qbo = new Quickbooks(QBAppconfig, realmID);
 
-  const cdcData = await qbo.changeDataCapture(['Invoice', 'Customer'], '2023-11-01');
+  const testDateString = '2021-09-01'
+  // minus 30 days from today
+  const testDateDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+  const cdcData = await qbo.changeDataCapture(['Invoice', 'Customer'], testDateDate);
 
   console.log("cdcData", cdcData);
   console.log("cdcData Custermer", cdcData.CDCResponse[0].QueryResponse[0].Customer);
