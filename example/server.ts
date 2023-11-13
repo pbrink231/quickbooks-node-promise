@@ -497,6 +497,31 @@ app.post("/bigInvoice", async (req, res) => {
   }
 });
 
+app.post("/deleteInvoice", async (req, res) => {
+  const realmID = req.query.realmID;
+  const entityID = req.query.entityID;
+
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("realmID is required");
+    return;
+  }
+  if (!entityID || typeof entityID !== "string") {
+    res.status(500).send("entityID is required");
+    return;
+  }
+
+  var qbo = new Quickbooks(QBAppconfig, realmID);
+
+  try {
+    const deletedInvoice = await qbo.deleteInvoice(entityID);
+    deletedInvoice.Invoice.Id = entityID;
+    res.send(deletedInvoice);
+  } catch (err: any) {
+    res.send(err);
+  }
+});
+
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)
   console.log(`try http://localhost:${port}/requestToken`)
