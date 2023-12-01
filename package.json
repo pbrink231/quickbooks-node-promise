@@ -5,7 +5,9 @@
   "author": "Peter Brink",
   "license": "ISC",
   "types": "dist/index.d.ts",
-  "files": ["dist/**"],
+  "files": [
+    "dist/**"
+  ],
   "main": "dist/index.js",
   "keywords": [
     "quickbooks",
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "csrf": "^3.1.0",
+    "form-data": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.7.0",
     "qs": "^6.11.2",

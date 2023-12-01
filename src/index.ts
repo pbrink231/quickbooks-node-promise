@@ -24,6 +24,7 @@ import _, { any } from "underscore";
 import qs from "qs";
 import jwt from "jsonwebtoken";
 import fetch, { Response } from "node-fetch";
+import FormData from "form-data";
 import Tokens from "csrf";
 import crypto from "crypto";
 import {
@@ -220,6 +221,7 @@ export interface RequestOptions {
   qs?: Record<string, any>;
   headers?: object;
   fullurl?: boolean;
+  formData?: FormData;
   returnHeadersInBody?: boolean;
 }
 
@@ -946,7 +948,7 @@ class Quickbooks {
     const opts: {
       qs: Record<string, any>;
       headers: Record<string, any>;
-      body?: string;
+      body?: string | FormData;
       encoding?: null;
       returnHeadersInBody?: boolean;
     } = {
@@ -979,6 +981,9 @@ class Quickbooks {
     if (entity !== null) {
       opts.body = JSON.stringify(entity);
       opts.headers["Content-Type"] = "application/json";
+    }
+    if (options.formData) {
+      opts.body = options.formData;
     }
 
     const fetchOptions = {
@@ -1323,39 +1328,22 @@ class Quickbooks {
     entityType: (something: any, somethingElse: any) => any | string | null,
     entityId?: number
   ) => {
-    const opts = {
-      url: "/upload",
-      formData: {
-        file_content_01: {
-          value: stream,
-          options: {
-            filename: filename,
-            contentType: contentType,
+    const formData = new FormData();
+    formData.append("file_metadata_01", JSON.stringify({
+      AttachableRef: [
+        {
+          EntityRef: {
+            type: entityType,
+            value: entityId + "",
           },
         },
-      },
-    };
-    const data = await this.request("post", opts, null);
-    const dataUnwraped = this.unwrap(data, "AttachableResponse");
-    if (dataUnwraped[0].Fault) {
-      return entityType(dataUnwraped[0], null);
-    } else if (_.isFunction(entityType)) {
-      return entityType(null, dataUnwraped[0].Attachable);
-    } else {
-      const id = dataUnwraped[0].Attachable.Id;
-      return this.updateAttachable({
-        Id: id,
-        SyncToken: "0",
-        AttachableRef: [
-          {
-            EntityRef: {
-              type: entityType,
-              value: entityId + "",
-            },
-          },
-        ],
-      });
-    }
+      ],
+      ContentType: contentType,
+      FileName: filename
+    }), { filename: "attachment.json", contentType: "application/json" });
+    formData.append("file_content_01", stream);
+
+    const data = await this.request("post", { url: "/upload", formData }, null);
   };
 
   /**
