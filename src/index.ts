@@ -1343,7 +1343,17 @@ class Quickbooks {
     }), { filename: "attachment.json", contentType: "application/json" });
     formData.append("file_content_01", buffer, { filename, contentType });
 
-    const data = await this.request("post", { url: "/upload", formData }, null);
+    const response = await this.request<any>("post", { url: "/upload", formData }, null);
+
+    if (response?.AttachableResponse?.[0]?.Fault) {
+      const fault = response.AttachableResponse[0];
+      throw new QBResponseError(`Error of type ${fault.Fault.type}`, fault);
+    }
+    return response as {
+      AttachableResponse: {
+        Attachable: QuickbooksTypes[EntityName.Attachable]
+      }[]
+    };
   };
 
   /**
