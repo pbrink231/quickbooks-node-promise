@@ -23,7 +23,8 @@ import { v4 as uuidv4 } from "uuid";
 import _, { any } from "underscore";
 import qs from "qs";
 import jwt from "jsonwebtoken";
-import fetch, { Response } from "node-fetch";
+import fetch, { Response, RequestInit } from "node-fetch";
+import FormData from "form-data";
 import Tokens from "csrf";
 import crypto from "crypto";
 import {
@@ -31,6 +32,7 @@ import {
   getAuthBase64,
   getConfigWithStoreMethod,
   getDateCheck,
+  getDateString,
   getQueryString,
 } from "./helpers";
 import { QuickbooksTypes } from "./qbTypes";
@@ -49,6 +51,11 @@ export interface WebhookEntity {
   /** The ID of the deleted or merged entity (this only applies to merge events) */
   deletedID?: string;
 }
+
+export type QuickbookEntityType = keyof QuickbooksTypes;
+type QuickbooksTypesArrayed = {
+  [P in QuickbookEntityType]: QuickbooksTypes[P][];
+};
 
 export interface WebhookEventNotification {
   realmId: string;
@@ -196,15 +203,15 @@ export enum ReportName {
   VendorExpenses = "VendorExpenses",
 }
 
-export type CreateInput<T extends keyof QuickbooksTypes> = Partial<
+export type CreateInput<T extends QuickbookEntityType> = Partial<
   QuickbooksTypes[T]
 >;
 
-export type UpdateInput<T extends keyof QuickbooksTypes> = Partial<
+export type UpdateInput<T extends QuickbookEntityType> = Partial<
   QuickbooksTypes[T]
 >;
 
-export type DeleteInput<T extends keyof QuickbooksTypes> =
+export type DeleteInput<T extends QuickbookEntityType> =
   | number
   | string
   | Partial<QuickbooksTypes[T]>;
@@ -214,16 +221,35 @@ export interface RequestOptions {
   qs?: Record<string, any>;
   headers?: object;
   fullurl?: boolean;
+  formData?: FormData;
+  returnHeadersInBody?: boolean;
 }
 
 interface BaseRequest {
   time: string;
 }
 
-interface QueryRequest {
+interface HeaderAdditions {
+  specialHeaders: {
+    intuitTid: string;
+    server: string;
+    qboVersion: string;
+    expires: string;
+    date: string;
+  }
+}
+
+type QueryRequest<K extends QuickbookEntityType> = {
   startPosition: number;
   totalCount: number;
   maxResults: number;
+} & Record<K, Array<QuickbooksTypes[K]>>
+
+type QueryResponse<K extends QuickbookEntityType> = {
+  QueryResponse: {
+    [P in keyof (QueryRequest<K>)]?: (QueryRequest<K>)[P];
+  }
+  time: string;
 }
 
 export interface CriteriaItem {
@@ -285,13 +311,15 @@ interface GetExchangeRateOptions {
   asOfDate?: string;
 }
 
-type DeleteResponse = {
-  [entity in EntityName]: {
-    status: string;
-    domain: string;
-    Id: string;
-  };
-};
+type DeleteResponse<K extends QuickbookEntityType> = Record<K, {
+  status: string
+  domain: string
+  Id: string
+}>;
+
+type DeleteNewResponse<K extends QuickbookEntityType> = {
+  [P in keyof (BaseRequest & HeaderAdditions & DeleteResponse<K>)]: (BaseRequest & HeaderAdditions & DeleteResponse<K>)[P];
+}
 
 export interface AttachableResponseData {
   AttachableResponse: {
@@ -374,24 +402,24 @@ interface AppConfigBase {
 
 export type StoreMethod = 'Class' | 'Function' | 'Internal';
 
-interface AppConfigWithToken {
+export interface AppConfigStoreInternal {
   accessToken?: string;
   refreshToken?: string;
 }
 
-interface AppConfigStoreClass {
+export interface AppConfigStoreClass {
   storeStrategy: QBStoreStrategy;
 }
 
-interface AppConfigStoreFunctions {
+export interface AppConfigStoreFunctions {
   saveToken: (realmId: number | string, saveTokenData: StoreTokenData, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
   getToken: (realmId: number | string, appConfig: AppConfigClean, extra: any) => Promise<StoreTokenData>;
 }
 
 export type AppConfig = AppConfigBase &
-  (AppConfigWithToken | AppConfigStoreClass | AppConfigStoreFunctions);
+  (AppConfigStoreInternal | AppConfigStoreClass | AppConfigStoreFunctions);
 
-interface AppConfigCleanInternal extends AppConfigWithToken {
+interface AppConfigCleanInternal extends AppConfigStoreInternal {
   storeMethod: 'Internal';
 }
 
@@ -478,10 +506,16 @@ class Quickbooks {
     }
   }
 
+  static generateCsrf = () => {
+    return csrf.create(csrf.secretSync())
+  };
+
   /**
    * Redirect link to Authorization Page
+   * 
+   * Can use generateCsrf to create a state string
    */
-  static authorizeUrl = (appConfig: AppConfig) => {
+  static authorizeUrl = (appConfig: AppConfig, state?: string) => {
     if (!appConfig.appKey) throw new Error("appKey is missing");
     if (!appConfig.redirectUrl) throw new Error("RedirectUrl is missing");
     if (!appConfig.scope) throw new Error("scope is missing");
@@ -494,7 +528,7 @@ class Quickbooks {
       redirect_uri: appConfig.redirectUrl, //Make sure this path matches entry in application dashboard
       scope: scopes,
       response_type: "code",
-      state: appConfig.state || csrf.create(csrf.secretSync()),
+      state: state ?? appConfig.state ?? csrf.create(csrf.secretSync()),
     };
 
     let authorizeUri = `${Quickbooks.AUTHORIZATION_URL}?${qs.stringify(
@@ -914,11 +948,13 @@ class Quickbooks {
     const opts: {
       qs: Record<string, any>;
       headers: Record<string, any>;
-      body?: string;
+      body?: string | FormData;
       encoding?: null;
+      returnHeadersInBody?: boolean;
     } = {
       qs: options.qs || {},
       headers: options.headers || {},
+      returnHeadersInBody: options.returnHeadersInBody || false,
     };
 
     let url: string | null = null;
@@ -946,8 +982,11 @@ class Quickbooks {
       opts.body = JSON.stringify(entity);
       opts.headers["Content-Type"] = "application/json";
     }
+    if (options.formData) {
+      opts.body = options.formData;
+    }
 
-    const fetchOptions = {
+    const fetchOptions: RequestInit = {
       method: verb,
       headers: opts.headers,
       body: opts.body,
@@ -961,7 +1000,18 @@ class Quickbooks {
 
     const response = await fetch(url, fetchOptions);
     if (response.ok) {
+
       const returnedObject: T = await response.json();
+      if (opts.returnHeadersInBody) {
+        const specialHeaders: HeaderAdditions['specialHeaders'] = {
+          intuitTid: response.headers.get("intuit_tid"),
+          server: response.headers.get("Server"),
+          qboVersion: response.headers.get("QBO-Version"),
+          expires: response.headers.get("Expires"),
+          date: response.headers.get("Date"),
+        }
+        return { ...returnedObject, specialHeaders } as T
+      }
       return returnedObject;
     } else {
       try {
@@ -1013,18 +1063,18 @@ class Quickbooks {
   };
 
   // **********************  CRUD Api **********************
-  create = <K extends keyof QuickbooksTypes>(
+  create = <K extends QuickbookEntityType>(
     entityName: K,
     entity: Partial<QuickbooksTypes[K]>
   ) => {
     const url = "/" + entityName.toLowerCase();
     return this.request<{
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+      [P in keyof (BaseRequest & HeaderAdditions & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
         Record<K, QuickbooksTypes[K]>)[P];
-    }>("post", { url: url }, entity);
+    }>("post", { url: url, returnHeadersInBody: true }, entity);
   };
 
-  read = <K extends keyof QuickbooksTypes>(
+  read = <K extends QuickbookEntityType>(
     entityName: K,
     id: string | number | null,
     options?: object
@@ -1032,12 +1082,12 @@ class Quickbooks {
     let url = "/" + entityName.toLowerCase();
     if (id) url = `${url}/${id}`;
     return this.request<{
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+      [P in keyof (BaseRequest & HeaderAdditions & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
         Record<K, QuickbooksTypes[K]>)[P];
-    }>("get", { url: url, qs: options }, null);
+    }>("get", { url: url, qs: options, returnHeadersInBody: true }, null);
   };
 
-  update = <K extends Exclude<keyof QuickbooksTypes, EntityName.Exchangerate>>(
+  update = <K extends Exclude<QuickbookEntityType, EntityName.Exchangerate>>(
     entityName: K,
     entity: Partial<QuickbooksTypes[K]>
   ) => {
@@ -1046,15 +1096,15 @@ class Quickbooks {
     }
     let url = "/" + entityName.toLowerCase();
     let qs = { operation: "update" };
-    let opts = { url: url, qs: qs };
+    let opts: RequestOptions = { url: url, qs: qs, returnHeadersInBody: true };
     return this.request<{
-      [P in keyof (BaseRequest & Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+      [P in keyof (BaseRequest & HeaderAdditions & Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
         Record<K, QuickbooksTypes[K]>)[P];
     }>("post", opts, entity);
   };
 
-  delete = async <K extends keyof QuickbooksTypes>(
-    entityName: EntityName,
+  delete = async <K extends QuickbookEntityType>(
+    entityName: K,
     idOrEntity: string | number | Partial<QuickbooksTypes[K]>
   ) => {
     // requires minimum Id and SyncToken
@@ -1062,18 +1112,22 @@ class Quickbooks {
     let url = "/" + entityName.toLowerCase();
     let qs = { operation: "delete" };
     if (_.isObject(idOrEntity)) {
-      return this.request<DeleteResponse>(
+      return this.request<{
+        [P in keyof (DeleteResponse<K> & HeaderAdditions)]: (DeleteResponse<K> & HeaderAdditions)[P];
+      }>(
         "post",
-        { url: url, qs: qs },
+        { url: url, qs: qs, returnHeadersInBody: true },
         idOrEntity
       );
     } else {
       const entity = await this.read(entityName, idOrEntity);
-      return this.request<DeleteResponse>("post", { url: url, qs: qs }, entity);
+      return this.request<{
+        [P in keyof (DeleteResponse<K> & HeaderAdditions)]: (DeleteResponse<K> & HeaderAdditions)[P];
+      }>("post", { url: url, qs: qs, returnHeadersInBody: true }, entity);
     }
   };
 
-  void = async <K extends keyof QuickbooksTypes>(
+  void = async <K extends QuickbookEntityType>(
     entityName: K,
     idOrEntity: string | number | Partial<QuickbooksTypes[K]>
   ) => {
@@ -1083,22 +1137,22 @@ class Quickbooks {
     let qs = { operation: "void" };
     if (_.isObject(idOrEntity)) {
       return this.request<{
-        [P in keyof (BaseRequest &
-          Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+        [P in keyof (BaseRequest & HeaderAdditions &
+          Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
             Record<K, QuickbooksTypes[K]>)[P];
-      }>("post", { url: url, qs: qs }, idOrEntity);
+      }>("post", { url: url, qs: qs, returnHeadersInBody: true }, idOrEntity);
     } else {
       const entity = await this.read(entityName, idOrEntity);
       return this.request<{
-        [P in keyof (BaseRequest &
-          Record<K, QuickbooksTypes[K]>)]: (BaseRequest &
+        [P in keyof (BaseRequest & HeaderAdditions &
+          Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
             Record<K, QuickbooksTypes[K]>)[P];
-      }>("post", { url: url, qs: qs }, entity);
+      }>("post", { url: url, qs: qs, returnHeadersInBody: true }, entity);
     }
   };
 
   // **********************  Query Api **********************
-  query = async <K extends keyof QuickbooksTypes>(
+  query = async <K extends QuickbookEntityType>(
     entityName: K,
     queryInput?: QueryInput | null
   ) => {
@@ -1117,13 +1171,8 @@ class Quickbooks {
     }
 
     const data = await this.request<{
-      QueryResponse: {
-        [P in keyof (QueryRequest &
-          Record<K, Array<QuickbooksTypes[K]>>)]?: (QueryRequest &
-            Record<K, Array<QuickbooksTypes[K]>>)[P];
-      };
-      time: string;
-    }>("get", { url: url, qs: qs }, null);
+      [P in keyof (QueryResponse<K> & HeaderAdditions)]: (QueryResponse<K> & HeaderAdditions)[P];
+    }>("get", { url: url, qs: qs, returnHeadersInBody: true }, null);
     if (
       queryData?.fetchAll &&
       queryData?.limit &&
@@ -1154,7 +1203,7 @@ class Quickbooks {
     return data;
   };
 
-  queryCount = async <K extends keyof QuickbooksTypes>(
+  queryCount = async <K extends QuickbookEntityType>(
     entityName: K,
     queryInput?: QueryInput | null
   ) => {
@@ -1171,7 +1220,7 @@ class Quickbooks {
     return this.request<{
       QueryResponse: { totalCount: number };
       time: string;
-    }>("get", { url: url, qs: qs }, null);
+    } & HeaderAdditions>("get", { url: url, qs: qs, returnHeadersInBody: true }, null);
   };
 
   // **********************  Report Api **********************
@@ -1230,21 +1279,27 @@ class Quickbooks {
    * @param  entities - Comma separated list or JavaScript array of entities to search for changes
    * @param  since - JS Date object, JS Date milliseconds, or string in ISO 8601 - to look back for changes until
    */
-  changeDataCapture = (
-    entities: string | string[],
-    since: Date | number
+  changeDataCapture = <K extends QuickbookEntityType | (QuickbookEntityType)[]>(
+    entities: K,
+    since: Date | number | string
   ) => {
-    const dateToCheck = getDateCheck(since);
-    if (!dateToCheck) {
-      throw new Error("Invalid date passed to changeDataCapture");
-    }
+    const dateString = getDateString(since);
 
     let url = "/cdc";
     let qs = {
       entities: typeof entities === "string" ? entities : entities.join(","),
-      changedSince: new Date(dateToCheck).toISOString(),
+      changedSince: dateString,
     };
-    return this.request("get", { url: url, qs: qs }, null);
+    return this.request<{
+      CDCResponse: {
+        QueryResponse: ({
+          startPosition?: number
+          maxResults?: number
+          totalCount?: number
+        } & Pick<Partial<QuickbooksTypesArrayed>, K extends Array<any> ? K[number] : K>)[]
+      }[]
+      time: string
+    } & HeaderAdditions>("get", { url: url, qs: qs, returnHeadersInBody: true }, null);
   };
 
   /**
@@ -1262,50 +1317,43 @@ class Quickbooks {
    *
    * @param filename - the name of the file
    * @param contentType - the mime type of the file
-   * @param stream - ReadableStream of file contents
+   * @param buffer - Buffer of file contents
    * @param entityType - optional string name of the QBO entity the Attachable will be linked to (e.g. Invoice)
    * @param entityId - optional Id of the QBO entity the Attachable will be linked to
    */
   upload = async (
     filename: string,
     contentType: string,
-    stream: ReadableStream,
-    entityType: (something: any, somethingElse: any) => any | string | null,
-    entityId?: number
+    buffer: Buffer,
+    entityType: QuickbookEntityType,
+    entityId: string | number
   ) => {
-    const opts = {
-      url: "/upload",
-      formData: {
-        file_content_01: {
-          value: stream,
-          options: {
-            filename: filename,
-            contentType: contentType,
+    const formData = new FormData();
+    formData.append("file_metadata_01", JSON.stringify({
+      AttachableRef: [
+        {
+          EntityRef: {
+            type: entityType,
+            value: entityId + "",
           },
         },
-      },
-    };
-    const data = await this.request("post", opts, null);
-    const dataUnwraped = this.unwrap(data, "AttachableResponse");
-    if (dataUnwraped[0].Fault) {
-      return entityType(dataUnwraped[0], null);
-    } else if (_.isFunction(entityType)) {
-      return entityType(null, dataUnwraped[0].Attachable);
-    } else {
-      const id = dataUnwraped[0].Attachable.Id;
-      return this.updateAttachable({
-        Id: id,
-        SyncToken: "0",
-        AttachableRef: [
-          {
-            EntityRef: {
-              type: entityType,
-              value: entityId + "",
-            },
-          },
-        ],
-      });
+      ],
+      ContentType: contentType,
+      FileName: filename
+    }), { filename: "attachment.json", contentType: "application/json" });
+    formData.append("file_content_01", buffer, { filename, contentType });
+
+    const response = await this.request<any>("post", { url: "/upload", formData }, null);
+
+    if (response?.AttachableResponse?.[0]?.Fault) {
+      const fault = response.AttachableResponse[0];
+      throw new QBResponseError(`Error of type ${fault.Fault.type}`, fault);
     }
+    return response as {
+      AttachableResponse: {
+        Attachable: QuickbooksTypes[EntityName.Attachable]
+      }[]
+    };
   };
 
   /**

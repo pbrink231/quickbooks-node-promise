@@ -86,6 +86,7 @@ const main = async () => {
     processTypesFile();
     return;
   }
+  console.log("Incorrect arg given");
 };
 
 main();

@@ -91,6 +91,14 @@ export const getDateCheck = (dateItem: Date | number) => {
   return dateToCheck;
 };
 
+export const getDateString = (dateItem: Date | number | string | null) => {
+  if (dateItem === null) return new Date().toISOString();
+  if (typeof dateItem == "string") return dateItem;
+  const dateToCheck = getDateCheck(dateItem);
+  if (!dateToCheck) return new Date().toISOString();
+  return new Date(dateToCheck).toISOString();
+}
+
 /**
  * Helper Method to check token expiry { set Token Object }
  */

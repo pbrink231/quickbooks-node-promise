@@ -1,11 +1,13 @@
 {
   "name": "quickbooks-node-promise",
-  "version": "3.3.5",
+  "version": "3.3.11",
   "description": "Connect to QuickBooks Online API with OAuth 2 with typescript on entities",
   "author": "Peter Brink",
   "license": "ISC",
   "types": "dist/index.d.ts",
-  "files": ["dist/**"],
+  "files": [
+    "dist/**"
+  ],
   "main": "dist/index.js",
   "keywords": [
     "quickbooks",
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "csrf": "^3.1.0",
+    "form-data": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
     "node-fetch": "^2.7.0",
     "qs": "^6.11.2",
@@ -41,7 +44,9 @@
   "scripts": {
     "dev": "ts-node example/server.ts",
     "scrape": "ts-node quickbooks-type-scrape/index.ts",
+    "scrape:process": "ts-node quickbooks-type-scrape/index.ts process",
     "prepublish": "tsc",
-    "sendnpm": "npm run prepublish && npm publish"
+    "prepare": "tsc",
+    "pushnpm": "npm run prepublish && npm publish"
   }
 }

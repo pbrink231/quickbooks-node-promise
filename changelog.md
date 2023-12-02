@@ -1,3 +1,39 @@
+## [3.3.11]
+
+- Changed /upload endpoint for attachments to use Buffer instead of stream
+- Working upload of attachments
+- Added typescript for upload return
+- fixed typescript on attachmentRef
+
+## [3.3.10]
+
+- Added special header for CDC
+- Added typing for CDC endpoint
+- Updated server example with cdc
+- Updated readme with cdc information
+
+## [3.3.9]
+
+- Added in special headers to most returns to allow for easier debugging
+
+## [3.3.8]
+
+- exported store interfaces
+
+## [3.3.7]
+
+- Added state as optional paramater to authorize url
+- Updated readme with new authorize url paramater
+- Updated example serveer
+
+## [3.3.6]
+
+- Updated processing to allow forced types
+- Allow type meta and description changes
+- Fixed TelephoneNumber to be combined type
+- Fixed Customer PreferredDeliveryMethod to be literal type
+- Fixed Vendor_OtherContactInfo_ContactInfo Telephone to be string and not TelephoneNumber type
+
 ## [3.3.5]
 
 - Changed readme config setup to say function store instaed of class store for the example

@@ -1,28 +1,46 @@
 export const indent = "  ";
 
+export const forceCombineTypes: string[] = ['TelephoneNumber']
+
 export const typeAttributeFixes: {
   [typeName: string]: {
-    [attributeName: string]: {
-      interfaceValue?: string;
-      fixedName?: string;
-      fixedType?: string;
+    attributeReplacements?: {
+      [attributeName: string]: {
+        replacedInterface?: string;
+        fixedName?: string;
+        fixedType?: string;
+        fixedMetaData?: string;
+        fixedDescription?: string;
+      };
     };
-  };
+  }
 } = {
+  TelephoneNumber: {
+    attributeReplacements: {
+      FreeFormNumber: {
+        fixedMetaData: "Optional ,max character: Maximum of 20/30 chars"
+      },
+    },
+  },
   Invoice_Line_SubTotalLine: {
-    SubtotalLineDetail: {
-      fixedName: "SubTotalLineDetail",
+    attributeReplacements: {
+      SubtotalLineDetail: {
+        fixedName: "SubTotalLineDetail",
+      }
     },
   },
   Preferences_AccountingInfoPrefs: {
-    FirstMonthOfFiscalYear: {
-      fixedType:
-        '"January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December"',
-    },
+    attributeReplacements: {
+      FirstMonthOfFiscalYear: {
+        fixedType:
+          '"January" | "February" | "March" | "April" | "May" | "June" | "July" | "August" | "September" | "October" | "November" | "December"',
+      },
+    }
   },
   Preferences: {
-    OtherPrefs: {
-      interfaceValue: `${indent}/**
+    attributeReplacements: {
+      OtherPrefs: {
+        replacedInterface: `${indent}/**
   ${indent} * Other Preferences
   ${indent} *
   ${indent} * Other preferences that are not listed in the Preferences list
@@ -30,19 +48,36 @@ export const typeAttributeFixes: {
   ${indent} *
   ${indent} * DESCRIPTION: Specifies extension of Preference resource to allow extension of Name-Value pair based extension at the top level.
   ${indent} */
-  ${indent}OtherPrefs?: { Name: string, Value: string}[];\n`,
-    },
+  ${indent}OtherPrefs?: { Name: string, Value: string }[];\n`,
+      },
+    }
   },
   CompanyInfo: {
-    NameValue: {
-      interfaceValue: `${indent}/**
+    attributeReplacements: {
+      NameValue: {
+        replacedInterface: `${indent}/**
   ${indent} * META: Optional
   ${indent} *
   ${indent} * DESCRIPTION: Any other preference not covered with the standard set of attributes. See Data Services Extensions, below, for special reserved name/value pairs.
   ${indent} * NameValue.Name--Name of the element.
   ${indent} * NameValue.Value--Value of the element.
   ${indent} */
-  ${indent}NameValue?: { Name: string, Value: string}[];\n`,
+  ${indent}NameValue?: { Name: string, Value: string }[];\n`,
+      },
+    }
+  },
+  Customer: {
+    attributeReplacements: {
+      PreferredDeliveryMethod: {
+        fixedType: '"Print" | "Email" | "None"',
+      },
+    },
+  },
+  Vendor_OtherContactInfo_ContactInfo: {
+    attributeReplacements: {
+      Telephone: {
+        fixedType: 'string',
+      },
     },
   },
 };
@@ -92,8 +127,8 @@ export const typeConversion: {
     addOnDescription: "Integer as String",
   },
   "Internal use": { newType: "any", addOnDescription: "Internal use" },
-  TelephoneNumber: { newType: "string", addOnDescription: "Telephone Number" },
   CustomField: { isList: true },
+  Attachable_AttachableRef: { isList: true },
 };
 
 export const enumValueFixes: { [key: string]: string } = {
