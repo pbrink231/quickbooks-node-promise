@@ -46,6 +46,7 @@
     "scrape": "ts-node quickbooks-type-scrape/index.ts",
     "scrape:process": "ts-node quickbooks-type-scrape/index.ts process",
     "prepublish": "tsc",
+    "prepare": "tsc",
     "pushnpm": "npm run prepublish && npm publish"
   }
 }
