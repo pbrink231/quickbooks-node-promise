@@ -5,6 +5,7 @@ import Quickbooks, {
   QBStoreStrategy,
   QueryData,
   QueryDataWithProperties,
+  QuickbookEntityType,
   StoreGetTokenData,
   StoreSaveTokenData,
   StoreTokenData,
@@ -13,6 +14,8 @@ import Quickbooks, {
 import "dotenv/config";
 import express from "express";
 import { Invoice } from "../src/qbTypes";
+import * as path from "path";
+import * as fs from "fs";
 
 const { NODE_ENV, QB_APP_KEY, QB_APP_SECRET, QB_REDIRECT_URL, QB_USE_PROD, QB_WEBHOOK_VERIFIER_TOKEN } =
   process.env;
@@ -540,6 +543,36 @@ app.post("/deleteInvoice", async (req, res) => {
   }
 });
 
+app.post("/uploadInvoiceFile", async (req, res) => {
+  const realmID = req.query.realmID ?? usingRealm;
+  const entityID = req.query.entityID;
+
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("realmID is required");
+    return;
+  }
+  if (!entityID || typeof entityID !== "string") {
+    res.status(500).send("entityID is required");
+    return;
+  }
+
+
+  try {
+    const qbo = new Quickbooks(QBAppconfig, realmID);
+
+    const filePath = path.join(__dirname, 'sample.pdf');
+    const fileData = fs.readFileSync(filePath);
+    const uploadResponse = await qbo.upload('sample.pdf', 'application/pdf', fileData, 'Invoice', entityID);
+    console.log("uploadResponse", uploadResponse);
+    const firstAttchment = uploadResponse.AttachableResponse[0].Attachable;
+    const attachableInvoiceId = firstAttchment?.AttachableRef?.[0].EntityRef?.value
+    const fileName = firstAttchment?.FileName
+    res.send(uploadResponse);
+  } catch (err) {
+    console.log("err", err);
+    res.send(err);
+  }
+});
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)
