@@ -23,7 +23,7 @@ import { v4 as uuidv4 } from "uuid";
 import _, { any } from "underscore";
 import qs from "qs";
 import jwt from "jsonwebtoken";
-import fetch, { Response } from "node-fetch";
+import fetch, { Response, RequestInit } from "node-fetch";
 import FormData from "form-data";
 import Tokens from "csrf";
 import crypto from "crypto";
@@ -986,7 +986,7 @@ class Quickbooks {
       opts.body = options.formData;
     }
 
-    const fetchOptions = {
+    const fetchOptions: RequestInit = {
       method: verb,
       headers: opts.headers,
       body: opts.body,
@@ -1325,8 +1325,8 @@ class Quickbooks {
     filename: string,
     contentType: string,
     buffer: Buffer,
-    entityType: (something: any, somethingElse: any) => any | string | null,
-    entityId?: number
+    entityType: QuickbookEntityType,
+    entityId: string | number
   ) => {
     const formData = new FormData();
     formData.append("file_metadata_01", JSON.stringify({
