@@ -1,3 +1,10 @@
+## [3.3.11]
+
+- Changed /upload endpoint for attachments to use Buffer instead of stream
+- Working upload of attachments
+- Added typescript for upload return
+- fixed typescript on attachmentRef
+
 ## [3.3.10]
 
 - Added special header for CDC
