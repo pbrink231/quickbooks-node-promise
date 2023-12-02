@@ -52,9 +52,9 @@ export interface WebhookEntity {
   deletedID?: string;
 }
 
-type QuickbooksTypesKeys = keyof QuickbooksTypes;
+export type QuickbookEntityType = keyof QuickbooksTypes;
 type QuickbooksTypesArrayed = {
-  [P in QuickbooksTypesKeys]: QuickbooksTypes[P][];
+  [P in QuickbookEntityType]: QuickbooksTypes[P][];
 };
 
 export interface WebhookEventNotification {
@@ -203,15 +203,15 @@ export enum ReportName {
   VendorExpenses = "VendorExpenses",
 }
 
-export type CreateInput<T extends keyof QuickbooksTypes> = Partial<
+export type CreateInput<T extends QuickbookEntityType> = Partial<
   QuickbooksTypes[T]
 >;
 
-export type UpdateInput<T extends keyof QuickbooksTypes> = Partial<
+export type UpdateInput<T extends QuickbookEntityType> = Partial<
   QuickbooksTypes[T]
 >;
 
-export type DeleteInput<T extends keyof QuickbooksTypes> =
+export type DeleteInput<T extends QuickbookEntityType> =
   | number
   | string
   | Partial<QuickbooksTypes[T]>;
@@ -239,13 +239,13 @@ interface HeaderAdditions {
   }
 }
 
-type QueryRequest<K extends keyof QuickbooksTypes> = {
+type QueryRequest<K extends QuickbookEntityType> = {
   startPosition: number;
   totalCount: number;
   maxResults: number;
 } & Record<K, Array<QuickbooksTypes[K]>>
 
-type QueryResponse<K extends keyof QuickbooksTypes> = {
+type QueryResponse<K extends QuickbookEntityType> = {
   QueryResponse: {
     [P in keyof (QueryRequest<K>)]?: (QueryRequest<K>)[P];
   }
@@ -311,13 +311,13 @@ interface GetExchangeRateOptions {
   asOfDate?: string;
 }
 
-type DeleteResponse<K extends keyof QuickbooksTypes> = Record<K, {
+type DeleteResponse<K extends QuickbookEntityType> = Record<K, {
   status: string
   domain: string
   Id: string
 }>;
 
-type DeleteNewResponse<K extends keyof QuickbooksTypes> = {
+type DeleteNewResponse<K extends QuickbookEntityType> = {
   [P in keyof (BaseRequest & HeaderAdditions & DeleteResponse<K>)]: (BaseRequest & HeaderAdditions & DeleteResponse<K>)[P];
 }
 
@@ -1063,7 +1063,7 @@ class Quickbooks {
   };
 
   // **********************  CRUD Api **********************
-  create = <K extends keyof QuickbooksTypes>(
+  create = <K extends QuickbookEntityType>(
     entityName: K,
     entity: Partial<QuickbooksTypes[K]>
   ) => {
@@ -1074,7 +1074,7 @@ class Quickbooks {
     }>("post", { url: url, returnHeadersInBody: true }, entity);
   };
 
-  read = <K extends keyof QuickbooksTypes>(
+  read = <K extends QuickbookEntityType>(
     entityName: K,
     id: string | number | null,
     options?: object
@@ -1087,7 +1087,7 @@ class Quickbooks {
     }>("get", { url: url, qs: options, returnHeadersInBody: true }, null);
   };
 
-  update = <K extends Exclude<keyof QuickbooksTypes, EntityName.Exchangerate>>(
+  update = <K extends Exclude<QuickbookEntityType, EntityName.Exchangerate>>(
     entityName: K,
     entity: Partial<QuickbooksTypes[K]>
   ) => {
@@ -1103,7 +1103,7 @@ class Quickbooks {
     }>("post", opts, entity);
   };
 
-  delete = async <K extends keyof QuickbooksTypes>(
+  delete = async <K extends QuickbookEntityType>(
     entityName: K,
     idOrEntity: string | number | Partial<QuickbooksTypes[K]>
   ) => {
@@ -1127,7 +1127,7 @@ class Quickbooks {
     }
   };
 
-  void = async <K extends keyof QuickbooksTypes>(
+  void = async <K extends QuickbookEntityType>(
     entityName: K,
     idOrEntity: string | number | Partial<QuickbooksTypes[K]>
   ) => {
@@ -1152,7 +1152,7 @@ class Quickbooks {
   };
 
   // **********************  Query Api **********************
-  query = async <K extends keyof QuickbooksTypes>(
+  query = async <K extends QuickbookEntityType>(
     entityName: K,
     queryInput?: QueryInput | null
   ) => {
@@ -1203,7 +1203,7 @@ class Quickbooks {
     return data;
   };
 
-  queryCount = async <K extends keyof QuickbooksTypes>(
+  queryCount = async <K extends QuickbookEntityType>(
     entityName: K,
     queryInput?: QueryInput | null
   ) => {
@@ -1279,7 +1279,7 @@ class Quickbooks {
    * @param  entities - Comma separated list or JavaScript array of entities to search for changes
    * @param  since - JS Date object, JS Date milliseconds, or string in ISO 8601 - to look back for changes until
    */
-  changeDataCapture = <K extends keyof QuickbooksTypes | (keyof QuickbooksTypes)[]>(
+  changeDataCapture = <K extends QuickbookEntityType | (QuickbookEntityType)[]>(
     entities: K,
     since: Date | number | string
   ) => {
