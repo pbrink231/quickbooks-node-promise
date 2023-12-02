@@ -128,6 +128,7 @@ export const typeConversion: {
   },
   "Internal use": { newType: "any", addOnDescription: "Internal use" },
   CustomField: { isList: true },
+  Attachable_AttachableRef: { isList: true },
 };
 
 export const enumValueFixes: { [key: string]: string } = {

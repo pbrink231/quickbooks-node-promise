@@ -313,7 +313,7 @@ export interface Attachable {
    *
    * DESCRIPTION: Specifies the transaction object to which this attachable file is to be linked.
    */
-  AttachableRef?: Attachable_AttachableRef;
+  AttachableRef?: Attachable_AttachableRef[];
   /**
    * META: Optional ,max character: max 100 chars
    *
