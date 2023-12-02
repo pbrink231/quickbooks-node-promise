@@ -1317,14 +1317,14 @@ class Quickbooks {
    *
    * @param filename - the name of the file
    * @param contentType - the mime type of the file
-   * @param stream - ReadableStream of file contents
+   * @param buffer - Buffer of file contents
    * @param entityType - optional string name of the QBO entity the Attachable will be linked to (e.g. Invoice)
    * @param entityId - optional Id of the QBO entity the Attachable will be linked to
    */
   upload = async (
     filename: string,
     contentType: string,
-    stream: ReadableStream,
+    buffer: Buffer,
     entityType: (something: any, somethingElse: any) => any | string | null,
     entityId?: number
   ) => {
@@ -1341,7 +1341,7 @@ class Quickbooks {
       ContentType: contentType,
       FileName: filename
     }), { filename: "attachment.json", contentType: "application/json" });
-    formData.append("file_content_01", stream);
+    formData.append("file_content_01", buffer, { filename, contentType });
 
     const data = await this.request("post", { url: "/upload", formData }, null);
   };
