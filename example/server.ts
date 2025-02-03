@@ -574,6 +574,23 @@ app.post("/uploadInvoiceFile", async (req, res) => {
   }
 });
 
+app.get("/userinfo", async (req, res) => {
+  const realmID = req.query.realmID ?? usingRealm;
+  if (!realmID || typeof realmID !== "string") {
+    res.status(500).send("realmID is required");
+    return;
+  }
+
+  const qbo = new Quickbooks(QBAppconfig, realmID);
+
+  try {
+    const userInfo = await qbo.getUserInfo();
+    res.send(userInfo);
+  } catch (err: any) {
+    res.send(err);
+  }
+});
+
 app.listen(port, () => {
   console.log(`Listening on port ${port}`)
   console.log(`try http://localhost:${port}/requestToken`)
