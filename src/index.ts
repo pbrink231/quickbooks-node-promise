@@ -202,6 +202,23 @@ export enum ReportName {
   VendorExpenses = "VendorExpenses",
 }
 
+export type UserInfo = {
+  sub: string;
+  givenName: string;
+  familyName: string;
+  email: string;
+  emailVerified: boolean;
+  phoneNumber: string;
+  phoneNumberVerified: boolean;
+  address: {
+    streetAddress: string;
+    locality: string;
+    region: string;
+    postalCode: string;
+    country: string;
+  };
+};
+
 export type CreateInput<T extends QuickbookEntityType> = Partial<
   QuickbooksTypes[T]
 >;
@@ -1259,9 +1276,14 @@ class Quickbooks {
   /**
    * Get user info (OAuth2).
    *
+   * fields returned based on scope
+   * givenName, familyName - profile scope
+   * Email, EmailVerified - email scope
+   * Phone, PhoneVerified - phone scope
+   * Address - address scope
    */
   getUserInfo = () => {
-    return this.request("get", { 
+    return this.request<UserInfo>("get", { 
       url: Quickbooks.getUserInfoEndpoint(this.config.useProduction), 
       fullurl: true
     }, null);

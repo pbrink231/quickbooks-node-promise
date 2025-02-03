@@ -2,6 +2,10 @@
 TODO: Allow download of attachment
 TODO: Allow listing of attachments by entity
 
+## [3.3.14]
+
+- Added typescript to user info return
+
 ## [3.3.13]
 
 - Removed lodash library

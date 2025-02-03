@@ -1,6 +1,6 @@
 {
   "name": "quickbooks-node-promise",
-  "version": "3.3.13",
+  "version": "3.3.14",
   "description": "Connect to QuickBooks Online API with OAuth 2 with typescript on entities",
   "author": "Peter Brink",
   "license": "ISC",
