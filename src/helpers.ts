@@ -36,10 +36,7 @@ export const getConfigWithStoreMethod = (appConfig: AppConfig): AppConfigClean =
       debug: appConfig.debug === "true" || appConfig.debug === true ? true : false,
       autoRefresh: appConfig.autoRefresh === false ? false : true,
       autoRefreshBufferSeconds: appConfig.autoRefreshBufferSeconds ? appConfig.autoRefreshBufferSeconds : Quickbooks.EXPIRATION_BUFFER_SECONDS,
-      useProduction: useProduction,
-      endpoint: useProduction
-      ? Quickbooks.V3_ENDPOINT_BASE_URL.replace("sandbox-", "")
-      : Quickbooks.V3_ENDPOINT_BASE_URL
+      useProduction: useProduction
     }
 
 

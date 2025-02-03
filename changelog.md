@@ -1,3 +1,13 @@
+
+TODO: Allow download of attachment
+TODO: Allow listing of attachments by entity
+
+## [3.3.12]
+
+- Added download of file id
+- Fixed getUserInfo endpoint to work with production
+- Added get user info to example server
+
 ## [3.3.11]
 
 - Changed /upload endpoint for attachments to use Buffer instead of stream
