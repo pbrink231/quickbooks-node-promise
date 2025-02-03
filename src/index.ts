@@ -436,7 +436,6 @@ export interface AppConfigCleanBase extends AppConfigBase {
   debug: boolean;
   autoRefresh: boolean;
   autoRefreshBufferSeconds: number;
-  endpoint: string;
 }
 
 export type AppConfigClean = AppConfigCleanBase &
@@ -502,12 +501,24 @@ class Quickbooks {
     }
 
     if ("production" !== process.env.NODE_ENV && this.config.debug) {
-      console.log("using enpoint for calls", this.config.endpoint);
+      console.log("using enpoint for calls", Quickbooks.getApiEndpoint(this.config.useProduction));
     }
   }
 
   static generateCsrf = () => {
     return csrf.create(csrf.secretSync())
+  };
+
+  static getApiEndpoint = (useProduction: boolean) => {
+    return useProduction
+    ? Quickbooks.V3_ENDPOINT_BASE_URL.replace("sandbox-", "")
+    : Quickbooks.V3_ENDPOINT_BASE_URL;
+  };
+
+  static getUserInfoEndpoint = (useProduction: boolean) => {
+    return useProduction
+    ? Quickbooks.USER_INFO_URL.replace("sandbox-", "")
+    : Quickbooks.USER_INFO_URL;
   };
 
   /**
@@ -961,7 +972,7 @@ class Quickbooks {
     if (options.fullurl) {
       url = options.url;
     } else {
-      url = this.config.endpoint + this.realmID + options.url;
+      url = Quickbooks.getApiEndpoint(this.config.useProduction) + this.realmID + options.url;
     }
 
     if (entity && entity.allowDuplicateDocNum) {
@@ -1046,7 +1057,7 @@ class Quickbooks {
       qsv.minorversion = this.config.minorversion;
     }
 
-    const sendUrl = `${this.config.endpoint}${this.realmID
+    const sendUrl = `${Quickbooks.getApiEndpoint(this.config.useProduction)}${this.realmID
       }/${entityName.toLowerCase()}/${id}/pdf?${qs.stringify(qsv)}`;
 
     if ("production" !== process.env.NODE_ENV && this.config.debug) {
@@ -1251,11 +1262,10 @@ class Quickbooks {
    *
    */
   getUserInfo = () => {
-    let useUrl = this.useProduction
-      ? Quickbooks.USER_INFO_URL.replace("sandbox-", "")
-      : Quickbooks.USER_INFO_URL;
-
-    return this.request("get", { url: useUrl, fullurl: true }, null);
+    return this.request("get", { 
+      url: Quickbooks.getUserInfoEndpoint(this.config.useProduction), 
+      fullurl: true
+    }, null);
   };
 
   /**
@@ -1355,6 +1365,18 @@ class Quickbooks {
       }[]
     };
   };
+
+  /**
+   * Downloads the file associated with the specified Attachable.
+   */
+  download = async (id: string | number) => {
+    const response = await this.request<any>("get", { url: `/download/${id}` }, null);
+    if (response?.AttachableResponse?.[0]?.Fault) {
+      const fault = response.AttachableResponse[0];
+      throw new QBResponseError(`Error of type ${fault.Fault.type}`, fault);
+    }
+    return response;
+  }
 
   /**
    * Creates the Account in QuickBooks
