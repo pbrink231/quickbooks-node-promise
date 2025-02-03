@@ -20,7 +20,6 @@
  */
 
 import { v4 as uuidv4 } from "uuid";
-import _, { any } from "underscore";
 import qs from "qs";
 import jwt from "jsonwebtoken";
 import fetch, { Response, RequestInit } from "node-fetch";
@@ -1122,7 +1121,7 @@ class Quickbooks {
     // if passed Id as numeric value then grab entity and send it to delete
     let url = "/" + entityName.toLowerCase();
     let qs = { operation: "delete" };
-    if (_.isObject(idOrEntity)) {
+    if (typeof idOrEntity === 'object') {
       return this.request<{
         [P in keyof (DeleteResponse<K> & HeaderAdditions)]: (DeleteResponse<K> & HeaderAdditions)[P];
       }>(
@@ -1146,7 +1145,7 @@ class Quickbooks {
     // if passed Id as numeric value then grab entity and send it to delete
     const url = "/" + entityName.toLowerCase();
     let qs = { operation: "void" };
-    if (_.isObject(idOrEntity)) {
+    if (typeof idOrEntity === 'object') {
       return this.request<{
         [P in keyof (BaseRequest & HeaderAdditions &
           Record<K, QuickbooksTypes[K]>)]: (BaseRequest & HeaderAdditions &
