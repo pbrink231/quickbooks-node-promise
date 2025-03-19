@@ -19,6 +19,9 @@
     "type": "git",
     "url": "git+https://github.com/pbrink231/quickbooks-node-promise.git"
   },
+  "engines": {
+    "node": ">=21"
+  },
   "dependencies": {
     "csrf": "^3.1.0",
     "form-data": "^4.0.0",
