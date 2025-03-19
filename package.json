@@ -1,6 +1,6 @@
 {
   "name": "quickbooks-node-promise",
-  "version": "3.3.14",
+  "version": "4.0.0",
   "description": "Connect to QuickBooks Online API with OAuth 2 with typescript on entities",
   "author": "Peter Brink",
   "license": "ISC",
@@ -19,18 +19,19 @@
     "type": "git",
     "url": "git+https://github.com/pbrink231/quickbooks-node-promise.git"
   },
+  "engines": {
+    "node": ">=21"
+  },
   "dependencies": {
     "csrf": "^3.1.0",
     "form-data": "^4.0.0",
     "jsonwebtoken": "^9.0.2",
-    "node-fetch": "^2.7.0",
     "qs": "^6.11.2",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.19",
     "@types/jsonwebtoken": "^9.0.3",
-    "@types/node-fetch": "^2.6.6",
     "@types/uuid": "^9.0.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",

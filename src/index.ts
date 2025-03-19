@@ -22,7 +22,6 @@
 import { v4 as uuidv4 } from "uuid";
 import qs from "qs";
 import jwt from "jsonwebtoken";
-import fetch, { Response, RequestInit } from "node-fetch";
 import FormData from "form-data";
 import Tokens from "csrf";
 import crypto from "crypto";
@@ -665,7 +664,7 @@ class Quickbooks {
     if (!response.ok) {
       throw new QBFetchError(response.statusText, response);
     }
-    const newTokenData: TokenData = await response.json();
+    const newTokenData: TokenData = await response.json() as TokenData;
     return this.saveToken(newTokenData);
   };
 
@@ -786,7 +785,7 @@ class Quickbooks {
     if (!response.ok) {
       throw new QBFetchError(response.statusText, response);
     }
-    const newTokenData: TokenData = await response.json();
+    const newTokenData: TokenData = await response.json() as TokenData;
     return this.saveToken(newTokenData);
 
   }
@@ -895,7 +894,7 @@ class Quickbooks {
     return fetch(Quickbooks.JWKS_URL, fetchOptions)
       .then((response) => {
         if (response.ok) {
-          return response.json();
+          return response.json() as Promise<{ keys: { kid: string, n: string, e: string }[] }>;
         } else {
           throw new QBFetchError(response.statusText, response);
         }
@@ -1016,7 +1015,7 @@ class Quickbooks {
     const fetchOptions: RequestInit = {
       method: verb,
       headers: opts.headers,
-      body: opts.body,
+      body: opts.body as BodyInit,
     };
     url = `${url}?${qs.stringify(opts.qs)}`;
 
@@ -1027,8 +1026,7 @@ class Quickbooks {
 
     const response = await fetch(url, fetchOptions);
     if (response.ok) {
-
-      const returnedObject: T = await response.json();
+      const returnedObject: T = await response.json() as T;
       if (opts.returnHeadersInBody) {
         const specialHeaders: HeaderAdditions['specialHeaders'] = {
           intuitTid: response.headers.get("intuit_tid"),
@@ -1042,7 +1040,7 @@ class Quickbooks {
       return returnedObject;
     } else {
       try {
-        const body = await response.json();
+        const body = await response.json() as ResponseErrorJson & { Fault: { Error: boolean, type: string } };
         if (body?.Fault?.Error) {
           throw new QBResponseError(`Error of type ${body.Fault.type}`, body);
         }
@@ -1083,7 +1081,8 @@ class Quickbooks {
 
     const response = await fetch(sendUrl, fetchOptions);
     if (response.ok) {
-      return response.buffer();
+      const arrayBuffer = await response.arrayBuffer();
+      return Buffer.from(arrayBuffer);
     } else {
       throw new QBFetchError(response.statusText, response);
     }
