@@ -2,6 +2,11 @@
 TODO: Allow download of attachment
 TODO: Allow listing of attachments by entity
 
+## [3.3.15]
+
+- Added fixes for Purchase interface
+- Fixed void operation handling for Payment entity
+
 ## [3.3.14]
 
 - Added typescript to user info return
