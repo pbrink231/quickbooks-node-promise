@@ -80,6 +80,19 @@ export const typeAttributeFixes: {
       },
     },
   },
+  Purchase: {
+    attributeReplacements: {
+      EntityRef: {
+        replacedInterface: `${indent}/**
+  ${indent} * META: Optional
+  ${indent} *
+  ${indent} * DESCRIPTION: Specifies the party with whom an expense is associated. Can be **Customer**, **Vendor, or Employee.**
+  ${indent} * Query the corresponding name list resource of the associated type to determine the appropriate object for this reference. Use the **Id** and **DisplayName** values from that object for **EntityRef.value** and **EntityRef.name**, respectively. Set **EntityRef.type** to the type of object associated with this expense. For example, if this object represents a purchase from a vendor, then set **EntityRef.type** to **Vendor** and query the Vendor resource for the appropriate object to reference.
+  ${indent} */
+  ${indent}EntityRef?: { value: string, name?: string, type?: "Customer" | "Vendor" | "Employee" };\n`,
+      },
+    }
+  }
 };
 
 export const typeConversion: {

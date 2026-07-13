@@ -1161,7 +1161,10 @@ class Quickbooks {
     // requires minimum Id and SyncToken
     // if passed Id as numeric value then grab entity and send it to delete
     const url = "/" + entityName.toLowerCase();
-    let qs = { operation: "void" };
+    let qs: { operation: string; include?: string } = { operation: "void" };
+    if (entityName === EntityName.Payment) {
+      qs = { operation: "update", include: "void" };
+    }
     if (typeof idOrEntity === 'object') {
       return this.request<{
         [P in keyof (BaseRequest & HeaderAdditions &
@@ -2502,7 +2505,7 @@ class Quickbooks {
     if (typeof payment === "object") {
       payment.sparse = true;
     }
-    return this.update(EntityName.Payment, payment);
+    return this.void(EntityName.Payment, payment);
   };
 
   /**
