@@ -2,3 +2,4 @@
 node_modules
 jsdoc.md
 dist/
+.npmrc
